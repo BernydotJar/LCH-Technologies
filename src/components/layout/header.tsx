@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Menu, MountainIcon } from 'lucide-react';
+import { ThemeToggleButton } from '@/components/theme-toggle-button';
 
 export default function Header() {
   const navItems = [
@@ -30,32 +31,35 @@ export default function Header() {
             </Link>
           ))}
         </nav>
-        <div className="md:hidden">
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="outline" size="icon">
-                <Menu className="h-6 w-6" />
-                <span className="sr-only">Toggle navigation menu</span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right">
-              <div className="grid gap-4 p-4">
-                <Link href="/" className="flex items-center gap-2 text-lg font-semibold text-primary mb-4">
-                  <MountainIcon className="h-5 w-5" />
-                  <span>TechFront</span>
-                </Link>
-                {navItems.map((item) => (
-                  <Link
-                    key={item.label}
-                    href={item.href}
-                    className="text-muted-foreground hover:text-primary"
-                  >
-                    {item.label}
+        <div className="flex items-center gap-2">
+          <ThemeToggleButton />
+          <div className="md:hidden">
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="icon">
+                  <Menu className="h-6 w-6" />
+                  <span className="sr-only">Toggle navigation menu</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right">
+                <div className="grid gap-4 p-4">
+                  <Link href="/" className="flex items-center gap-2 text-lg font-semibold text-primary mb-4">
+                    <MountainIcon className="h-5 w-5" />
+                    <span>TechFront</span>
                   </Link>
-                ))}
-              </div>
-            </SheetContent>
-          </Sheet>
+                  {navItems.map((item) => (
+                    <Link
+                      key={item.label}
+                      href={item.href}
+                      className="text-muted-foreground hover:text-primary"
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
         </div>
       </div>
     </header>
