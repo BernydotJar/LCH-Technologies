@@ -1,3 +1,4 @@
+
 'use client';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -82,7 +83,7 @@ export default function Home() {
       itConsulting: 'Consulenza IT',
       learnMore: 'Saperne di Più',
       ctaTitle: 'Pronto ad Elevare la Tua Attività?',
-      ctaSubtitle: "Discutiamo di come TechFront può personalizzare soluzioni per affrontare le tue sfide e obiettivi unici.",
+      ctaSubtitle: "Discutiamo di come TechFront può personalizzare solutions per affrontare le tue sfide e obiettivi unici.",
       getInTouch: 'Mettiti in Contatto',
     }
   };
@@ -104,7 +105,12 @@ export default function Home() {
             <Button size="lg" asChild className="bg-accent text-accent-foreground hover:bg-accent/90 transition-all duration-300 transform hover:scale-105 shadow-md">
               <Link href="/solutions">{t.discoverButton} <ArrowRight className="ml-2 h-5 w-5" /></Link>
             </Button>
-            <Button size="lg" variant="outline" asChild className="text-primary-foreground border-primary-foreground hover:bg-primary-foreground hover:text-primary transition-all duration-300 transform hover:scale-105 shadow-md">
+            <Button 
+              size="lg" 
+              variant="outline" 
+              asChild 
+              className="bg-[#deb952] text-foreground border-[#deb952] hover:bg-[#c4962f] hover:text-foreground transition-all duration-300 transform hover:scale-105 shadow-md"
+            >
               <Link href="/contact">{t.requestDemoButton}</Link>
             </Button>
           </div>
@@ -186,3 +192,4 @@ export default function Home() {
     </div>
   );
 }
+
