@@ -1,8 +1,10 @@
+
 "use client";
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, MountainIcon } from 'lucide-react';
+import { Menu } from 'lucide-react';
+import TechFrontLogo from '@/components/icons/tech-front-logo'; // Import TechFrontLogo
 import {
   Select,
   SelectContent,
@@ -40,7 +42,7 @@ export default function Header({
     <header className="bg-background/80 backdrop-blur-md sticky top-0 z-50 w-full border-b">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2 text-xl font-semibold text-primary">
-          <MountainIcon className="h-6 w-6" />
+          <TechFrontLogo className="h-6 w-6" /> {/* Use TechFrontLogo */}
           <span>TechFront</span>
         </Link>
         <nav className="hidden md:flex gap-6 items-center">
@@ -78,7 +80,7 @@ export default function Header({
               <SheetContent side="right">
                 <div className="grid gap-4 p-4">
                   <Link href="/" className="flex items-center gap-2 text-lg font-semibold text-primary mb-4">
-                    <MountainIcon className="h-5 w-5" />
+                    <TechFrontLogo className="h-5 w-5" /> {/* Use TechFrontLogo */}
                     <span>TechFront</span>
                   </Link>
                   {navItems.map((item) => (
