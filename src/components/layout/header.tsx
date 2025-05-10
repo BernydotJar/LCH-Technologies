@@ -1,3 +1,4 @@
+
 'use client';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -20,6 +21,7 @@ export default function Header() {
     { href: '/blog', label: 'Blog' },
     { href: '/contact', label: 'Contact' },
     { href: '/meta-generator', label: 'AI Meta Tool' },
+    { href: '/chatbot', label: 'Chatbot' }, // Added Chatbot link
   ];
 
   const { language, setLanguage, languages } = useLanguage();

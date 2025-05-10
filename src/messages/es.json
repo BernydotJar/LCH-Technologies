@@ -1,3 +1,4 @@
+
 {
   "Hero": {
     "title": "Innovar. Transformar. Tener éxito.",
@@ -49,6 +50,7 @@
     "blog": "Blog",
     "contact": "Contacto",
     "aiMetaTool": "Herramienta IA Meta",
+    "chatbot": "Chatbot",
     "toggleNavigation": "Alternar menú de navegación"
   },
   "ContactPage": {
