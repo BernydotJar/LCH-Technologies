@@ -1,9 +1,8 @@
-'use client';
+"use client";
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Menu, MountainIcon } from 'lucide-react';
-import { ThemeToggleButton } from '@/components/theme-toggle-button';
 import {
   Select,
   SelectContent,
@@ -11,9 +10,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useLanguage } from '@/contexts/language-context';
+import * as React from 'react';
+import { ThemeToggleButton } from '@/components/theme-toggle-button'
 
-export default function Header() {
+export default function Header({
+  language,
+  setLanguage,
+}: { language: string; setLanguage: (lang: string) => void }) {
   const navItems = [
     { href: '/', label: 'Home' },
     { href: '/solutions', label: 'Solutions' },
@@ -22,7 +25,16 @@ export default function Header() {
     { href: '/meta-generator', label: 'AI Meta Tool' },
   ];
 
-  const { language, setLanguage, languages } = useLanguage();
+  // Assuming language state and data are managed here or passed as props
+  // This is a placeholder; you'll need to implement the actual state management
+  const languages = [ // Example data
+    { code: 'en', name: 'English' },
+    { code: 'es', name: 'Español' },
+    { code: 'it', name: 'Italiano' },
+  ];
+
+  // ... rest of your component
+
 
   return (
     <header className="bg-background/80 backdrop-blur-md sticky top-0 z-50 w-full border-b">
@@ -44,14 +56,17 @@ export default function Header() {
         </nav>
         <div className="flex items-center gap-2">
           <ThemeToggleButton />
-          <Select onValueChange={setLanguage} value={language}>
-            <SelectTrigger aria-label="Change language" />
+          <Select onValueChange={setLanguage} defaultValue={language}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Select Language" />
+            </SelectTrigger>
             <SelectContent>
               {languages.map((lang) => (
                 <SelectItem key={lang.code} value={lang.code}>{lang.name}</SelectItem>
               ))}
             </SelectContent>
           </Select>
+
           <div className="md:hidden">
             <Sheet>
               <SheetTrigger asChild>
