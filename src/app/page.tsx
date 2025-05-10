@@ -92,8 +92,8 @@ export default function Home() {
   return (
     <div className="flex flex-col items-center space-y-16 md:space-y-24">
       {/* Hero Section */}
-      <section className="w-full text-center py-16 md:py-24 rounded-xl shadow-lg bg-gradient-to-br from-primary via-primary/90 to-accent/30 text-primary-foreground">
-        <div className="container mx-auto px-4">
+      <section className="relative w-full text-center py-16 md:py-24 rounded-xl shadow-lg bg-gradient-to-br from-primary via-primary/90 to-accent/30 text-primary-foreground hero-section-flash overflow-hidden">
+        <div className="relative z-10 container mx-auto px-4">
           <h1 className="text-4xl md:text-6xl font-bold mb-6">
             {t.heroTitle}
           </h1>

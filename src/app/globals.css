@@ -100,3 +100,28 @@
     /* font-family removed to allow Geist font from layout.tsx to take precedence */
   }
 }
+
+@layer utilities {
+  @keyframes subtleFlash {
+    0%, 100% { background-color: hsl(var(--primary) / 0.1); } /* Transparent deep teal */
+    12.5% { background-color: #f4d97626; } /* Light yellow 15% opacity */
+    25%   { background-color: #deb95226; } /* Medium yellow 15% opacity */
+    37.5% { background-color: #c4962f26; } /* Dark yellow/gold 15% opacity */
+    50%   { background-color: #00ab8f26; } /* Teal 15% opacity */
+    62.5% { background-color: #8c8c8c26; } /* Gray 15% opacity */
+    75%   { background-color: #8fd0f626; } /* Light blue 15% opacity */
+    87.5% { background-color: #14223b26; } /* Dark blue 15% opacity */
+  }
+
+  .hero-section-flash::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: inherit; /* Match parent's rounded-xl */
+    animation: subtleFlash 20s ease-in-out infinite;
+    z-index: 0; /* Behind content, on top of main background */
+  }
+}

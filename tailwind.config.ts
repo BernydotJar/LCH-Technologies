@@ -82,11 +82,22 @@ export default {
   				to: {
   					height: '0'
   				}
-  			}
+  			},
+        subtleFlash: { // Defined in globals.css
+          '0%, 100%': { backgroundColor: 'hsl(var(--primary) / 0.1)' },
+          '12.5%': { backgroundColor: '#f4d97626' },
+          '25%':   { backgroundColor: '#deb95226' },
+          '37.5%': { backgroundColor: '#c4962f26' },
+          '50%':   { backgroundColor: '#00ab8f26' },
+          '62.5%': { backgroundColor: '#8c8c8c26' },
+          '75%':   { backgroundColor: '#8fd0f626' },
+          '87.5%': { backgroundColor: '#14223b26' },
+        }
   		},
   		animation: {
   			'accordion-down': 'accordion-down 0.2s ease-out',
-  			'accordion-up': 'accordion-up 0.2s ease-out'
+  			'accordion-up': 'accordion-up 0.2s ease-out',
+        'subtle-flash': 'subtleFlash 20s ease-in-out infinite',
   		}
   	}
   },
