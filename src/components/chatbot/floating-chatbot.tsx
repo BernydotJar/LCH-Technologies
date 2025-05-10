@@ -56,7 +56,7 @@ export default function FloatingChatbot() {
             </Button>
           </CardHeader>
           <CardContent className="p-0 flex-grow overflow-hidden">
-            <ChatInterface initialMessage={!hasBeenOpened || messages.length === 0 ? "Hello! I'm your RPA & Low-Code expert. How can I assist you today?" : undefined} />
+            <ChatInterface initialMessage={!hasBeenOpened ? "Hello! I'm your RPA & Low-Code expert. How can I assist you today?" : undefined} />
           </CardContent>
         </Card>
       )}
@@ -93,3 +93,4 @@ export default function FloatingChatbot() {
     </>
   );
 }
+
