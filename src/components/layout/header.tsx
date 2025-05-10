@@ -12,7 +12,8 @@ import {
   SelectTrigger,
 } from '@/components/ui/select';
 import { useLanguage } from '@/contexts/language-context';
-import TechFrontLogo from '@/components/icons/tech-front-logo';
+import { Avatar, AvatarImage } from '@/components/ui/avatar';
+import { useTheme } from 'next-themes';
 
 
 export default function Header() {
@@ -26,13 +27,17 @@ export default function Header() {
   ];
 
   const { language, setLanguage, languages } = useLanguage();
+  const { theme } = useTheme();
+  const logoSrc = theme === 'dark' ? '/black-lch-technologies-logo.png' : '/light-lch-technologies-logo.png';
 
   return (
     <header className="bg-background/80 backdrop-blur-md sticky top-0 z-50 w-full border-b">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2 text-xl font-semibold text-primary">
-          <TechFrontLogo className="h-6 w-6 text-primary" />
-          <span>TechFront</span>
+          <Avatar className="h-6 w-6">
+            <AvatarImage src={logoSrc} alt="LCH Technologies Logo" />
+          </Avatar>
+          <span>LCH Technologies</span>
         </Link>
         <nav className="hidden md:flex gap-6 items-center">
           {navItems.map((item) => (
@@ -65,9 +70,11 @@ export default function Header() {
               </SheetTrigger>
               <SheetContent side="right">
                 <div className="grid gap-4 p-4">
-                  <Link href="/" className="flex items-center gap-2 text-lg font-semibold text-primary mb-4">
-                    <TechFrontLogo className="h-5 w-5 text-primary" />
-                    <span>TechFront</span>
+                  <Link href="/" className="flex items-center gap-2 text-lg font-semibold text-primary mb-4" >
+                     <Avatar className="h-5 w-5">
+                       <AvatarImage src={logoSrc} alt="LCH Technologies Logo" />
+                     </Avatar>
+                    <span>LCH Technologies</span>
                   </Link>
                   {navItems.map((item) => (
                     <Link
