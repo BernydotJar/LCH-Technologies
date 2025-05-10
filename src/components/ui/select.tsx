@@ -16,18 +16,21 @@ const SelectTrigger = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Trigger>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger>
 >(({ className, children, ...props }, ref) => (
-  <SelectPrimitive.Trigger
-    ref={ref}
-    className={cn(
-      "flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
-      className
-    )}
-    {...props}
-  >
-    {children}
-    <SelectPrimitive.Icon asChild>
+  <SelectPrimitive.Trigger ref={ref} className={cn("flex h-10 w-10 items-center justify-center rounded-md border border-input bg-background ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50", className)} {...props} aria-label="Select language">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-languages h-4 w-4 opacity-50">
+      <path d="m5 8 6 6"></path>
+      <path d="m4 14 6-6"></path>
+      <path d="M2 5h10"></path>
+      <path d="M7 2v6"></path>
+      <path d="M15 17h6"></path>
+      <path d="m18 14v6"></path>
+      <path d="m14 20 3-3 3 3"></path>
+    </svg>
+    {/* The original children prop likely contained the SelectValue for the language name. We remove it from the visible part. */}
+    {/* We keep the SelectPrimitive.Icon with ChevronDown if you want to maintain a visual indicator for the dropdown. */}
+    {/* <SelectPrimitive.Icon asChild>
       <ChevronDown className="h-4 w-4 opacity-50" />
-    </SelectPrimitive.Icon>
+    </SelectPrimitive.Icon> */}
   </SelectPrimitive.Trigger>
 ))
 SelectTrigger.displayName = SelectPrimitive.Trigger.displayName

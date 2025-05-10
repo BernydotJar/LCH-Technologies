@@ -1,0 +1,120 @@
+{
+  "Hero": {
+    "title": "Innovate. Transform. Succeed.",
+    "subtitle": "TechFront empowers your business with cutting-edge technology solutions designed for growth and efficiency.",
+    "discoverButton": "Discover Our Solutions",
+    "requestDemoButton": "Request a Demo"
+  },
+  "About": {
+    "title": "About TechFront",
+    "subtitle": "We are a passionate team of innovators and problem-solvers dedicated to delivering impactful technology solutions. Our mission is to drive your success through strategic application of the latest advancements.",
+    "missionTitle": "Our Mission",
+    "missionText": "To empower businesses with transformative technology that fuels growth and innovation.",
+    "visionTitle": "Our Vision",
+    "visionText": "To be the leading partner for businesses seeking to navigate the complexities of the digital age.",
+    "valuesTitle": "Our Values",
+    "valuesText": "Innovation, Integrity, Collaboration, and Customer Centricity guide everything we do."
+  },
+  "Expertise": {
+    "title": "Our Expertise",
+    "customSoftware": "Custom Software Development",
+    "cloudSolutions": "Cloud Solutions",
+    "aiMl": "AI & Machine Learning",
+    "dataAnalytics": "Data Analytics",
+    "cybersecurity": "Cybersecurity",
+    "itConsulting": "IT Consulting",
+    "learnMore": "Learn More"
+  },
+  "CTA": {
+    "title": "Ready to Elevate Your Business?",
+    "subtitle": "Let's discuss how TechFront can tailor solutions to meet your unique challenges and goals.",
+    "getInTouch": "Get In Touch"
+  },
+  "Footer": {
+    "companyName": "TechFront",
+    "companyDescription": "Innovative solutions for a digital world. Driving your business forward with technology.",
+    "quickLinks": "Quick Links",
+    "aboutUsLink": "About Us",
+    "solutionsLink": "Solutions",
+    "blogLink": "Blog",
+    "contactLink": "Contact",
+    "legal": "Legal",
+    "privacyPolicyLink": "Privacy Policy",
+    "termsOfServiceLink": "Terms of Service",
+    "copyright": "© {currentYear} TechFront. All rights reserved."
+  },
+  "Header": {
+    "home": "Home",
+    "solutions": "Solutions",
+    "blog": "Blog",
+    "contact": "Contact",
+    "aiMetaTool": "AI Meta Tool",
+    "toggleNavigation": "Toggle navigation menu"
+  },
+  "ContactPage": {
+    "title": "Contact Us",
+    "description": "We're here to help and answer any question you might have. We look forward to hearing from you!",
+    "sendMessageTitle": "Send us a Message",
+    "sendMessageDescription": "Fill out the form and we'll get back to you as soon as possible.",
+    "ourOfficeTitle": "Our Office",
+    "addressLabel": "Address",
+    "addressValue": "123 Innovation Drive, Tech City, TX 75001, USA",
+    "emailLabel": "Email",
+    "emailValue": "info@techfront.com",
+    "phoneLabel": "Phone",
+    "phoneValue": "+1 (234) 567-890",
+    "businessHoursTitle": "Business Hours",
+    "businessHoursDays": "Monday - Friday: 9:00 AM - 6:00 PM (CST)",
+    "businessHoursWeekend": "Saturday - Sunday: Closed"
+  },
+  "ContactForm": {
+    "nameLabel": "Full Name",
+    "namePlaceholder": "John Doe",
+    "emailLabel": "Email Address",
+    "emailPlaceholder": "you@example.com",
+    "companyLabel": "Company (Optional)",
+    "companyPlaceholder": "Your Company Inc.",
+    "messageLabel": "Message",
+    "messagePlaceholder": "Tell us how we can help you...",
+    "submitButton": "Send Message",
+    "submittingButton": "Sending...",
+    "successTitle": "Message Sent!",
+    "successDescription": "Thank you for contacting us. We'll be in touch soon.",
+    "errorTitle": "Error",
+    "errorMessageDefault": "Failed to send message. Please try again.",
+    "errorUnexpected": "An unexpected error occurred. Please try again."
+  },
+  "MetaGeneratorPage": {
+    "title": "AI Meta Description Generator",
+    "description": "Craft compelling, SEO-friendly meta descriptions for your web pages with the power of AI.",
+    "formTitle": "Generate Your Meta Description",
+    "formDescription": "Provide keywords and page content to generate an optimized meta description."
+  },
+  "MetaGeneratorForm": {
+    "keywordsLabel": "Keywords",
+    "keywordsPlaceholder": "e.g., innovative technology, AI solutions, business growth",
+    "contentLabel": "Page Content",
+    "contentPlaceholder": "Paste the main content of your web page here...",
+    "submitButton": "Generate Meta Description",
+    "submittingButton": "Generating...",
+    "generatedTitle": "Generated Meta Description",
+    "generatedDescription": "Copy and use this for your page's SEO settings.",
+    "copyButton": "Copy to Clipboard",
+    "copiedToast": "Copied!",
+    "copiedDescriptionToast": "Meta description copied to clipboard.",
+    "successToast": "Meta Description Generated!",
+    "successDescriptionToast": "Review the generated meta description below.",
+    "errorToastTitle": "Error Generating Meta Description",
+    "errorToastDefault": "Failed to generate meta description. Please try again.",
+    "errorToastUnexpected": "An unexpected error occurred. Please try again."
+  },
+  "ThemeToggle": {
+    "toggleTheme": "Toggle theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "LanguageSwitcher": {
+    "selectLanguageLabel": "Change language"
+  }
+}

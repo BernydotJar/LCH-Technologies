@@ -1,0 +1,120 @@
+{
+  "Hero": {
+    "title": "Innovare. Trasformare. Riuscire.",
+    "subtitle": "TechFront potenzia la tua azienda con soluzioni tecnologiche all'avanguardia progettate per la crescita e l'efficienza.",
+    "discoverButton": "Scopri le Nostre Soluzioni",
+    "requestDemoButton": "Richiedi una Demo"
+  },
+  "About": {
+    "title": "Informazioni su TechFront",
+    "subtitle": "Siamo un team appassionato di innovatori e risolutori di problemi dedicati a fornire soluzioni tecnologiche di impatto. La nostra missione è guidare il tuo successo attraverso l'applicazione strategica degli ultimi progressi.",
+    "missionTitle": "La Nostra Missione",
+    "missionText": "Potenziare le aziende con tecnologia trasformativa che alimenta crescita e innovazione.",
+    "visionTitle": "La Nostra Visione",
+    "visionText": "Essere il partner leader per le aziende che cercano di navigare le complessità dell'era digitale.",
+    "valuesTitle": "I Nostri Valori",
+    "valuesText": "Innovazione, Integrità, Collaborazione e Centralità del Cliente guidano tutto ciò che facciamo."
+  },
+  "Expertise": {
+    "title": "La Nostra Competenza",
+    "customSoftware": "Sviluppo Software Personalizzato",
+    "cloudSolutions": "Soluzioni Cloud",
+    "aiMl": "IA & Machine Learning",
+    "dataAnalytics": "Analisi dei Dati",
+    "cybersecurity": "Sicurezza Informatica",
+    "itConsulting": "Consulenza IT",
+    "learnMore": "Saperne di Più"
+  },
+  "CTA": {
+    "title": "Pronto a Elevare la Tua Attività?",
+    "subtitle": "Discutiamo di come TechFront può personalizzare soluzioni per affrontare le tue sfide e obiettivi unici.",
+    "getInTouch": "Mettiti in Contatto"
+  },
+  "Footer": {
+    "companyName": "TechFront",
+    "companyDescription": "Soluzioni innovative per un mondo digitale. Guidiamo la tua azienda verso il futuro con la tecnologia.",
+    "quickLinks": "Link Rapidi",
+    "aboutUsLink": "Chi Siamo",
+    "solutionsLink": "Soluzioni",
+    "blogLink": "Blog",
+    "contactLink": "Contatti",
+    "legal": "Legale",
+    "privacyPolicyLink": "Informativa sulla Privacy",
+    "termsOfServiceLink": "Termini di Servizio",
+    "copyright": "© {currentYear} TechFront. Tutti i diritti riservati."
+  },
+  "Header": {
+    "home": "Home",
+    "solutions": "Soluzioni",
+    "blog": "Blog",
+    "contact": "Contatti",
+    "aiMetaTool": "Strumento IA Meta",
+    "toggleNavigation": "Attiva/disattiva menu di navigazione"
+  },
+  "ContactPage": {
+    "title": "Contattaci",
+    "description": "Siamo qui per aiutarti e rispondere a qualsiasi domanda tu possa avere. Non vediamo l'ora di sentirti!",
+    "sendMessageTitle": "Inviaci un Messaggio",
+    "sendMessageDescription": "Compila il modulo e ti risponderemo il prima possibile.",
+    "ourOfficeTitle": "Il Nostro Ufficio",
+    "addressLabel": "Indirizzo",
+    "addressValue": "123 Innovation Drive, Tech City, TX 75001, USA",
+    "emailLabel": "Email",
+    "emailValue": "info@techfront.com",
+    "phoneLabel": "Telefono",
+    "phoneValue": "+1 (234) 567-890",
+    "businessHoursTitle": "Orari di Apertura",
+    "businessHoursDays": "Lunedì - Venerdì: 9:00 - 18:00 (CST)",
+    "businessHoursWeekend": "Sabato - Domenica: Chiuso"
+  },
+  "ContactForm": {
+    "nameLabel": "Nome Completo",
+    "namePlaceholder": "Mario Rossi",
+    "emailLabel": "Indirizzo Email",
+    "emailPlaceholder": "tu@esempio.com",
+    "companyLabel": "Azienda (Opzionale)",
+    "companyPlaceholder": "La Tua Azienda S.p.A.",
+    "messageLabel": "Messaggio",
+    "messagePlaceholder": "Dicci come possiamo aiutarti...",
+    "submitButton": "Invia Messaggio",
+    "submittingButton": "Invio in corso...",
+    "successTitle": "Messaggio Inviato!",
+    "successDescription": "Grazie per averci contattato. Ti risponderemo presto.",
+    "errorTitle": "Errore",
+    "errorMessageDefault": "Impossibile inviare il messaggio. Per favore, riprova.",
+    "errorUnexpected": "Si è verificato un errore imprevisto. Per favore, riprova."
+  },
+  "MetaGeneratorPage": {
+    "title": "Generatore di Meta Description IA",
+    "description": "Crea meta description accattivanti e ottimizzate per la SEO per le tue pagine web con la potenza dell'IA.",
+    "formTitle": "Genera la Tua Meta Description",
+    "formDescription": "Fornisci parole chiave e contenuto della pagina per generare una meta description ottimizzata."
+  },
+  "MetaGeneratorForm": {
+    "keywordsLabel": "Parole Chiave",
+    "keywordsPlaceholder": "es. tecnologia innovativa, soluzioni IA, crescita aziendale",
+    "contentLabel": "Contenuto della Pagina",
+    "contentPlaceholder": "Incolla qui il contenuto principale della tua pagina web...",
+    "submitButton": "Genera Meta Description",
+    "submittingButton": "Generazione...",
+    "generatedTitle": "Meta Description Generata",
+    "generatedDescription": "Copia e usa questa per le impostazioni SEO della tua pagina.",
+    "copyButton": "Copia negli Appunti",
+    "copiedToast": "Copiato!",
+    "copiedDescriptionToast": "Meta description copiata negli appunti.",
+    "successToast": "Meta Description Generata!",
+    "successDescriptionToast": "Rivedi la meta description generata qui sotto.",
+    "errorToastTitle": "Errore Generazione Meta Description",
+    "errorToastDefault": "Impossibile generare la meta description. Per favore, riprova.",
+    "errorToastUnexpected": "Si è verificato un errore imprevisto. Per favore, riprova."
+  },
+  "ThemeToggle": {
+    "toggleTheme": "Cambia tema",
+    "light": "Chiaro",
+    "dark": "Scuro",
+    "system": "Sistema"
+  },
+  "LanguageSwitcher": {
+    "selectLanguageLabel": "Seleziona lingua"
+  }
+}
