@@ -12,32 +12,34 @@ const FUNNY_MESSAGE = "Psst... heard you're into RPA and low-code? So am I! 😉
 export default function FloatingChatbot() {
   const [isOpen, setIsOpen] = useState(false);
   const [showTeaser, setShowTeaser] = useState(false);
-  const [hasBeenOpened, setHasBeenOpened] = useState(false);
+  const [hasBeenOpened, setHasBeenOpened] = useState(false); // Tracks if chat has ever been opened
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (!isOpen && !hasBeenOpened) { // Only show teaser if chat hasn't been opened yet at all
-        setShowTeaser(true);
-      }
-    }, 15000); // 15 seconds
-
-    return () => clearTimeout(timer);
-  }, [isOpen, hasBeenOpened]);
+    let teaserTimer: NodeJS.Timeout;
+    if (!hasBeenOpened) { // Only set up timer if chat has never been opened
+      teaserTimer = setTimeout(() => {
+        if (!isOpen && !hasBeenOpened) { // Double check state before showing
+          setShowTeaser(true);
+        }
+      }, 15000); // 15 seconds
+    }
+    return () => clearTimeout(teaserTimer);
+  }, [isOpen, hasBeenOpened]); // Rerun if isOpen or hasBeenOpened changes
 
   const toggleChat = () => {
     const newIsOpenState = !isOpen;
     setIsOpen(newIsOpenState);
-    setShowTeaser(false); 
+    setShowTeaser(false); // Always hide teaser when chat is toggled
     if (newIsOpenState && !hasBeenOpened) {
-        setHasBeenOpened(true); 
+      setHasBeenOpened(true); // Mark as opened if it's being opened for the first time
     }
   };
 
   const openChatFromTeaser = () => {
     setIsOpen(true);
     setShowTeaser(false);
-    if(!hasBeenOpened) {
-        setHasBeenOpened(true);
+    if (!hasBeenOpened) {
+      setHasBeenOpened(true); // Mark as opened
     }
   };
 
@@ -56,13 +58,14 @@ export default function FloatingChatbot() {
             </Button>
           </CardHeader>
           <CardContent className="p-0 flex-grow overflow-hidden">
+            {/* Pass initial message only if chat has never been opened before */}
             <ChatInterface initialMessage={!hasBeenOpened ? "Hello! I'm your RPA & Low-Code expert. How can I assist you today?" : undefined} />
           </CardContent>
         </Card>
       )}
 
       {/* Teaser Message */}
-      {!isOpen && showTeaser && (
+      {!isOpen && showTeaser && ( // Show teaser only if chat is closed and showTeaser is true
         <div
           className="fixed bottom-24 right-4 z-[60] p-3 rounded-lg bg-accent text-accent-foreground shadow-lg cursor-pointer w-auto max-w-[280px] animate-in fade-in-0 slide-in-from-bottom-5"
           onClick={openChatFromTeaser}
@@ -73,7 +76,14 @@ export default function FloatingChatbot() {
           <div className="flex items-start gap-2">
             <Zap className="h-5 w-5 mt-0.5 shrink-0" />
             <p className="text-sm">{FUNNY_MESSAGE}</p>
-            <button onClick={(e) => { e.stopPropagation(); setShowTeaser(false); }} className="ml-auto shrink-0" aria-label="Dismiss teaser">
+            <button 
+              onClick={(e) => { 
+                e.stopPropagation(); 
+                setShowTeaser(false); 
+              }} 
+              className="ml-auto shrink-0" 
+              aria-label="Dismiss teaser"
+            >
                 <X className="h-4 w-4 opacity-70 hover:opacity-100"/>
             </button>
           </div>
@@ -82,9 +92,9 @@ export default function FloatingChatbot() {
 
       {/* Toggle Button */}
       <Button
-        variant="default" // Changed to default for primary color
+        variant="default"
         size="lg"
-        className="fixed bottom-4 right-4 z-[60] rounded-full p-0 h-16 w-16 shadow-xl flex items-center justify-center"
+        className="fixed bottom-4 right-4 z-[60] rounded-full p-0 h-16 w-16 shadow-xl flex items-center justify-center bg-primary hover:bg-primary/90"
         onClick={toggleChat}
         aria-label={isOpen ? "Close chat" : "Open chat"}
       >
@@ -93,4 +103,3 @@ export default function FloatingChatbot() {
     </>
   );
 }
-
