@@ -2,14 +2,13 @@
 'use client';
 
 import type { FormEvent } from 'react';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { askRpaLowcodeBot } from '@/app/actions/chatbot';
 import { Bot, User, Loader2, SendHorizonal } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../ui/card';
 
 interface Message {
   id: string;
@@ -18,20 +17,27 @@ interface Message {
   timestamp: Date;
 }
 
-export default function ChatInterface() {
+interface ChatInterfaceProps {
+  initialMessage?: string;
+}
+
+export default function ChatInterface({ initialMessage }: ChatInterfaceProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [userInput, setUserInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
-  const addMessage = (sender: 'user' | 'bot', text: string) => {
+  const addMessage = useCallback((sender: 'user' | 'bot', text: string) => {
     setMessages((prevMessages) => [
       ...prevMessages,
       { id: crypto.randomUUID(), sender, text, timestamp: new Date() },
     ]);
-  };
+  }, []);
 
   useEffect(() => {
+    if (initialMessage && messages.length === 0) {
+      addMessage('bot', initialMessage);
+    }
     // Scroll to bottom when messages change
     if (scrollAreaRef.current) {
       const viewport = scrollAreaRef.current.querySelector('div[data-radix-scroll-area-viewport]');
@@ -39,7 +45,7 @@ export default function ChatInterface() {
         viewport.scrollTop = viewport.scrollHeight;
       }
     }
-  }, [messages]);
+  }, [messages, initialMessage, addMessage]);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -65,24 +71,9 @@ export default function ChatInterface() {
     }
   };
   
-  useEffect(() => {
-    // Initial greeting from the bot
-    addMessage('bot', "Hello! I'm an expert in RPA and Low-Code/No-Code platforms. How can I help you today?");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-
   return (
-    <Card className="w-full max-w-2xl mx-auto shadow-xl flex flex-col h-[70vh]">
-      <CardHeader className="border-b">
-        <CardTitle className="flex items-center gap-2">
-          <Bot className="h-6 w-6 text-primary" />
-          <span>RPA & Low-Code Assistant</span>
-        </CardTitle>
-        <CardDescription>Ask me anything about Robotic Process Automation or Low-Code/No-Code platforms.</CardDescription>
-      </CardHeader>
-      <CardContent className="flex-grow p-0">
-        <ScrollArea className="h-full p-4" ref={scrollAreaRef}>
+    <>
+      <ScrollArea className="h-full p-4 flex-grow" ref={scrollAreaRef}>
           <div className="space-y-6">
             {messages.map((msg) => (
               <div
@@ -130,22 +121,21 @@ export default function ChatInterface() {
             )}
           </div>
         </ScrollArea>
-      </CardContent>
-      <CardFooter className="p-4 border-t">
-        <form onSubmit={handleSubmit} className="flex w-full items-center gap-2">
-          <Input
-            type="text"
-            value={userInput}
-            onChange={(e) => setUserInput(e.target.value)}
-            placeholder="Type your message..."
-            className="flex-grow"
-            disabled={isLoading}
-          />
-          <Button type="submit" disabled={isLoading || !userInput.trim()} size="icon" aria-label="Send message">
-            {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : <SendHorizonal className="h-5 w-5" />}
-          </Button>
-        </form>
-      </CardFooter>
-    </Card>
+        <div className="p-4 border-t bg-background">
+          <form onSubmit={handleSubmit} className="flex w-full items-center gap-2">
+            <Input
+              type="text"
+              value={userInput}
+              onChange={(e) => setUserInput(e.target.value)}
+              placeholder="Type your message..."
+              className="flex-grow"
+              disabled={isLoading}
+            />
+            <Button type="submit" disabled={isLoading || !userInput.trim()} size="icon" aria-label="Send message">
+              {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : <SendHorizonal className="h-5 w-5" />}
+            </Button>
+          </form>
+        </div>
+    </>
   );
 }
