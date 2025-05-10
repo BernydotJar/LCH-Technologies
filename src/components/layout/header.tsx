@@ -21,7 +21,7 @@ export default function Header() {
     { href: '/blog', label: 'Blog' },
     { href: '/contact', label: 'Contact' },
     { href: '/meta-generator', label: 'AI Meta Tool' },
-    { href: '/chatbot', label: 'Chatbot' }, // Added Chatbot link
+    // { href: '/chatbot', label: 'Chatbot' }, // Removed Chatbot link
   ];
 
   const { language, setLanguage, languages } = useLanguage();
@@ -86,3 +86,4 @@ export default function Header() {
     </header>
   );
 }
+
