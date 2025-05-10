@@ -131,7 +131,13 @@ export default function ChatInterface({ initialMessage }: ChatInterfaceProps) {
               className="flex-grow"
               disabled={isLoading}
             />
-            <Button type="submit" disabled={isLoading || !userInput.trim()} size="icon" aria-label="Send message">
+            <Button 
+              type="submit" 
+              disabled={isLoading || !userInput.trim()} 
+              size="icon" 
+              aria-label="Send message"
+              className="bg-accent text-accent-foreground hover:bg-accent/90"
+            >
               {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : <SendHorizonal className="h-5 w-5" />}
             </Button>
           </form>
@@ -139,3 +145,4 @@ export default function ChatInterface({ initialMessage }: ChatInterfaceProps) {
     </>
   );
 }
+
