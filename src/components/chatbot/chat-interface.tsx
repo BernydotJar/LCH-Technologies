@@ -38,6 +38,9 @@ export default function ChatInterface({ initialMessage }: ChatInterfaceProps) {
     if (initialMessage && messages.length === 0) {
       addMessage('bot', initialMessage);
     }
+  }, [initialMessage, messages.length, addMessage]);
+
+  useEffect(() => {
     // Scroll to bottom when messages change
     if (scrollAreaRef.current) {
       const viewport = scrollAreaRef.current.querySelector('div[data-radix-scroll-area-viewport]');
@@ -45,7 +48,8 @@ export default function ChatInterface({ initialMessage }: ChatInterfaceProps) {
         viewport.scrollTop = viewport.scrollHeight;
       }
     }
-  }, [messages, initialMessage, addMessage]);
+  }, [messages]);
+
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -72,8 +76,8 @@ export default function ChatInterface({ initialMessage }: ChatInterfaceProps) {
   };
   
   return (
-    <>
-      <ScrollArea className="h-full p-4 flex-grow" ref={scrollAreaRef}>
+    <div className="flex flex-col h-full">
+      <ScrollArea className="flex-grow p-4" ref={scrollAreaRef}>
           <div className="space-y-6">
             {messages.map((msg) => (
               <div
@@ -121,7 +125,7 @@ export default function ChatInterface({ initialMessage }: ChatInterfaceProps) {
             )}
           </div>
         </ScrollArea>
-        <div className="p-4 border-t bg-background">
+        <div className="p-4 border-t bg-background shrink-0">
           <form onSubmit={handleSubmit} className="flex w-full items-center gap-2">
             <Input
               type="text"
@@ -142,7 +146,7 @@ export default function ChatInterface({ initialMessage }: ChatInterfaceProps) {
             </Button>
           </form>
         </div>
-    </>
+    </div>
   );
 }
 
