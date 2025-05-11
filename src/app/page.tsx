@@ -13,7 +13,7 @@ export default function Home() {
   const translations = {
     en: {
       heroTitle: 'Innovate. Transform. Succeed.',
-      heroSubtitle: 'LCH empowers your business with cutting-edge technology solutions designed for growth and efficiency.',
+      heroSubtitle: "At LCH, we partner with you to build your foundational intelligent automations and comprehensively train your developers, empowering you to independently drive future innovation. We're more than consultants; we're your dedicated mentors for lasting technological self-sufficiency.",
       discoverButton: 'Discover Our Solutions',
       requestDemoButton: 'Request a Demo',
       aboutTitle: 'About LCH',
@@ -38,7 +38,7 @@ export default function Home() {
     },
     es: {
       heroTitle: 'Innovar. Transformar. Tener éxito.',
-      heroSubtitle: 'LCH impulsa su negocio con soluciones tecnológicas de vanguardia diseñadas para el crecimiento y la eficiencia.',
+      heroSubtitle: "En LCH, nos asociamos contigo para construir tus automatizaciones inteligentes fundamentales y capacitar integralmente a tus desarrolladores, empoderándote para impulsar la innovación futura de forma independiente. Somos más que consultores; somos tus mentores dedicados para una autosuficiencia tecnológica duradera.",
       discoverButton: 'Descubra nuestras soluciones',
       requestDemoButton: 'Solicite una demostración',
       aboutTitle: 'Sobre LCH',
@@ -63,7 +63,7 @@ export default function Home() {
     },
     it: {
       heroTitle: 'Innovare. Trasformare. Riuscire.',
-      heroSubtitle: "LCH potenzia la tua azienda con soluzioni tecnologiche all'avanguardia progettate per la crescita e l'efficienza.",
+      heroSubtitle: "In LCH, collaboriamo con te per costruire le tue automazioni intelligenti fondamentali e formare in modo completo i tuoi sviluppatori, consentendoti di guidare autonomamente l'innovazione futura. Siamo più che consulenti; siamo i tuoi mentori dedicati per un'autosufficienza tecnologica duratura.",
       discoverButton: 'Scopri le Nostre Soluzioni',
       requestDemoButton: 'Richiedi una Demo',
       aboutTitle: 'Informazioni su LCH',
