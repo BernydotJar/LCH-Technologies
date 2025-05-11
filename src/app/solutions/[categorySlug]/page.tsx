@@ -76,35 +76,44 @@ export default function ServiceCategoryPage({ params }: Props) {
         </h2>
         {category.services.length > 0 ? (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {category.services.map((service: Service) => (
-              <Card key={service.id} className="flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300">
-                <CardHeader>
-                  <CardTitle className="text-xl text-primary">{service.serviceName}</CardTitle>
-                  <CardDescription className="text-sm leading-relaxed h-20 overflow-hidden text-ellipsis"> 
-                    {service.shortDescription}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="flex-grow">
-                  <h4 className="font-semibold mb-2 text-sm text-foreground">Key Benefits:</h4>
-                  <ul className="space-y-1 text-xs text-muted-foreground">
-                    {service.benefits.slice(0, 2).map((benefit, idx) => ( // Show first 2 benefits
-                      <li key={idx} className="flex items-start">
-                        <CheckCircle className="h-3.5 w-3.5 text-green-500 mr-2 mt-0.5 shrink-0" />
-                        <span>{benefit}</span>
-                      </li>
-                    ))}
-                     {service.benefits.length > 2 && <li className="text-xs text-muted-foreground/80">...and more</li>}
-                  </ul>
-                </CardContent>
-                <CardContent className="mt-auto">
-                  <Button asChild variant="default" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
-                    <Link href={`/solutions/${category.slug}/${service.serviceSlug}`}>
-                      Learn More <ArrowRight className="ml-2 h-4 w-4" />
-                    </Link>
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
+            {category.services.map((service: Service) => {
+              const benefitsToShow = category.slug === 'power-platform' ? service.benefits : service.benefits.slice(0,2);
+              const showMoreIndicator = category.slug !== 'power-platform' && service.benefits.length > 2;
+              const ServiceIcon = service.serviceIcon;
+
+              return (
+                <Card key={service.id} className="flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300">
+                  <CardHeader>
+                    <div className="flex items-center gap-3 mb-1">
+                      {ServiceIcon && <ServiceIcon className="h-7 w-7 text-primary shrink-0" />}
+                      <CardTitle className="text-xl text-primary">{service.serviceName}</CardTitle>
+                    </div>
+                    <CardDescription className="text-sm leading-relaxed min-h-[60px]"> 
+                      {service.shortDescription}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="flex-grow">
+                    <h4 className="font-semibold mb-2 text-sm text-foreground">Key Benefits:</h4>
+                    <ul className="space-y-1 text-xs text-muted-foreground">
+                      {benefitsToShow.map((benefit, idx) => (
+                        <li key={idx} className="flex items-start">
+                          <CheckCircle className="h-3.5 w-3.5 text-green-500 mr-2 mt-0.5 shrink-0" />
+                          <span>{benefit}</span>
+                        </li>
+                      ))}
+                       {showMoreIndicator && <li className="text-xs text-muted-foreground/80">...and more</li>}
+                    </ul>
+                  </CardContent>
+                  <CardContent className="mt-auto pt-4"> {/* Added pt-4 for spacing */}
+                    <Button asChild variant="default" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
+                      <Link href={`/solutions/${category.slug}/${service.serviceSlug}`}>
+                        Learn More <ArrowRight className="ml-2 h-4 w-4" />
+                      </Link>
+                    </Button>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         ) : (
           <p className="text-center text-muted-foreground">No specific services listed for this category yet. Please check back soon or contact us for more information.</p>

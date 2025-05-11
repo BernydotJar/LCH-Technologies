@@ -1,11 +1,12 @@
 
 import type { LucideIcon } from 'lucide-react';
-import { Brain, Cog, Bot, Search, ShieldCheck, TestTube2, BarChartBig, CloudCog, Zap, Layers, Database, Users } from 'lucide-react'; // Added Layers, Database, Users
+import { Brain, Cog, Bot, Search, ShieldCheck, TestTube2, BarChartBig, CloudCog, Zap, Layers, Database, Users, BarChart, Workflow, Globe, Lock, Telescope } from 'lucide-react'; // Added Layers, Database, Users, and icons for new services
 
 export interface ServiceUseCase {
   title: string;
   description: string;
   image?: string; // Optional: URL for an image illustrating the use case
+  dataAiHint?: string; // AI hint for use case image
 }
 
 export interface ServiceFeature {
@@ -31,6 +32,7 @@ export interface Service {
   useCases?: ServiceUseCase[];
   features?: ServiceFeature[];
   relatedProducts?: string[];
+  serviceIcon?: LucideIcon; // Optional icon for the service card itself
   mediaPlaceholder?: {
     type: 'video' | 'diagram' | 'gallery' | 'gif';
     caption: string;
@@ -374,14 +376,14 @@ export const services: Service[] = [
     categoryIcon: Layers,
     serviceName: "Power Apps Development",
     serviceSlug: "power-apps-development",
-    tagline: "Rapidly build custom business applications.",
-    shortDescription: "Design and develop custom applications using Microsoft Power Apps to address specific business needs and streamline processes.",
-    overview: "Leverage Power Apps to quickly create low-code applications that modernize processes and tackle business challenges. We guide you through the entire lifecycle, from ideation and design to development, deployment, and governance, enabling citizen developers and professional developers alike.",
+    tagline: "Crea aplicaciones empresariales personalizadas rápidamente.",
+    shortDescription: "Permite crear aplicaciones empresariales personalizadas sin necesidad de codificación, según Microsoft.",
+    overview: "Leverage Power Apps to quickly create low-code applications that modernize processes and tackle business challenges. We guide you through the entire lifecycle, from ideation and design to development, deployment, and governance, enabling citizen developers and professional developers alike. Permite crear aplicaciones empresariales personalizadas sin necesidad de codificación, según Microsoft.",
     benefits: [
-      "Accelerated application development",
-      "Improved operational efficiency through custom solutions",
-      "Empowerment of citizen developers",
-      "Seamless integration with Microsoft ecosystem"
+      "Desarrollo acelerado de aplicaciones",
+      "Eficiencia operativa mejorada mediante soluciones personalizadas",
+      "Empoderamiento de los desarrolladores ciudadanos",
+      "Integración perfecta con el ecosistema de Microsoft"
     ],
     features: [
       { name: "Custom App Design & Prototyping", description: "Visualize and refine your app idea before development.", icon: Brain },
@@ -394,6 +396,7 @@ export const services: Service[] = [
       { title: "Internal Process Automation Apps", description: "Develop apps for expense approvals, inventory management, or employee onboarding.", image: "https://picsum.photos/400/300?random=71", dataAiHint: "business process" }
     ],
     relatedProducts: ["Microsoft Power Automate", "Microsoft Power BI", "Microsoft Dataverse", "SharePoint"],
+    serviceIcon: Layers,
     mediaPlaceholder: {
       type: "gallery",
       caption: "Screenshots of custom Power Apps solutions.",
@@ -402,6 +405,114 @@ export const services: Service[] = [
         "https://picsum.photos/600/400?random=73",
       ]
     }
+  },
+  {
+    id: "PP-701",
+    category: "Power Platform Services",
+    categorySlug: "power-platform",
+    categoryDescription: "Empower your organization with custom apps, automated workflows, and insightful analytics using Microsoft Power Platform.",
+    categoryIcon: Layers,
+    serviceName: "Power BI",
+    serviceSlug: "power-bi",
+    tagline: "Visualiza y analiza datos para decisiones.",
+    shortDescription: "Permite visualizar y analizar datos para la toma de decisiones.",
+    overview: "Permite visualizar y analizar datos para la toma de decisiones.",
+    benefits: [
+        "Información basada en datos",
+        "Paneles interactivos",
+        "Toma de decisiones informada"
+    ],
+    serviceIcon: BarChart,
+  },
+  {
+    id: "PP-702",
+    category: "Power Platform Services",
+    categorySlug: "power-platform",
+    categoryDescription: "Empower your organization with custom apps, automated workflows, and insightful analytics using Microsoft Power Platform.",
+    categoryIcon: Layers,
+    serviceName: "Power Automate (Cloud & Desktop Flows)",
+    serviceSlug: "power-automate",
+    tagline: "Automatiza flujos y tareas repetitivas.",
+    shortDescription: "Automatiza flujos de trabajo y tareas repetitivas para aumentar la productividad.",
+    overview: "Automatiza flujos de trabajo y tareas repetitivas para aumentar la productividad. Nuestros Desktop Flows son tan buenos que casi desearían ser robots RPA... ¡pero están demasiado ocupados haciendo tu trabajo!",
+    benefits: [
+        "Productividad incrementada",
+        "Reducción del esfuerzo manual",
+        "Procesos de negocio optimizados"
+    ],
+    serviceIcon: Workflow,
+  },
+  {
+    id: "PP-703",
+    category: "Power Platform Services",
+    categorySlug: "power-platform",
+    categoryDescription: "Empower your organization with custom apps, automated workflows, and insightful analytics using Microsoft Power Platform.",
+    categoryIcon: Layers,
+    serviceName: "Power Pages",
+    serviceSlug: "power-pages",
+    tagline: "Crea sitios web y soluciones de cliente.",
+    shortDescription: "Permite crear sitios web y soluciones de cliente rápidamente.",
+    overview: "Permite crear sitios web y soluciones de cliente rápidamente.",
+    benefits: [
+        "Despliegue rápido de sitios web",
+        "Portales de cliente seguros",
+        "Interacción con el cliente mejorada"
+    ],
+    serviceIcon: Globe,
+  },
+  {
+    id: "PP-704",
+    category: "Power Platform Services",
+    categorySlug: "power-platform",
+    categoryDescription: "Empower your organization with custom apps, automated workflows, and insightful analytics using Microsoft Power Platform.",
+    categoryIcon: Layers,
+    serviceName: "Microsoft Dataverse",
+    serviceSlug: "dataverse",
+    tagline: "Plataforma de datos para tus aplicaciones.",
+    shortDescription: "Una plataforma de datos que almacena y gestiona los datos de las aplicaciones y flujos de trabajo.",
+    overview: "Una plataforma de datos que almacena y gestiona los datos de las aplicaciones y flujos de trabajo.",
+    benefits: [
+        "Gestión de datos centralizada",
+        "Almacenamiento de datos seguro y escalable",
+        "Integración perfecta con Power Platform"
+    ],
+    serviceIcon: Database,
+  },
+  {
+    id: "PP-705",
+    category: "Power Platform Services",
+    categorySlug: "power-platform",
+    categoryDescription: "Empower your organization with custom apps, automated workflows, and insightful analytics using Microsoft Power Platform.",
+    categoryIcon: Layers,
+    serviceName: "Copilot Studio",
+    serviceSlug: "copilot-studio",
+    tagline: "Construye copilots personalizados.",
+    shortDescription: "Permite construir copilots personalizados para mejorar las experiencias de los clientes y empleados.",
+    overview: "Permite construir copilots personalizados para mejorar las experiencias de los clientes y empleados.",
+    benefits: [
+        "Servicio al cliente mejorado con IA",
+        "Productividad de empleados mejorada mediante asistentes personalizados",
+        "Experiencias de IA a medida"
+    ],
+    serviceIcon: Telescope, // Using Bot as a placeholder, consider a more specific icon for Copilots if available/created
+  },
+  {
+    id: "PP-706",
+    category: "Power Platform Services",
+    categorySlug: "power-platform",
+    categoryDescription: "Empower your organization with custom apps, automated workflows, and insightful analytics using Microsoft Power Platform.",
+    categoryIcon: Layers,
+    serviceName: "Power Platform Security & Governance",
+    serviceSlug: "power-platform-security-governance",
+    tagline: "Gestiona y protege tus inversiones low-code.",
+    shortDescription: "Ofrece herramientas para gestionar, supervisar y proteger las inversiones de bajo código, con cumplimiento y gobernanza de nivel empresarial.",
+    overview: "Ofrece herramientas para gestionar, supervisar y proteger las inversiones de bajo código, con cumplimiento y gobernanza de nivel empresarial.",
+    benefits: [
+        "Seguridad de nivel empresarial",
+        "Garantía de cumplimiento normativo",
+        "Gobernanza robusta de low-code"
+    ],
+    serviceIcon: Lock,
   }
 ];
 
