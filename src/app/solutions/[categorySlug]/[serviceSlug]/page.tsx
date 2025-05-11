@@ -1,5 +1,5 @@
 
-import { getServiceBySlugs, getServices, Service, ServiceFeature, ServiceUseCase } from '@/data/service-catalog';
+import { getServiceBySlugs, Service, ServiceFeature, ServiceUseCase } from '@/data/service-catalog';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -231,7 +231,7 @@ export default function ServiceDetailPage({ params }: Props) {
             <CardTitle className="text-2xl mb-3">Ready to Get Started?</CardTitle>
             <p className="mb-6 text-sm">Let&apos;s discuss how {service.serviceName} can help your business.</p>
             <Button size="lg" variant="secondary" asChild className="w-full bg-primary-foreground text-primary hover:bg-primary-foreground/90">
-              <Link href="/contact?service_interest=${service.serviceSlug}">
+              <Link href={`/contact?service_interest=${service.serviceSlug}`}>
                 Request Consultation <ExternalLink className="ml-2 h-5 w-5" />
               </Link>
             </Button>
