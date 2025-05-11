@@ -5,6 +5,8 @@ export const ContactFormSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address." }),
   company: z.string().optional(),
   message: z.string().min(10, { message: "Message must be at least 10 characters." }).max(500, { message: "Message must be less than 500 characters." }),
+  honeypot: z.string().optional(), // For bot protection, should be empty
+  formLoadTimestamp: z.coerce.number().positive("Invalid timestamp.").optional(), // For bot protection
 });
 
 export type ContactFormValues = z.infer<typeof ContactFormSchema>;
@@ -15,3 +17,4 @@ export const MetaGeneratorSchema = z.object({
 });
 
 export type MetaGeneratorValues = z.infer<typeof MetaGeneratorSchema>;
+

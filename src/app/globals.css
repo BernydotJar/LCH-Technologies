@@ -124,4 +124,17 @@
     animation: subtleFlash 20s ease-in-out infinite;
     z-index: 0; /* Behind content, on top of main background */
   }
+
+  /* For Honeypot field */
+  .sr-only-honeypot {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
 }
