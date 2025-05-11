@@ -22,7 +22,7 @@ export default function SolutionsPage() {
       {/* Hero Section */}
       <section 
         className="relative w-full py-20 md:py-32 rounded-xl shadow-lg overflow-hidden bg-gradient-to-br from-primary via-primary/90 to-accent/30 text-primary-foreground mb-16"
-        data-ai-hint="technology innovation"
+        
       >
         {/* Placeholder for video/animation - using a static image for now */}
         <Image 
@@ -32,6 +32,7 @@ export default function SolutionsPage() {
           objectFit="cover" 
           className="absolute inset-0 z-0 opacity-30"
           priority
+          data-ai-hint="technology innovation"
         />
         <div className="relative z-10 container mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-6xl font-bold mb-6">
@@ -52,7 +53,7 @@ export default function SolutionsPage() {
           <h2 className="text-3xl md:text-4xl font-semibold text-center mb-10 text-foreground">
             How Can We Accelerate Your Growth?
           </h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6"> {/* Adjusted grid for potentially 5 items */}
             {commonBusinessChallenges.map((challenge) => (
               <Card key={challenge.title} className="shadow-lg hover:shadow-xl transition-shadow duration-300 flex flex-col">
                 <CardHeader>
@@ -104,3 +105,5 @@ export default function SolutionsPage() {
     </>
   );
 }
+
+```

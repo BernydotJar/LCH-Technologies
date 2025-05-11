@@ -1,6 +1,6 @@
 
 import type { LucideIcon } from 'lucide-react';
-import { Brain, Cog, Bot, Search, ShieldCheck, TestTube2, BarChartBig, CloudCog, Zap } from 'lucide-react';
+import { Brain, Cog, Bot, Search, ShieldCheck, TestTube2, BarChartBig, CloudCog, Zap, Layers, Database } from 'lucide-react'; // Added Layers, Database
 
 export interface ServiceUseCase {
   title: string;
@@ -21,6 +21,7 @@ export interface Service {
   categoryDescription: string;
   categoryIcon?: LucideIcon; 
   categoryBannerImage?: string; // URL for category banner
+  categoryDataAiHint?: string; // AI hint for category banner image
   serviceName: string; // e.g., "Program Roadmap and Capability Advisory"
   serviceSlug: string; // e.g., "program-roadmap-capability-advisory"
   tagline: string;
@@ -70,6 +71,14 @@ export const serviceCategories = [
     icon: Search,
     bannerImage: "https://picsum.photos/1200/400?random=4",
     dataAiHint: "data analytics"
+  },
+  {
+    name: "Power Platform Services", // New Category
+    slug: "power-platform",
+    description: "Empower your organization with custom apps, automated workflows, and insightful analytics using Microsoft Power Platform. We help you build, govern, and scale low-code solutions.",
+    icon: Layers, // Using Layers icon for Power Platform
+    bannerImage: "https://picsum.photos/1200/400?random=7", // New random image
+    dataAiHint: "low code platform"
   },
   {
     name: "Manage & Infrastructure",
@@ -122,7 +131,7 @@ export const services: Service[] = [
     mediaPlaceholder: {
       type: "diagram",
       caption: "Visualizing your AI adoption journey.",
-      src: "https://picsum.photos/600/400?random=12", // Placeholder for diagram image
+      src: "https://picsum.photos/600/400?random=12", 
     }
   },
   {
@@ -156,7 +165,7 @@ export const services: Service[] = [
     mediaPlaceholder: {
       type: "video",
       caption: "See how custom ML models drive innovation.",
-      src: "https://www.youtube.com/embed/ honaayFV2gA", // Sample YouTube embed
+      src: "https://www.youtube.com/embed/honaayFV2gA", 
     }
   },
   // CORE Engineering
@@ -246,10 +255,20 @@ export const services: Service[] = [
       "Improved employee productivity and satisfaction",
       "Enhanced compliance and auditability"
     ],
+    features: [
+        { name: "Process Discovery & Assessment", description: "Identify and evaluate processes suitable for automation.", icon: Search },
+        { name: "Bot Development & Testing", description: "Design, build, and test resilient RPA bots.", icon: Bot },
+        { name: "Deployment & Orchestration", description: "Deploy bots into your environment and manage their execution.", icon: CloudCog },
+        { name: "Monitoring & Maintenance", description: "Provide ongoing support and optimization for your RPA solutions.", icon: Cog }
+    ],
+    useCases: [
+        { title: "Automated Data Entry", description: "Eliminate manual data entry across multiple systems.", image: "https://picsum.photos/400/300?random=31" },
+        { title: "Report Generation", description: "Automate the creation and distribution of regular reports.", image: "https://picsum.photos/400/300?random=32" }
+    ],
     mediaPlaceholder: {
       type: "gif",
       caption: "RPA bot automating a data entry task.",
-      src: "https://picsum.photos/600/400?random=30&gif", // Placeholder for gif
+      src: "https://picsum.photos/600/400?random=30&gif", 
     }
   },
   // Discovery & Analytics
@@ -270,6 +289,12 @@ export const services: Service[] = [
       "Identification of trends and patterns",
       "Improved collaboration through shared insights"
     ],
+    features: [
+        { name: "Interactive Dashboards", description: "Develop dynamic dashboards for real-time data exploration.", icon: BarChartBig },
+        { name: "Custom Reporting Solutions", description: "Design reports tailored to specific business needs and audiences.", icon: Cog },
+        { name: "Data Source Integration", description: "Connect to various data sources for a unified view.", icon: Database },
+        { name: "User Training & Adoption", description: "Empower your team to effectively use BI tools.", icon: Users } // Assuming Users icon from lucide
+    ],
     relatedProducts: ["Tableau, Power BI, Qlik", "Data Warehousing solutions"],
     mediaPlaceholder: {
         type: "gallery",
@@ -280,7 +305,7 @@ export const services: Service[] = [
         ]
       }
   },
-    // Manage & Infrastructure
+  // Manage & Infrastructure
   {
     id: "MI-500",
     category: "Manage & Infrastructure",
@@ -328,12 +353,56 @@ export const services: Service[] = [
       "Reduced testing costs",
       "Early defect detection"
     ],
+    features: [
+        { name: "Test Automation Strategy", description: "Define a comprehensive strategy for test automation.", icon: Cog },
+        { name: "Framework Development", description: "Build custom, reusable test automation frameworks.", icon: Zap },
+        { name: "Script Development & Execution", description: "Write and execute automated test scripts.", icon: TestTube2 },
+        { name: "CI/CD Integration", description: "Integrate test automation into your CI/CD pipeline.", icon: CloudCog }
+    ],
     mediaPlaceholder: {
         type: "video",
         caption: "Demonstration of our test automation framework in action.",
-        src: "https://www.youtube.com/embed/shortsamplevideoid" // Replace with actual video
+        src: "https://www.youtube.com/embed/dQw4w9WgXcQ" 
       }
   },
+  // Power Platform Services (New Placeholder Service)
+  {
+    id: "PP-700",
+    category: "Power Platform Services",
+    categorySlug: "power-platform",
+    categoryDescription: "Empower your organization with custom apps, automated workflows, and insightful analytics using Microsoft Power Platform.",
+    categoryIcon: Layers,
+    serviceName: "Power Apps Development",
+    serviceSlug: "power-apps-development",
+    tagline: "Rapidly build custom business applications.",
+    shortDescription: "Design and develop custom applications using Microsoft Power Apps to address specific business needs and streamline processes.",
+    overview: "Leverage Power Apps to quickly create low-code applications that modernize processes and tackle business challenges. We guide you through the entire lifecycle, from ideation and design to development, deployment, and governance, enabling citizen developers and professional developers alike.",
+    benefits: [
+      "Accelerated application development",
+      "Improved operational efficiency through custom solutions",
+      "Empowerment of citizen developers",
+      "Seamless integration with Microsoft ecosystem"
+    ],
+    features: [
+      { name: "Custom App Design & Prototyping", description: "Visualize and refine your app idea before development.", icon: Brain },
+      { name: "Canvas & Model-Driven App Development", description: "Build both UI-focused and data-centric applications.", icon: Layers },
+      { name: "Dataverse Integration & Custom Connectors", description: "Connect to your data sources securely and efficiently.", icon: Database },
+      { name: "Power Platform Governance & ALM", description: "Establish best practices for managing and deploying Power Apps.", icon: ShieldCheck }
+    ],
+    useCases: [
+      { title: "Field Service Mobile Apps", description: "Equip field technicians with custom apps for real-time data access and updates.", image: "https://picsum.photos/400/300?random=70" },
+      { title: "Internal Process Automation Apps", description: "Develop apps for expense approvals, inventory management, or employee onboarding.", image: "https://picsum.photos/400/300?random=71" }
+    ],
+    relatedProducts: ["Microsoft Power Automate", "Microsoft Power BI", "Microsoft Dataverse", "SharePoint"],
+    mediaPlaceholder: {
+      type: "gallery",
+      caption: "Screenshots of custom Power Apps solutions.",
+      galleryImages: [
+        "https://picsum.photos/600/400?random=72",
+        "https://picsum.photos/600/400?random=73",
+      ]
+    }
+  }
 ];
 
 // Helper functions to get data
@@ -361,7 +430,7 @@ export const commonBusinessChallenges = [
   {
     title: "Streamline Operations",
     description: "Reduce manual effort and boost efficiency with automation and optimized workflows.",
-    link: "/solutions/rpa", // or #rpa if on the same page
+    link: "/solutions/rpa", 
     icon: Zap,
     dataAiHint: "workflow automation"
   },
@@ -385,5 +454,14 @@ export const commonBusinessChallenges = [
     link: "/solutions/discovery-analytics",
     icon: BarChartBig,
     dataAiHint: "business intelligence"
+  },
+  { // New Challenge linking to Power Platform
+    title: "Accelerate Digital Transformation",
+    description: "Rapidly build and deploy custom applications and automated workflows with low-code solutions.",
+    link: "/solutions/power-platform",
+    icon: Layers, // Using Layers icon consistent with Power Platform
+    dataAiHint: "digital transformation"
   }
 ];
+
+```
