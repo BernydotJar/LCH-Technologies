@@ -1,6 +1,6 @@
 
 import type { LucideIcon } from 'lucide-react';
-import { Brain, Cog, Bot, Search, ShieldCheck, TestTube2, BarChartBig, CloudCog, Zap, Layers, Database } from 'lucide-react'; // Added Layers, Database
+import { Brain, Cog, Bot, Search, ShieldCheck, TestTube2, BarChartBig, CloudCog, Zap, Layers, Database, Users } from 'lucide-react'; // Added Layers, Database, Users
 
 export interface ServiceUseCase {
   title: string;
@@ -124,8 +124,8 @@ export const services: Service[] = [
       { name: "Implementation Roadmap", description: "Develop a phased plan with clear milestones and deliverables.", icon: CloudCog }
     ],
     useCases: [
-      { title: "AI for Customer Personalization", description: "Understand how AI can tailor customer experiences at scale.", image: "https://picsum.photos/400/300?random=10" },
-      { title: "Predictive Maintenance with ML", description: "Explore AI's role in forecasting equipment failures to reduce downtime.", image: "https://picsum.photos/400/300?random=11" }
+      { title: "AI for Customer Personalization", description: "Understand how AI can tailor customer experiences at scale.", image: "https://picsum.photos/400/300?random=10", dataAiHint: "customer experience" },
+      { title: "Predictive Maintenance with ML", description: "Explore AI's role in forecasting equipment failures to reduce downtime.", image: "https://picsum.photos/400/300?random=11", dataAiHint: "industrial machine" }
     ],
     relatedProducts: ["Data Analytics Platforms", "Cloud AI Services"],
     mediaPlaceholder: {
@@ -158,8 +158,8 @@ export const services: Service[] = [
       { name: "Performance Monitoring & Retraining", description: "Continuously track model performance and retrain as needed.", icon: BarChartBig }
     ],
     useCases: [
-        { title: "Fraud Detection Systems", description: "Develop custom models to identify and prevent fraudulent transactions with higher accuracy.", image: "https://picsum.photos/400/300?random=13" },
-        { title: "Natural Language Processing for Sentiment Analysis", description: "Build models to understand customer opinions from text data.", image: "https://picsum.photos/400/300?random=14" }
+        { title: "Fraud Detection Systems", description: "Develop custom models to identify and prevent fraudulent transactions with higher accuracy.", image: "https://picsum.photos/400/300?random=13", dataAiHint: "security system" },
+        { title: "Natural Language Processing for Sentiment Analysis", description: "Build models to understand customer opinions from text data.", image: "https://picsum.photos/400/300?random=14", dataAiHint: "customer feedback" }
     ],
     relatedProducts: ["Python, TensorFlow, PyTorch", "Cloud ML Platforms"],
     mediaPlaceholder: {
@@ -227,8 +227,8 @@ export const services: Service[] = [
       { name: "DevOps & CI/CD Pipelines", description: "Automate build, test, and deployment processes.", icon: Cog }
     ],
     useCases: [
-        { title: "Scalable E-commerce Platforms", description: "Build online stores that can handle high traffic and seasonal peaks.", image: "https://picsum.photos/400/300?random=23" },
-        { title: "Real-time Data Processing Systems", description: "Develop applications that can process and analyze streaming data.", image: "https://picsum.photos/400/300?random=24" }
+        { title: "Scalable E-commerce Platforms", description: "Build online stores that can handle high traffic and seasonal peaks.", image: "https://picsum.photos/400/300?random=23", dataAiHint: "online shopping" },
+        { title: "Real-time Data Processing Systems", description: "Develop applications that can process and analyze streaming data.", image: "https://picsum.photos/400/300?random=24", dataAiHint: "data stream" }
     ],
     relatedProducts: ["AWS, Azure, GCP", "Docker, Kubernetes"],
     mediaPlaceholder: {
@@ -262,8 +262,8 @@ export const services: Service[] = [
         { name: "Monitoring & Maintenance", description: "Provide ongoing support and optimization for your RPA solutions.", icon: Cog }
     ],
     useCases: [
-        { title: "Automated Data Entry", description: "Eliminate manual data entry across multiple systems.", image: "https://picsum.photos/400/300?random=31" },
-        { title: "Report Generation", description: "Automate the creation and distribution of regular reports.", image: "https://picsum.photos/400/300?random=32" }
+        { title: "Automated Data Entry", description: "Eliminate manual data entry across multiple systems.", image: "https://picsum.photos/400/300?random=31", dataAiHint: "data entry" },
+        { title: "Report Generation", description: "Automate the creation and distribution of regular reports.", image: "https://picsum.photos/400/300?random=32", dataAiHint: "financial report" }
     ],
     mediaPlaceholder: {
       type: "gif",
@@ -293,7 +293,7 @@ export const services: Service[] = [
         { name: "Interactive Dashboards", description: "Develop dynamic dashboards for real-time data exploration.", icon: BarChartBig },
         { name: "Custom Reporting Solutions", description: "Design reports tailored to specific business needs and audiences.", icon: Cog },
         { name: "Data Source Integration", description: "Connect to various data sources for a unified view.", icon: Database },
-        { name: "User Training & Adoption", description: "Empower your team to effectively use BI tools.", icon: Users } // Assuming Users icon from lucide
+        { name: "User Training & Adoption", description: "Empower your team to effectively use BI tools.", icon: Users } 
     ],
     relatedProducts: ["Tableau, Power BI, Qlik", "Data Warehousing solutions"],
     mediaPlaceholder: {
@@ -362,10 +362,10 @@ export const services: Service[] = [
     mediaPlaceholder: {
         type: "video",
         caption: "Demonstration of our test automation framework in action.",
-        src: "https://www.youtube.com/embed/dQw4w9WgXcQ" 
+        src: "https://www.youtube.com/embed/dQw4w9WgXcQ" // Placeholder video
       }
   },
-  // Power Platform Services (New Placeholder Service)
+  // Power Platform Services 
   {
     id: "PP-700",
     category: "Power Platform Services",
@@ -390,8 +390,8 @@ export const services: Service[] = [
       { name: "Power Platform Governance & ALM", description: "Establish best practices for managing and deploying Power Apps.", icon: ShieldCheck }
     ],
     useCases: [
-      { title: "Field Service Mobile Apps", description: "Equip field technicians with custom apps for real-time data access and updates.", image: "https://picsum.photos/400/300?random=70" },
-      { title: "Internal Process Automation Apps", description: "Develop apps for expense approvals, inventory management, or employee onboarding.", image: "https://picsum.photos/400/300?random=71" }
+      { title: "Field Service Mobile Apps", description: "Equip field technicians with custom apps for real-time data access and updates.", image: "https://picsum.photos/400/300?random=70", dataAiHint: "mobile application" },
+      { title: "Internal Process Automation Apps", description: "Develop apps for expense approvals, inventory management, or employee onboarding.", image: "https://picsum.photos/400/300?random=71", dataAiHint: "business process" }
     ],
     relatedProducts: ["Microsoft Power Automate", "Microsoft Power BI", "Microsoft Dataverse", "SharePoint"],
     mediaPlaceholder: {
@@ -455,13 +455,11 @@ export const commonBusinessChallenges = [
     icon: BarChartBig,
     dataAiHint: "business intelligence"
   },
-  { // New Challenge linking to Power Platform
+  { 
     title: "Accelerate Digital Transformation",
     description: "Rapidly build and deploy custom applications and automated workflows with low-code solutions.",
     link: "/solutions/power-platform",
-    icon: Layers, // Using Layers icon consistent with Power Platform
+    icon: Layers, 
     dataAiHint: "digital transformation"
   }
 ];
-
-```
