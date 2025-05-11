@@ -28,15 +28,12 @@ export default function Header() {
 
   const { language, setLanguage, languages } = useLanguage();
   const { theme } = useTheme();
-  const logoSrc = theme === 'dark' ? '/black-lch-technologies-logo.png' : '/light-lch-technologies-logo.png';
+  const logoSrc = theme === 'dark' ? '/black-lch-technologies-logo.png' : '/light-lch-technologies-logo.png'; 
 
   return (
     <header className="bg-background/80 backdrop-blur-md sticky top-0 z-50 w-full border-b">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <Link href="/" className="flex items-center gap-2 text-xl font-semibold text-primary">
-          <Avatar className="h-6 w-6">
-            <AvatarImage src={logoSrc} alt="LCH Technologies Logo" />
-          </Avatar>
+        <Link href="/" className="flex items-center gap-2 text-xl font-semibold text-primary">          <img src={logoSrc} alt="LCH Technologies Logo" className="h-10 w-10" />
           <span>LCH Technologies</span>
         </Link>
         <nav className="hidden md:flex gap-6 items-center">
@@ -70,10 +67,7 @@ export default function Header() {
               </SheetTrigger>
               <SheetContent side="right">
                 <div className="grid gap-4 p-4">
-                  <Link href="/" className="flex items-center gap-2 text-lg font-semibold text-primary mb-4" >
-                     <Avatar className="h-5 w-5">
-                       <AvatarImage src={logoSrc} alt="LCH Technologies Logo" />
-                     </Avatar>
+                  <Link href="/" className="flex items-center gap-2 text-lg font-semibold text-primary mb-4" >                     <img src={logoSrc} alt="LCH Technologies Logo" className="h-8 w-8" />
                     <span>LCH Technologies</span>
                   </Link>
                   {navItems.map((item) => (
