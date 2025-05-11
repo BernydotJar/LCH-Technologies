@@ -8,7 +8,7 @@ import { ArrowRight } from 'lucide-react';
 import Breadcrumbs from '@/components/shared/Breadcrumbs';
 
 export const metadata = {
-  title: 'Explore Our Solutions - LCH Technologies',
+  title: 'Explore Our Solutions - TechFront Marketing',
   description: 'Discover a comprehensive range of technology services designed to empower your business, from AI and ML to CORE engineering and RPA.',
 };
 
@@ -39,7 +39,7 @@ export default function SolutionsPage() {
             Empowering Your Future with Intelligent Solutions
           </h1>
           <p className="text-lg md:text-2xl mb-10 max-w-3xl mx-auto">
-            At LCH Technologies, we craft innovative solutions that drive growth, efficiency, and transformation. Explore our expertise across various technology domains.
+            At TechFront Marketing, we craft innovative solutions that drive growth, efficiency, and transformation. Explore our expertise across various technology domains.
           </p>
           <Button size="lg" asChild className="bg-accent text-accent-foreground hover:bg-accent/90">
             <Link href="#service-categories">Explore Our Expertise <ArrowRight className="ml-2 h-5 w-5" /></Link>
@@ -92,7 +92,10 @@ export default function SolutionsPage() {
                     <p className="text-muted-foreground mb-4">{category.description}</p>
                   </CardContent>
                   <CardContent className="text-center mt-auto">
-                     <Button variant="outline" className="text-primary border-primary hover:bg-primary hover:text-primary-foreground">
+                     <Button 
+                        variant="outline" 
+                        className="w-full text-primary border-primary hover:bg-primary hover:text-primary-foreground whitespace-normal h-auto text-center"
+                      >
                         Explore {category.name} <ArrowRight className="ml-2 h-4 w-4" />
                       </Button>
                   </CardContent>
