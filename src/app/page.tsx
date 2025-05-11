@@ -125,7 +125,7 @@ export default function Home() {
           <Carousel
             opts={{ loop: true }}
             plugins={[autoplayPlugin.current]}
-            className="w-full max-w-3xl mx-auto mb-10"
+            className="w-full max-w-3xl mx-auto mb-10 group"
             onMouseEnter={autoplayPlugin.current.stop}
             onMouseLeave={autoplayPlugin.current.reset}
           >
@@ -138,8 +138,8 @@ export default function Home() {
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <CarouselPrevious className="absolute left-0 md:left-2 top-1/2 -translate-y-1/2 z-10 bg-background/30 hover:bg-background/60 text-primary-foreground" />
-            <CarouselNext className="absolute right-0 md:right-2 top-1/2 -translate-y-1/2 z-10 bg-background/30 hover:bg-background/60 text-primary-foreground" />
+            <CarouselPrevious className="absolute left-0 md:left-2 top-1/2 -translate-y-1/2 z-10 bg-background/30 hover:bg-background/60 text-primary-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <CarouselNext className="absolute right-0 md:right-2 top-1/2 -translate-y-1/2 z-10 bg-background/30 hover:bg-background/60 text-primary-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </Carousel>
           <div className="space-x-4">
             <Button size="lg" asChild className="bg-accent text-accent-foreground hover:bg-accent/90 transition-all duration-300 transform hover:scale-105 shadow-md">
