@@ -27,8 +27,10 @@ export default function Home() {
       heroTitle: 'Innovate. Transform. Succeed.',
       heroSubtitles: [
         "At LCH, we partner with you to build your foundational intelligent automations.",
-        "We can help you train your developers.",
-        "Empowering you to independently drive future innovation. We're more than consultants; we're your dedicated mentors for lasting technological self-sufficiency."
+        "We help you train and mentor your developers into skilled automation leaders and scale your intelligent automations.",
+        "Empowering you to independently drive future innovation.",
+        "We're more than consultants; we're your dedicated mentors for lasting technological self-sufficiency.",
+        "Our focused enablement model accelerates your journey to in-house automation mastery and tangible results."
       ],
       discoverButton: 'Discover Our Solutions',
       requestDemoButton: 'Request a Demo',
@@ -56,8 +58,10 @@ export default function Home() {
       heroTitle: 'Innovar. Transformar. Tener éxito.',
       heroSubtitles: [
         "En LCH, nos asociamos contigo para construir tus automatizaciones inteligentes fundamentales.",
-        "Podemos ayudarte a capacitar a tus desarrolladores.",
-        "Empoderándote para impulsar la innovación futura de forma independiente. Somos más que consultores; somos tus mentores dedicados para una autosuficiencia tecnológica duradera."
+        "Te ayudamos a capacitar y guiar a tus desarrolladores para convertirlos en líderes de automatización cualificados y escalar tus automatizaciones inteligentes.",
+        "Empoderándote para impulsar la innovación futura de forma independiente.",
+        "Somos más que consultores; somos tus mentores dedicados para una autosuficiencia tecnológica duradera.",
+        "Nuestro modelo de habilitación enfocado acelera tu viaje hacia el dominio interno de la automatización y resultados tangibles."
       ],
       discoverButton: 'Descubra nuestras soluciones',
       requestDemoButton: 'Solicite una demostración',
@@ -85,8 +89,10 @@ export default function Home() {
       heroTitle: 'Innovare. Trasformare. Riuscire.',
       heroSubtitles: [
         "In LCH, collaboriamo con te per costruire le tue automazioni intelligenti fondamentali.",
-        "Possiamo aiutarti a formare i tuoi sviluppatori.",
-        "Consentendoti di guidare autonomamente l'innovazione futura. Siamo più che consulenti; siamo i tuoi mentori dedicati per un'autosufficienza tecnologica duratura."
+        "Ti aiutiamo a formare e fare da mentore ai tuoi sviluppatori per trasformarli in leader esperti dell'automazione e scalare le tue automazioni intelligenti.",
+        "Consentendoti di guidare autonomamente l'innovazione futura.",
+        "Siamo più che consulenti; siamo i tuoi mentori dedicati per un'autosufficienza tecnologica duratura.",
+        "Il nostro modello di abilitazione mirato accelera il tuo percorso verso la padronanza interna dell'automazione e risultati tangibili."
       ],
       discoverButton: 'Scopri le Nostre Soluzioni',
       requestDemoButton: 'Richiedi una Demo',
@@ -132,9 +138,8 @@ export default function Home() {
             <CarouselContent>
               {t.heroSubtitles.map((subtitle, index) => (
                 <CarouselItem key={index}>
-                  <p className="text-lg md:text-2xl text-center py-4 min-h-[120px] md:min-h-[100px] flex items-center justify-center px-6">
-                    {subtitle}
-                  </p>
+                  <p className="text-lg md:text-2xl text-center py-4 min-h-[120px] md:min-h-[100px] flex items-center justify-center px-6"
+                     dangerouslySetInnerHTML={{ __html: subtitle }} />
                 </CarouselItem>
               ))}
             </CarouselContent>
@@ -232,3 +237,4 @@ export default function Home() {
     </div>
   );
 }
+
