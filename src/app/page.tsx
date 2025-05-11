@@ -6,14 +6,30 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowRight, Lightbulb, Briefcase, MessageSquare, BarChart3 } from 'lucide-react';
 import { useLanguage } from '@/contexts/language-context';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+import Autoplay from "embla-carousel-autoplay";
+import * as React from "react";
 
 export default function Home() {
   const { language } = useLanguage();
+  const autoplayPlugin = React.useRef(
+    Autoplay({ delay: 7000, stopOnInteraction: true }) // Longer delay for readability
+  );
 
   const translations = {
     en: {
       heroTitle: 'Innovate. Transform. Succeed.',
-      heroSubtitle: "At LCH, we partner with you to build your foundational intelligent automations and comprehensively train your developers, empowering you to independently drive future innovation. We're more than consultants; we're your dedicated mentors for lasting technological self-sufficiency.",
+      heroSubtitles: [
+        "At LCH, we partner with you to build your foundational intelligent automations.",
+        "We can help you train your developers.",
+        "Empowering you to independently drive future innovation. We're more than consultants; we're your dedicated mentors for lasting technological self-sufficiency."
+      ],
       discoverButton: 'Discover Our Solutions',
       requestDemoButton: 'Request a Demo',
       aboutTitle: 'About LCH',
@@ -38,7 +54,11 @@ export default function Home() {
     },
     es: {
       heroTitle: 'Innovar. Transformar. Tener éxito.',
-      heroSubtitle: "En LCH, nos asociamos contigo para construir tus automatizaciones inteligentes fundamentales y capacitar integralmente a tus desarrolladores, empoderándote para impulsar la innovación futura de forma independiente. Somos más que consultores; somos tus mentores dedicados para una autosuficiencia tecnológica duradera.",
+      heroSubtitles: [
+        "En LCH, nos asociamos contigo para construir tus automatizaciones inteligentes fundamentales.",
+        "Podemos ayudarte a capacitar a tus desarrolladores.",
+        "Empoderándote para impulsar la innovación futura de forma independiente. Somos más que consultores; somos tus mentores dedicados para una autosuficiencia tecnológica duradera."
+      ],
       discoverButton: 'Descubra nuestras soluciones',
       requestDemoButton: 'Solicite una demostración',
       aboutTitle: 'Sobre LCH',
@@ -63,7 +83,11 @@ export default function Home() {
     },
     it: {
       heroTitle: 'Innovare. Trasformare. Riuscire.',
-      heroSubtitle: "In LCH, collaboriamo con te per costruire le tue automazioni intelligenti fondamentali e formare in modo completo i tuoi sviluppatori, consentendoti di guidare autonomamente l'innovazione futura. Siamo più che consulenti; siamo i tuoi mentori dedicati per un'autosufficienza tecnologica duratura.",
+      heroSubtitles: [
+        "In LCH, collaboriamo con te per costruire le tue automazioni intelligenti fondamentali.",
+        "Possiamo aiutarti a formare i tuoi sviluppatori.",
+        "Consentendoti di guidare autonomamente l'innovazione futura. Siamo più che consulenti; siamo i tuoi mentori dedicati per un'autosufficienza tecnologica duratura."
+      ],
       discoverButton: 'Scopri le Nostre Soluzioni',
       requestDemoButton: 'Richiedi una Demo',
       aboutTitle: 'Informazioni su LCH',
@@ -98,9 +122,25 @@ export default function Home() {
           <h1 className="text-4xl md:text-6xl font-bold mb-6">
             {t.heroTitle}
           </h1>
-          <p className="text-lg md:text-2xl mb-10 max-w-3xl mx-auto">
-            {t.heroSubtitle}
-          </p>
+          <Carousel
+            opts={{ loop: true }}
+            plugins={[autoplayPlugin.current]}
+            className="w-full max-w-3xl mx-auto mb-10"
+            onMouseEnter={autoplayPlugin.current.stop}
+            onMouseLeave={autoplayPlugin.current.reset}
+          >
+            <CarouselContent>
+              {t.heroSubtitles.map((subtitle, index) => (
+                <CarouselItem key={index}>
+                  <p className="text-lg md:text-2xl text-center py-4 min-h-[120px] md:min-h-[100px] flex items-center justify-center px-6">
+                    {subtitle}
+                  </p>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious className="absolute left-0 md:left-2 top-1/2 -translate-y-1/2 z-10 bg-background/30 hover:bg-background/60 text-primary-foreground" />
+            <CarouselNext className="absolute right-0 md:right-2 top-1/2 -translate-y-1/2 z-10 bg-background/30 hover:bg-background/60 text-primary-foreground" />
+          </Carousel>
           <div className="space-x-4">
             <Button size="lg" asChild className="bg-accent text-accent-foreground hover:bg-accent/90 transition-all duration-300 transform hover:scale-105 shadow-md">
               <Link href="/solutions">{t.discoverButton} <ArrowRight className="ml-2 h-5 w-5" /></Link>
@@ -192,4 +232,3 @@ export default function Home() {
     </div>
   );
 }
-
