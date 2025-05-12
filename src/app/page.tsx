@@ -1,10 +1,9 @@
-
 'use client';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowRight, Lightbulb, Briefcase, MessageSquare, BarChart3 } from 'lucide-react';
+import { ArrowRight, MessageSquare } from 'lucide-react';
 import { useLanguage } from '@/contexts/language-context';
 import {
   Carousel,
@@ -15,22 +14,23 @@ import {
 } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 import * as React from "react";
+import SectionObserver from '@/components/section-observer'; // Import SectionObserver
 
 export default function Home() {
   const { language } = useLanguage();
   const autoplayPlugin = React.useRef(
-    Autoplay({ delay: 7000, stopOnInteraction: true }) // Longer delay for readability
+    Autoplay({ delay: 7000, stopOnInteraction: true })
   );
 
   const translations = {
     en: {
       heroTitle: 'Innovate. Transform. Succeed.',
       heroSubtitles: [
-        "At LCH, we partner with you to build your foundational intelligent automations.",
-        "We help you train and mentor your developers into skilled automation leaders and scale your intelligent automations.",
-        "Empowering you to independently drive future innovation.",
-        "We're more than consultants; we're your dedicated mentors for lasting technological self-sufficiency.",
-        "Our focused enablement model accelerates your journey to in-house automation mastery and tangible results."
+        "At LCH, we partner with you to <strong>engineer</strong> your foundational intelligent automations, <strong>setting the stage for lasting success.</strong>",
+        "We help you train and mentor your developers into <strong>skilled automation leaders</strong> and scale your intelligent automations.",
+        "Empowering you to <strong>independently drive future innovation.</strong>",
+        "We're more than consultants; we're your <strong>dedicated mentors</strong> for <strong>lasting technological self-sufficiency.</strong>",
+        "Our focused enablement model <strong>accelerates your journey to in-house automation mastery</strong> and tangible results."
       ],
       discoverButton: 'Discover Our Solutions',
       requestDemoButton: 'Request a Demo',
@@ -57,11 +57,11 @@ export default function Home() {
     es: {
       heroTitle: 'Innovar. Transformar. Tener éxito.',
       heroSubtitles: [
-        "En LCH, nos asociamos contigo para construir tus automatizaciones inteligentes fundamentales.",
-        "Te ayudamos a capacitar y guiar a tus desarrolladores para convertirlos en líderes de automatización cualificados y escalar tus automatizaciones inteligentes.",
-        "Empoderándote para impulsar la innovación futura de forma independiente.",
-        "Somos más que consultores; somos tus mentores dedicados para una autosuficiencia tecnológica duradera.",
-        "Nuestro modelo de habilitación enfocado acelera tu viaje hacia el dominio interno de la automatización y resultados tangibles."
+        "En LCH, nos asociamos contigo para <strong>diseñar</strong> tus automatizaciones inteligentes fundamentales, <strong>sentando las bases para un éxito duradero.</strong>",
+        "Te ayudamos a capacitar y guiar a tus desarrolladores para convertirlos en <strong>líderes de automatización cualificados</strong> y escalar tus automatizaciones inteligentes.",
+        "Empoderándote para <strong>impulsar la innovación futura de forma independiente.</strong>",
+        "Somos más que consultores; somos tus <strong>mentores dedicados</strong> para una <strong>autosuficiencia tecnológica duradera.</strong>",
+        "Nuestro modelo de habilitación enfocado <strong>acelera tu viaje hacia el dominio interno de la automatización</strong> y resultados tangibles."
       ],
       discoverButton: 'Descubra nuestras soluciones',
       requestDemoButton: 'Solicite una demostración',
@@ -88,11 +88,11 @@ export default function Home() {
     it: {
       heroTitle: 'Innovare. Trasformare. Riuscire.',
       heroSubtitles: [
-        "In LCH, collaboriamo con te per costruire le tue automazioni intelligenti fondamentali.",
-        "Ti aiutiamo a formare e fare da mentore ai tuoi sviluppatori per trasformarli in leader esperti dell'automazione e scalare le tue automazioni intelligenti.",
-        "Consentendoti di guidare autonomamente l'innovazione futura.",
-        "Siamo più che consulenti; siamo i tuoi mentori dedicati per un'autosufficienza tecnologica duratura.",
-        "Il nostro modello di abilitazione mirato accelera il tuo percorso verso la padronanza interna dell'automazione e risultati tangibili."
+        "In LCH, collaboriamo con te per <strong>progettare</strong> le tue automazioni intelligenti fondamentali, <strong>ponendo le basi per un successo duraturo.</strong>",
+        "Ti aiutiamo a formare e fare da mentore ai tuoi sviluppatori per trasformarli in <strong>leader esperti dell'automazione</strong> e scalare le tue automazioni intelligenti.",
+        "Consentendoti di <strong>guidare autonomamente l'innovazione futura.</strong>",
+        "Siamo più che consulenti; siamo i tuoi <strong>mentori dedicati</strong> per <strong>un'autosufficienza tecnologica duratura.</strong>",
+        "Il nostro modello di abilitazione mirato <strong>accelera il tuo percorso verso la padronanza interna dell'automazione</strong> e risultati tangibili."
       ],
       discoverButton: 'Scopri le Nostre Soluzioni',
       requestDemoButton: 'Richiedi una Demo',
@@ -138,8 +138,9 @@ export default function Home() {
             <CarouselContent>
               {t.heroSubtitles.map((subtitle, index) => (
                 <CarouselItem key={index}>
-                  <p className="text-lg md:text-2xl text-center py-4 min-h-[120px] md:min-h-[100px] flex items-center justify-center px-6"
-                     dangerouslySetInnerHTML={{ __html: subtitle }} />
+                  <p 
+                    className="text-lg md:text-2xl text-center py-4 min-h-[120px] md:min-h-[100px] flex items-center justify-center px-6"
+                    dangerouslySetInnerHTML={{ __html: subtitle }} />
                 </CarouselItem>
               ))}
             </CarouselContent>
@@ -150,10 +151,10 @@ export default function Home() {
             <Button size="lg" asChild className="bg-accent text-accent-foreground hover:bg-accent/90 transition-all duration-300 transform hover:scale-105 shadow-md">
               <Link href="/solutions">{t.discoverButton} <ArrowRight className="ml-2 h-5 w-5" /></Link>
             </Button>
-            <Button 
-              size="lg" 
-              variant="outline" 
-              asChild 
+            <Button
+              size="lg"
+              variant="outline"
+              asChild
               className="bg-[#deb952] text-foreground border-[#deb952] hover:bg-[#c4962f] hover:text-foreground transition-all duration-300 transform hover:scale-105 shadow-md"
             >
               <Link href="/contact">{t.requestDemoButton}</Link>
@@ -163,78 +164,83 @@ export default function Home() {
       </section>
 
       {/* About Us Section */}
-      <section id="about" className="w-full py-12 md:py-16">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-semibold mb-4 text-foreground">{t.aboutTitle}</h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
-            {t.aboutSubtitle}
-          </p>
-          <div className="grid md:grid-cols-3 gap-8">
-            <Card className="text-center shadow-lg hover:shadow-xl transition-shadow duration-300">
-              <CardHeader>
-                <CardTitle>{t.missionTitle}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">{t.missionText}</p>
-              </CardContent>
-            </Card>
-            <Card className="text-center shadow-lg hover:shadow-xl transition-shadow duration-300">
-              <CardHeader>
-                <CardTitle>{t.visionTitle}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">{t.visionText}</p>
-              </CardContent>
-            </Card>
-            <Card className="text-center shadow-lg hover:shadow-xl transition-shadow duration-300">
-              <CardHeader>
-                <CardTitle>{t.valuesTitle}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">{t.valuesText}</p>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      {/* Solutions/Services Section */}
-      <section id="solutions" className="w-full py-12 md:py-16 bg-secondary rounded-lg">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-semibold mb-10 text-foreground">{t.expertiseTitle}</h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[t.customSoftware, t.cloudSolutions, t.aiMl, t.dataAnalytics, t.cybersecurity, t.itConsulting].map((service) => (
-              <Card key={service} className="shadow-lg hover:shadow-xl transition-shadow duration-300">
+      <SectionObserver sectionId="about">
+        <section id="about" className="w-full py-12 md:py-16">
+          <div className="container mx-auto px-4 text-center">
+            <h2 className="text-3xl md:text-4xl font-semibold mb-4 text-foreground">{t.aboutTitle}</h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
+              {t.aboutSubtitle}
+            </p>
+            <div className="grid md:grid-cols-3 gap-8">
+              <Card className="text-center shadow-lg hover:shadow-xl transition-shadow duration-300">
                 <CardHeader>
-                  <CardTitle className="text-primary">{service}</CardTitle>
-                  <CardDescription>Brief description of {service.toLowerCase()} and its benefits.</CardDescription>
+                  <CardTitle>{t.missionTitle}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <Button variant="link" asChild className="text-accent-foreground hover:text-primary" disabled>
-                    <Link href={`/solutions/${service.toLowerCase().replace(/\s+/g, '-').replace(/&/g, 'and')}`}>{t.learnMore} <ArrowRight className="ml-2 h-4 w-4" /></Link>
-                  </Button>
+                  <p className="text-muted-foreground">{t.missionText}</p>
                 </CardContent>
               </Card>
-            ))}
+              <Card className="text-center shadow-lg hover:shadow-xl transition-shadow duration-300">
+                <CardHeader>
+                  <CardTitle>{t.visionTitle}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">{t.visionText}</p>
+                </CardContent>
+              </Card>
+              <Card className="text-center shadow-lg hover:shadow-xl transition-shadow duration-300">
+                <CardHeader>
+                  <CardTitle>{t.valuesTitle}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">{t.valuesText}</p>
+                </CardContent>
+              </Card>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </SectionObserver>
+
+      {/* Solutions/Services Section */}
+      <SectionObserver sectionId="solutions">
+        <section id="solutions" className="w-full py-12 md:py-16 bg-secondary rounded-lg">
+          <div className="container mx-auto px-4 text-center">
+            <h2 className="text-3xl md:text-4xl font-semibold mb-10 text-foreground">{t.expertiseTitle}</h2>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[t.customSoftware, t.cloudSolutions, t.aiMl, t.dataAnalytics, t.cybersecurity, t.itConsulting].map((service) => (
+                <Card key={service} className="shadow-lg hover:shadow-xl transition-shadow duration-300">
+                  <CardHeader>
+                    <CardTitle className="text-primary">{service}</CardTitle>
+                    <CardDescription>Brief description of {service.toLowerCase()} and its benefits.</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button variant="link" asChild className="text-accent-foreground hover:text-primary" disabled>
+                      <Link href={`/solutions/${service.toLowerCase().replace(/\s+/g, '-').replace(/&/g, 'and')}`}>{t.learnMore} <ArrowRight className="ml-2 h-4 w-4" /></Link>
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+      </SectionObserver>
       
       {/* Call to Action / Contact Section Preview */}
-      <section id="contact-preview" className="w-full py-12 md:py-20">
-        <div className="container mx-auto px-4 text-center">
-          <Card className="max-w-2xl mx-auto p-6 md:p-10 shadow-xl bg-gradient-to-r from-accent/80 to-primary/80 text-primary-foreground">
-            <h2 className="text-3xl md:text-4xl font-semibold mb-6">{t.ctaTitle}</h2>
-            <p className="text-lg mb-8">
-              {t.ctaSubtitle}
-            </p>
-            <Button size="lg" variant="secondary" asChild className="bg-primary-foreground text-primary hover:bg-primary-foreground/90 transition-all duration-300 transform hover:scale-105 shadow-md">
-              <Link href="/contact">{t.getInTouch} <MessageSquare className="ml-2 h-5 w-5" /></Link>
-            </Button>
-          </Card>
-        </div>
-      </section>
+      <SectionObserver sectionId="contact-preview">
+        <section id="contact-preview" className="w-full py-12 md:py-20">
+          <div className="container mx-auto px-4 text-center">
+            <Card className="max-w-2xl mx-auto p-6 md:p-10 shadow-xl bg-gradient-to-r from-accent/80 to-primary/80 text-primary-foreground">
+              <h2 className="text-3xl md:text-4xl font-semibold mb-6">{t.ctaTitle}</h2>
+              <p className="text-lg mb-8">
+                {t.ctaSubtitle}
+              </p>
+              <Button size="lg" variant="secondary" asChild className="bg-primary-foreground text-primary hover:bg-primary-foreground/90 transition-all duration-300 transform hover:scale-105 shadow-md">
+                <Link href="/contact">{t.getInTouch} <MessageSquare className="ml-2 h-5 w-5" /></Link>
+              </Button>
+            </Card>
+          </div>
+        </section>
+      </SectionObserver>
     </div>
   );
 }
-

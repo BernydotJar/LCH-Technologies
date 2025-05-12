@@ -4,6 +4,7 @@ import * as React from "react";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import type { ThemeProviderProps } from "next-themes/dist/types";
 import { LanguageProvider } from "@/contexts/language-context";
+import { SectionProvider } from "@/contexts/section-context"; // Import SectionProvider
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
@@ -14,7 +15,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
       disableTransitionOnChange
     >
       <LanguageProvider>
-        {children}
+        <SectionProvider> {/* Add SectionProvider here */}
+          {children}
+        </SectionProvider>
       </LanguageProvider>
     </NextThemesProvider>
   );
