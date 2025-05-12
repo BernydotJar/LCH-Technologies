@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -98,8 +99,74 @@ export default {
   			'accordion-down': 'accordion-down 0.2s ease-out',
   			'accordion-up': 'accordion-up 0.2s ease-out',
         'subtle-flash': 'subtleFlash 20s ease-in-out infinite',
-  		}
+  		},
+      typography: ({ theme }: { theme: any }) => ({
+        DEFAULT: {
+          css: {
+            color: theme('colors.foreground'),
+            a: {
+              color: theme('colors.primary.DEFAULT'),
+              '&:hover': {
+                color: theme('colors.primary.DEFAULT / 0.9'),
+              },
+            },
+            'h1, h2, h3, h4': {
+              color: theme('colors.foreground'),
+            },
+            p: {
+              color: theme('colors.muted.foreground'),
+              'white-space': 'pre-line',
+            },
+            strong: {
+              color: theme('colors.foreground'),
+            },
+            ul: {
+              '> li::before': { backgroundColor: theme('colors.primary.DEFAULT') },
+            },
+            ol: {
+              '> li::before': { color: theme('colors.primary.DEFAULT') },
+            },
+            blockquote: {
+              color: theme('colors.muted.foreground'),
+              borderLeftColor: theme('colors.border'),
+            },
+          },
+        },
+        invert: {
+          css: {
+            color: theme('colors.foreground'),
+             a: {
+              color: theme('colors.primary.DEFAULT'), // Or a brighter primary for dark mode
+              '&:hover': {
+                color: `hsl(var(--primary) / 0.8)`,
+              },
+            },
+            'h1, h2, h3, h4': {
+              color: theme('colors.foreground'),
+            },
+            p: {
+              color: theme('colors.muted.foreground'),
+            },
+            strong: {
+              color: theme('colors.foreground'),
+            },
+             ul: {
+              '> li::before': { backgroundColor: theme('colors.primary.DEFAULT') },
+            },
+            ol: {
+              '> li::before': { color: theme('colors.primary.DEFAULT') },
+            },
+            blockquote: {
+              color: theme('colors.muted.foreground'),
+              borderLeftColor: theme('colors.border'),
+            },
+          },
+        },
+      }),
   	}
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [
+    require("tailwindcss-animate"),
+    require('@tailwindcss/typography')
+  ],
 } satisfies Config;

@@ -10,6 +10,7 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
+  SelectValue,
 } from '@/components/ui/select';
 import { useLanguage } from '@/contexts/language-context';
 import { Avatar, AvatarImage } from '@/components/ui/avatar';
@@ -23,7 +24,6 @@ export default function Header() {
     { href: '/blog', label: 'Blog' },
     { href: '/contact', label: 'Contact' },
     { href: '/meta-generator', label: 'AI Meta Tool' },
-    // { href: '/chatbot', label: 'Chatbot' }, // Removed Chatbot link
   ];
 
   const { language, setLanguage, languages } = useLanguage();
