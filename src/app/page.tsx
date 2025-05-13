@@ -26,11 +26,11 @@ export default function Home() {
     en: {
       heroTitle: 'Innovate. Transform. Succeed.',
       heroSubtitles: [
-        "At LCH, we partner with you to <strong>engineer</strong> your foundational intelligent automations, <strong>setting the stage for lasting success.</strong>",
-        "We help you train and mentor your developers into <strong>skilled automation leaders</strong> and scale your intelligent automations.",
-        "Empowering you to <strong>independently drive future innovation.</strong>",
-        "We're more than consultants; we're your <strong>dedicated mentors</strong> for <strong>lasting technological self-sufficiency.</strong>",
-        "Our focused enablement model <strong>accelerates your journey to in-house automation mastery</strong> and tangible results."
+        "At LCH, we partner with you to build your foundational intelligent automations.",
+        "We help you train and mentor your developers into skilled automation leaders and scale your intelligent automations.",
+        "Empowering you to independently drive future innovation.",
+        "We're more than consultants; we're your dedicated mentors for lasting technological self-sufficiency.",
+        "Our focused enablement model accelerates your journey to in-house automation mastery and tangible results."
       ],
       discoverButton: 'Discover Our Solutions',
       requestDemoButton: 'Request a Demo',
@@ -57,11 +57,11 @@ export default function Home() {
     es: {
       heroTitle: 'Innovar. Transformar. Tener éxito.',
       heroSubtitles: [
-        "En LCH, nos asociamos contigo para <strong>diseñar</strong> tus automatizaciones inteligentes fundamentales, <strong>sentando las bases para un éxito duradero.</strong>",
-        "Te ayudamos a capacitar y guiar a tus desarrolladores para convertirlos en <strong>líderes de automatización cualificados</strong> y escalar tus automatizaciones inteligentes.",
-        "Empoderándote para <strong>impulsar la innovación futura de forma independiente.</strong>",
-        "Somos más que consultores; somos tus <strong>mentores dedicados</strong> para una <strong>autosuficiencia tecnológica duradera.</strong>",
-        "Nuestro modelo de habilitación enfocado <strong>acelera tu viaje hacia el dominio interno de la automatización</strong> y resultados tangibles."
+        "En LCH, nos asociamos contigo para construir tus automatizaciones inteligentes fundamentales.",
+        "Te ayudamos a capacitar y guiar a tus desarrolladores para convertirlos en líderes de automatización cualificados y escalar tus automatizaciones inteligentes.",
+        "Empoderándote para impulsar la innovación futura de forma independiente.",
+        "Somos más que consultores; somos tus mentores dedicados para una autosuficiencia tecnológica duradera.",
+        "Nuestro modelo de habilitación enfocado acelera tu viaje hacia el dominio interno de la automatización y resultados tangibles."
       ],
       discoverButton: 'Descubra nuestras soluciones',
       requestDemoButton: 'Solicite una demostración',
@@ -88,11 +88,11 @@ export default function Home() {
     it: {
       heroTitle: 'Innovare. Trasformare. Riuscire.',
       heroSubtitles: [
-        "In LCH, collaboriamo con te per <strong>progettare</strong> le tue automazioni intelligenti fondamentali, <strong>ponendo le basi per un successo duraturo.</strong>",
-        "Ti aiutiamo a formare e fare da mentore ai tuoi sviluppatori per trasformarli in <strong>leader esperti dell'automazione</strong> e scalare le tue automazioni intelligenti.",
-        "Consentendoti di <strong>guidare autonomamente l'innovazione futura.</strong>",
-        "Siamo più che consulenti; siamo i tuoi <strong>mentori dedicati</strong> per <strong>un'autosufficienza tecnologica duratura.</strong>",
-        "Il nostro modello di abilitazione mirato <strong>accelera il tuo percorso verso la padronanza interna dell'automazione</strong> e risultati tangibili."
+        "In LCH, collaboriamo con te per costruire le tue automazioni intelligenti fondamentali.",
+        "Ti aiutiamo a formare e fare da mentore ai tuoi sviluppatori per trasformarli in leader esperti dell'automazione e scalare le tue automazioni intelligenti.",
+        "Consentendoti di guidare autonomamente l'innovazione futura.",
+        "Siamo più che consulenti; siamo i tuoi mentori dedicati per un'autosufficienza tecnologica duratura.",
+        "Il nostro modello di abilitazione mirato accelera il tuo percorso verso la padronanza interna dell'automazione e risultati tangibili."
       ],
       discoverButton: 'Scopri le Nostre Soluzioni',
       requestDemoButton: 'Richiedi una Demo',
@@ -140,7 +140,8 @@ export default function Home() {
                 <CarouselItem key={index}>
                   <p 
                     className="text-lg md:text-2xl text-center py-4 min-h-[120px] md:min-h-[100px] flex items-center justify-center px-6"
-                    dangerouslySetInnerHTML={{ __html: subtitle }} />
+                    // Removed dangerouslySetInnerHTML to use plain text
+                    >{subtitle}</p> 
                 </CarouselItem>
               ))}
             </CarouselContent>
