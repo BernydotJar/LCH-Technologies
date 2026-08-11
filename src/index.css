@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #0C0A50;
+  --color-secondary: #5B6470;
+  --color-accent: #155E75;
+  --color-success: #10B981;
+  --color-warning: #F59E0B;
+  --color-error: #EF4444;
+  --color-neutral-100: #F5F5F5;
+  --color-neutral-200: #E0E0E0;
+  --color-neutral-600: #666666;
+}
+
+body {
+  font-family: 'League Spartan', sans-serif;
+  color: var(--color-primary);
+  background-color: #FFFFFF;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
