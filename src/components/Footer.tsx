@@ -12,7 +12,7 @@ export const Footer = () => {
               className="mb-6 inline-flex items-center rounded-md bg-white px-2 py-1.5"
             >
               <img
-                src={`${import.meta.env.BASE_URL}assets/brand/lch-technologies-logo.svg`}
+                src="/assets/brand/lch-technologies-logo.svg"
                 alt="LCH Technologies"
                 className="h-10 w-auto"
               />

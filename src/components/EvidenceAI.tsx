@@ -98,7 +98,7 @@ export const EvidenceAI = () => {
                   className="flex gap-4"
                 >
                   <div className="w-8 h-8 rounded-sm bg-white flex-shrink-0 flex items-center justify-center shadow-lg overflow-hidden" aria-hidden="true">
-                    <img src={`${import.meta.env.BASE_URL}assets/brand/lch-isotipo.svg`} alt="" className="w-full h-full object-contain" />
+                    <img src="/assets/brand/lch-isotipo.svg" alt="" className="w-full h-full object-contain" />
                   </div>
                   <div className="flex-1 space-y-4">
                     <div className="bg-accent/10 border border-accent/20 p-4 rounded-sm text-sm text-white leading-relaxed">
