@@ -23,7 +23,7 @@
     },
     {
       "parameters": {
-        "authentication": "googleFirebaseCloudFirestoreOAuth2Api",
+        "authentication": "serviceAccount",
         "resource": "document",
         "operation": "query",
         "projectId": "REPLACE_WITH_FIREBASE_PROJECT_ID",
@@ -55,7 +55,7 @@
     },
     {
       "parameters": {
-        "authentication": "googleFirebaseCloudFirestoreOAuth2Api",
+        "authentication": "serviceAccount",
         "resource": "document",
         "operation": "upsert",
         "projectId": "REPLACE_WITH_FIREBASE_PROJECT_ID",
