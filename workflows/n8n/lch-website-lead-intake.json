@@ -1,0 +1,310 @@
+{
+  "name": "LCH Website — Lead Intake",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "lch/demo-request",
+        "responseMode": "responseNode",
+        "options": {
+          "ignoreBots": true
+        }
+      },
+      "id": "1ee10d64-30d0-4a54-bb11-74e3b0239b7b",
+      "name": "Lead Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -760,
+        80
+      ],
+      "webhookId": "lch-demo-request"
+    },
+    {
+      "parameters": {
+        "jsCode": "const envelope = $input.first().json;\nconst body = envelope.body ?? envelope;\nconst lead = body.lead ?? {};\nconst errors = [];\nconst interests = new Set(['Inteligencia Artificial','Automatización','Software Empresarial','Cloud','LCH Evidence AI','Otro']);\nconst freeDomains = new Set(['gmail.com','googlemail.com','hotmail.com','outlook.com','live.com','yahoo.com','icloud.com','me.com','proton.me','protonmail.com']);\nconst seniorTerms = ['ceo','cto','cio','coo','cdo','chief','director','directora','vp','vice president','gerente','head','presidente','president','owner','fundador','founder'];\nconst strategicInterests = new Set(['Inteligencia Artificial','Automatización','Software Empresarial','LCH Evidence AI']);\nconst isText = (value, min, max) => typeof value === 'string' && value.trim().length >= min && value.trim().length <= max;\nif (body.schemaVersion !== 'lch.lead.v1') errors.push('schemaVersion');\nif (!isText(body.leadId, 1, 128)) errors.push('leadId');\nif (body.source !== 'website') errors.push('source');\nif (body.status !== 'new') errors.push('status');\nif (!isText(lead.nombre, 1, 80)) errors.push('nombre');\nif (!isText(lead.apellido, 1, 80)) errors.push('apellido');\nif (!isText(lead.email, 3, 254) || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(lead.email)) errors.push('email');\nif (!isText(lead.empresa, 1, 160)) errors.push('empresa');\nif (!isText(lead.cargo, 1, 160)) errors.push('cargo');\nif (!interests.has(lead.interes)) errors.push('interes');\nif (typeof lead.mensaje !== 'string' || lead.mensaje.length > 2000) errors.push('mensaje');\nif (lead.consentimiento !== true) errors.push('consentimiento');\nif (errors.length) return [{ json: { ok: false, route: 'INVALID', leadId: body.leadId ?? null, errors } }];\nconst normalized = {\n  nombre: lead.nombre.trim().replace(/\\s+/g, ' '),\n  apellido: lead.apellido.trim().replace(/\\s+/g, ' '),\n  email: lead.email.trim().toLowerCase(),\n  empresa: lead.empresa.trim().replace(/\\s+/g, ' '),\n  cargo: lead.cargo.trim().replace(/\\s+/g, ' '),\n  interes: lead.interes,\n  mensaje: lead.mensaje.trim(),\n  consentimiento: true,\n};\nlet score = 0;\nconst reasons = [];\nconst domain = normalized.email.split('@')[1] ?? '';\nconst role = normalized.cargo.toLowerCase();\nif (domain && !freeDomains.has(domain)) { score += 2; reasons.push('corporate_email'); }\nif (seniorTerms.some((term) => role.includes(term))) { score += 3; reasons.push('decision_maker_role'); }\nif (strategicInterests.has(normalized.interes)) { score += 2; reasons.push('strategic_interest'); }\nif (normalized.mensaje.length >= 20) { score += 2; reasons.push('described_operational_challenge'); }\nif (normalized.empresa.length >= 3) { score += 1; reasons.push('company_identified'); }\nconst priority = score >= 7 ? 'HOT' : score >= 4 ? 'WARM' : 'LOW';\nreturn [{ json: { ok: true, route: priority, leadId: body.leadId, priority, score, reasons, lead: normalized, source: 'website', clientSubmittedAt: typeof body.submittedAt === 'string' ? body.submittedAt : null, receivedAt: new Date().toISOString() } }];"
+      },
+      "id": "ae753e26-1d2c-447a-9783-008fb786e333",
+      "name": "Validate and Score",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -520,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.route }}",
+                    "rightValue": "HOT",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "HOT"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.route }}",
+                    "rightValue": "WARM",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "WARM"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.route }}",
+                    "rightValue": "LOW",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "LOW"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.route }}",
+                    "rightValue": "INVALID",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "INVALID"
+            }
+          ]
+        },
+        "fallbackOutput": "extra"
+      },
+      "id": "e44b6fa3-5eb7-4412-890d-bdf4e92189c0",
+      "name": "Priority Router",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        -260,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all().map((item) => ({ json: { ...item.json, followUp: { queue: 'sales_immediate', slaMinutes: 15 } } }));"
+      },
+      "id": "dd539e89-761c-4c61-91fb-245a66e81306",
+      "name": "Route HOT",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        20,
+        -160
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all().map((item) => ({ json: { ...item.json, followUp: { queue: 'sales_standard', slaMinutes: 240 } } }));"
+      },
+      "id": "55871385-85dd-49a8-9b7f-079a468eb6d3",
+      "name": "Route WARM",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        20,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all().map((item) => ({ json: { ...item.json, followUp: { queue: 'sales_nurture', slaMinutes: 1440 } } }));"
+      },
+      "id": "9ce782b6-415b-4abf-bac4-dc5c9128f3ba",
+      "name": "Route LOW",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        20,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { ok: true, leadId: $json.leadId, priority: $json.priority, score: $json.score, reasons: $json.reasons, queue: $json.followUp.queue, slaMinutes: $json.followUp.slaMinutes } }}",
+        "options": {
+          "responseCode": 202
+        }
+      },
+      "id": "53f44cda-447e-4543-9bf7-73537145a5c3",
+      "name": "Accepted",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        320,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { ok: false, leadId: $json.leadId, errors: $json.errors } }}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "id": "7194f7cd-65f7-467a-8ef7-54a4af23268d",
+      "name": "Invalid Request",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        20,
+        320
+      ]
+    }
+  ],
+  "connections": {
+    "Lead Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validate and Score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate and Score": {
+      "main": [
+        [
+          {
+            "node": "Priority Router",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Priority Router": {
+      "main": [
+        [
+          {
+            "node": "Route HOT",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Route WARM",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Route LOW",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Invalid Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Invalid Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route HOT": {
+      "main": [
+        [
+          {
+            "node": "Accepted",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route WARM": {
+      "main": [
+        [
+          {
+            "node": "Accepted",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route LOW": {
+      "main": [
+        [
+          {
+            "node": "Accepted",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Guatemala"
+  },
+  "versionId": "d07dd3f2-ae8f-4ec4-a3c6-4a9c7e9d20f5",
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "pinData": {},
+  "staticData": null
+}

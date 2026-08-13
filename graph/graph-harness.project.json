@@ -1,0 +1,90 @@
+{
+  "schema_version": "graph-harness.project.v1",
+  "project_id": "lch-technologies-corporate-website",
+  "mode": "SHIP",
+  "gate_definitions": [
+    {
+      "id": "recovery_integrity",
+      "required_evidence_kinds": ["recovery_audit", "verification"],
+      "blocking": true
+    },
+    {
+      "id": "implementation_quality",
+      "required_evidence_kinds": ["critic_review", "verification", "independent_verification"],
+      "blocking": true
+    },
+    {
+      "id": "production_transport",
+      "required_evidence_kinds": ["external_validation", "independent_verification"],
+      "blocking": true
+    },
+    {
+      "id": "release_authorization",
+      "required_evidence_kinds": ["external_validation", "independent_verification"],
+      "blocking": true
+    }
+  ],
+  "nodes": [
+    {"id":"GH-00","kind":"legacy","title":"Source intake and requirements normalization","status":"done","depends_on":[],"capability":"requirements","gates":{},"allowed_paths":[],"metadata":{"recovered_from":"AI Studio legacy graph","historical_state_not_ledger_backed":true}},
+    {"id":"GH-01","kind":"legacy","title":"Brand/design-system implementation","status":"done","depends_on":[],"capability":"frontend","gates":{},"allowed_paths":[],"metadata":{"recovered_from":"AI Studio legacy graph","historical_state_not_ledger_backed":true}},
+    {"id":"GH-02","kind":"legacy","title":"Application architecture and scaffold","status":"done","depends_on":[],"capability":"architecture","gates":{},"allowed_paths":[],"metadata":{"recovered_from":"AI Studio legacy graph","historical_state_not_ledger_backed":true}},
+    {"id":"GH-03","kind":"legacy","title":"Header/navigation","status":"done","depends_on":[],"capability":"frontend","gates":{},"allowed_paths":[],"metadata":{"recovered_from":"AI Studio legacy graph","historical_state_not_ledger_backed":true}},
+    {"id":"GH-04","kind":"legacy","title":"Hero and visual language (Complexity -> Clarity)","status":"done","depends_on":[],"capability":"frontend","gates":{},"allowed_paths":[],"metadata":{"recovered_from":"AI Studio legacy graph","historical_state_not_ledger_backed":true}},
+    {"id":"GH-05","kind":"legacy","title":"Capability experience","status":"done","depends_on":[],"capability":"frontend","gates":{},"allowed_paths":[],"metadata":{"recovered_from":"AI Studio legacy graph","historical_state_not_ledger_backed":true}},
+    {"id":"GH-06","kind":"legacy","title":"LCH Evidence AI product experience","status":"done","depends_on":[],"capability":"frontend","gates":{},"allowed_paths":[],"metadata":{"recovered_from":"AI Studio legacy graph","historical_state_not_ledger_backed":true}},
+    {"id":"GH-07","kind":"legacy","title":"Governance/trust experience","status":"done","depends_on":[],"capability":"frontend","gates":{},"allowed_paths":[],"metadata":{"recovered_from":"AI Studio legacy graph","historical_state_not_ledger_backed":true}},
+    {"id":"GH-08","kind":"legacy","title":"Process and LCH differentiation","status":"done","depends_on":[],"capability":"frontend","gates":{},"allowed_paths":[],"metadata":{"recovered_from":"AI Studio legacy graph","historical_state_not_ledger_backed":true}},
+    {"id":"GH-09","kind":"legacy","title":"Demo/contact workflow and Firestore","status":"done","depends_on":[],"capability":"integration","gates":{},"allowed_paths":[],"metadata":{"recovered_from":"AI Studio legacy graph","historical_state_not_ledger_backed":true}},
+    {"id":"GH-10","kind":"legacy","title":"Responsive implementation","status":"done","depends_on":[],"capability":"frontend","gates":{},"allowed_paths":[],"metadata":{"recovered_from":"AI Studio legacy graph","historical_state_not_ledger_backed":true}},
+    {"id":"GH-11","kind":"legacy","title":"Accessibility verification","status":"done","depends_on":[],"capability":"quality","gates":{},"allowed_paths":[],"metadata":{"recovered_from":"AI Studio legacy graph","historical_state_not_ledger_backed":true}},
+    {"id":"GH-12","kind":"legacy","title":"Security and Firebase-rule verification","status":"done","depends_on":[],"capability":"security","gates":{},"allowed_paths":[],"metadata":{"recovered_from":"AI Studio legacy graph","historical_state_not_ledger_backed":true}},
+    {"id":"GH-13","kind":"legacy","title":"SEO and metadata","status":"done","depends_on":[],"capability":"frontend","gates":{},"allowed_paths":[],"metadata":{"recovered_from":"AI Studio legacy graph","historical_state_not_ledger_backed":true}},
+    {"id":"GH-14","kind":"legacy","title":"Performance optimization","status":"done","depends_on":[],"capability":"quality","gates":{},"allowed_paths":[],"metadata":{"recovered_from":"AI Studio legacy graph","historical_state_not_ledger_backed":true}},
+    {"id":"GH-15","kind":"legacy","title":"Cross-browser and visual QA","status":"done","depends_on":[],"capability":"quality","gates":{},"allowed_paths":[],"metadata":{"recovered_from":"AI Studio legacy graph","historical_state_not_ledger_backed":true}},
+    {"id":"GH-16","kind":"legacy","title":"Production readiness review","status":"done","depends_on":[],"capability":"release","gates":{},"allowed_paths":[],"metadata":{"recovered_from":"AI Studio legacy graph","historical_state_not_ledger_backed":true}},
+    {
+      "id":"GH-18",
+      "kind":"recovery",
+      "title":"Graph state recovery and canonicalization",
+      "status":"spec_ready",
+      "depends_on":[],
+      "capability":"graph-engineering",
+      "gates":{"done":["recovery_integrity"]},
+      "allowed_paths":["graph/**","specs/GH-18/**","progress/**"],
+      "metadata":{"priority":100,"execution_mode":"graph","reasoning_mode":"engineering","human_eval_frequency":"gated"}
+    },
+    {
+      "id":"GH-19",
+      "kind":"feature",
+      "title":"Durable lead capture with n8n follow-up automation",
+      "status":"spec_ready",
+      "depends_on":["GH-18","GH-09"],
+      "capability":"integration",
+      "gates":{"done":["implementation_quality"]},
+      "allowed_paths":["src/components/Contact.tsx","src/integrations/**","firestore.rules","workflows/n8n/**","docs/lead-automation.md",".env.example","package.json","package-lock.json","specs/GH-19/**","progress/**","graph/**"],
+      "metadata":{"priority":90,"durability":"Firestore first","orchestrator":"n8n"}
+    },
+    {
+      "id":"GH-20",
+      "kind":"infrastructure",
+      "title":"Protected public automation transport and production validation",
+      "status":"spec_ready",
+      "depends_on":["GH-19"],
+      "capability":"infrastructure",
+      "gates":{"done":["production_transport"]},
+      "allowed_paths":["docs/lead-automation.md","workflows/n8n/**","graph/**","specs/GH-20/**","progress/**"],
+      "metadata":{"priority":80,"preferred_transport":"Cloudflare named tunnel or managed Firebase endpoint"}
+    },
+    {
+      "id":"GH-17",
+      "kind":"human_gate",
+      "title":"Production deployment human gate",
+      "status":"pending",
+      "depends_on":["GH-20"],
+      "capability":"release",
+      "gates":{"done":["release_authorization"]},
+      "allowed_paths":["graph/**","progress/**"],
+      "metadata":{"priority":70,"human_gate":true}
+    }
+  ]
+}

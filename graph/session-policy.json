@@ -1,0 +1,7 @@
+{
+  "execution": {"mode": "graph"},
+  "reasoning": {"mode": "engineering"},
+  "governance": {"human_eval_frequency": "gated"},
+  "terminal_states": ["COMPLETED", "PARTIAL_WITH_DOCUMENTED_BLOCKERS", "SAFETY_STOP"],
+  "recovery_note": "The AI Studio app contained a legacy status graph without a graph-harness.project.v1 contract or recoverable append-only event ledger. This repository materializes the first canonical v1 state without fabricating historical events."
+}

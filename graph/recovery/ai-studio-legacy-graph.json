@@ -1,0 +1,26 @@
+{
+  "project": "LCH Technologies Corporate Website",
+  "source": "Google AI Studio app 8963e7a3-87ce-4ca9-938c-9490f698d4c7",
+  "recovered_at": "2026-08-12",
+  "note": "Recovered status projection only. No append-only historical event ledger was recoverable, so these statuses are preserved as legacy state rather than reconstructed events.",
+  "nodes": [
+    {"id":"GH-00","title":"Source intake and requirements normalization","status":"DONE"},
+    {"id":"GH-01","title":"Brand/design-system implementation","status":"DONE"},
+    {"id":"GH-02","title":"Application architecture and scaffold","status":"DONE"},
+    {"id":"GH-03","title":"Header/navigation","status":"DONE"},
+    {"id":"GH-04","title":"Hero and visual language (Complexity -> Clarity)","status":"DONE"},
+    {"id":"GH-05","title":"Capability experience","status":"DONE"},
+    {"id":"GH-06","title":"LCH Evidence AI product experience","status":"DONE"},
+    {"id":"GH-07","title":"Governance/trust experience","status":"DONE"},
+    {"id":"GH-08","title":"Process and LCH differentiation","status":"DONE"},
+    {"id":"GH-09","title":"Demo/contact workflow and Firestore","status":"DONE"},
+    {"id":"GH-10","title":"Responsive implementation","status":"DONE"},
+    {"id":"GH-11","title":"Accessibility verification","status":"DONE"},
+    {"id":"GH-12","title":"Security and Firebase-rule verification","status":"DONE"},
+    {"id":"GH-13","title":"SEO and metadata","status":"DONE"},
+    {"id":"GH-14","title":"Performance optimization","status":"DONE"},
+    {"id":"GH-15","title":"Cross-browser and visual QA","status":"DONE"},
+    {"id":"GH-16","title":"Production readiness review","status":"DONE"},
+    {"id":"GH-17","title":"Production deployment human gate","status":"PENDING"}
+  ]
+}
