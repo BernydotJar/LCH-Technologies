@@ -13,7 +13,8 @@ service cloud.firestore {
           'consentimiento',
           'createdAt',
           'source',
-          'status'
+          'status',
+          'automationStatus'
         ])
         && request.resource.data.keys().hasOnly([
           'nombre',
@@ -26,7 +27,8 @@ service cloud.firestore {
           'consentimiento',
           'createdAt',
           'source',
-          'status'
+          'status',
+          'automationStatus'
         ]);
     }
 
@@ -58,6 +60,7 @@ service cloud.firestore {
         && request.resource.data.consentimiento == true
         && request.resource.data.source == 'website'
         && request.resource.data.status == 'new'
+        && request.resource.data.automationStatus == 'pending'
         && request.resource.data.createdAt == request.time;
 
       allow read, update, delete: if false;

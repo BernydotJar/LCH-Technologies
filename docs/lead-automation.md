@@ -69,3 +69,10 @@ Gmail, Calendar, CRM, proposal generation, or AI enrichment should attach after 
 
 ### Webhook transport note
 The n8n lead webhook intentionally leaves node-level bot filtering disabled and declares `authentication: none`. This keeps server-to-server delivery compatible and avoids relying on User-Agent heuristics. Public exposure, authentication, origin controls, rate limiting, and stable HTTPS transport are release-blocking responsibilities of GH-20.
+
+
+## Production transport: private Firestore polling
+
+The preferred production topology does not expose n8n to the public Internet. The website persists each lead with `automationStatus: pending`. The private n8n workflow `LCH Website — Firestore Lead Processor` runs on a schedule, queries only pending documents, applies the same deterministic scoring baseline, and updates only automation metadata.
+
+The workflow intentionally exports no Google credential and no real project identifier. Before activation, an administrator must assign a Google Cloud Firestore credential in n8n and set the project/database fields. The browser-facing webhook workflow remains useful for development and controlled tests, but production can leave `VITE_N8N_WEBHOOK_URL` unset.

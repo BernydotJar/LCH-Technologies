@@ -51,6 +51,7 @@ export async function submitDemoRequest(request: DemoRequest): Promise<DemoReque
     createdAt: serverTimestamp(),
     source: 'website',
     status: 'new',
+    automationStatus: 'pending',
   });
 
   const payload = buildLeadAutomationPayload(document.id, lead);

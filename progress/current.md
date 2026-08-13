@@ -1,41 +1,14 @@
-# LCH Technologies — Graph Harness Current State
+# LCH Website — Graph Harness Current State
 
-## Execution policy
-- execution: graph
-- reasoning: engineering
-- human evaluations: gated
-- Graph Harness runtime pin: `477bdcc3d390c30eb49d823e5c7fd105fee2cc4d`
+- GH-18 — Graph recovery/canonicalization: DONE.
+- GH-19 — Durable Firestore-first lead capture + real n8n webhook workflow: DONE, revision 2, live n8n gate PASS.
+- GH-20 — Private production automation transport: RUNNING, revision 1.
+  - Producer/repair artifacts: implemented.
+  - Tests: 20/20 PASS.
+  - Typecheck/build/audit: PASS.
+  - Quick Tunnel: externally validated, rejected for production, and stopped.
+  - Preferred production path: Firestore `automationStatus=pending` -> private scheduled n8n processor.
+  - Blockers: Google Firestore credential assignment in n8n, live Firestore rules deploy/verification, public AI Studio create-contract synchronization.
+- GH-17 — Production deployment human gate: pending and remains downstream of GH-20.
 
-## Canonical repository
-`BernydotJar/LCH-Technologies`
-
-Working branch: `feature/graph-n8n-lead-automation`
-
-## Active graph
-- GH-18 — Graph state recovery and canonicalization — DONE, revision 1, gate PASS, checkpoint recorded.
-- GH-19 — Durable lead capture with n8n follow-up automation — REVIEW, revision 1, implementation gate BLOCKED only on real n8n import/execution.
-- GH-20 — Protected public automation transport and production validation — waiting on GH-19.
-- GH-17 — Production deployment human gate — waiting on GH-20.
-
-## GH-19 repository verification
-- tests: 16/16 PASS
-- TypeScript: PASS
-- Vite production build: PASS
-- production dependency audit: 0 vulnerabilities
-- secret-pattern scan: PASS
-- `git diff --check`: PASS
-- Critic findings on scoring parity and untrusted client time: repaired and re-reviewed PASS
-
-## Human/runtime gate
-The Mac n8n service is healthy, but the Chrome remote-debug profile used by the harness is not authenticated to n8n. Its sign-in page is open at `http://localhost:5678/signin`. The user must sign in there without sharing credentials. After authentication, the harness can import and execute the workflow using the browser session.
-
-## Recovered legacy state
-GH-00 through GH-16 are preserved as legacy DONE statuses from AI Studio. They are explicitly not represented as ledger-backed v1 completion evidence.
-
-## Current external systems
-- Public website mirror: AI Studio `ais-pre` URL.
-- Durable lead store: Firestore `demoRequests`.
-- Local automation engine: n8n Docker on the user's Mac, reachable from the harness workspace at `host.docker.internal:5678`.
-
-## Open risks
-See `graph/recovery/open-risks.md`.
+Current terminal assessment: not terminal yet while human-authenticated external actions may unlock GH-20.
