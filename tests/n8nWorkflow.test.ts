@@ -54,6 +54,8 @@ test('workflow exposes the stable LCH POST webhook and starts inactive', async (
   assert.equal(webhook.parameters.httpMethod, 'POST');
   assert.equal(webhook.parameters.path, 'lch/demo-request');
   assert.equal(webhook.parameters.responseMode, 'responseNode');
+  assert.equal(webhook.parameters.authentication, 'none');
+  assert.deepEqual(webhook.parameters.options, {});
 });
 
 test('workflow contains deterministic validation/scoring and explicit priority routing', async () => {

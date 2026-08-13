@@ -66,3 +66,6 @@ A localhost n8n instance is appropriate for development but not a production dep
 ## Downstream extensions
 
 Gmail, Calendar, CRM, proposal generation, or AI enrichment should attach after the deterministic intake/scoring layer. They must use credentials stored in n8n or another server-side secret store; no such credentials are exported with the workflow.
+
+### Webhook transport note
+The n8n lead webhook intentionally leaves node-level bot filtering disabled and declares `authentication: none`. This keeps server-to-server delivery compatible and avoids relying on User-Agent heuristics. Public exposure, authentication, origin controls, rate limiting, and stable HTTPS transport are release-blocking responsibilities of GH-20.

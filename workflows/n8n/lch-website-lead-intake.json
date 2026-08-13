@@ -6,9 +6,8 @@
         "httpMethod": "POST",
         "path": "lch/demo-request",
         "responseMode": "responseNode",
-        "options": {
-          "ignoreBots": true
-        }
+        "options": {},
+        "authentication": "none"
       },
       "id": "1ee10d64-30d0-4a54-bb11-74e3b0239b7b",
       "name": "Lead Webhook",
