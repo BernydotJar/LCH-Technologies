@@ -1,0 +1,147 @@
+\n### npm test
+
+> lch-technologies-website@1.0.0 test
+> node --test --experimental-strip-types tests/*.test.ts
+
+TAP version 13
+# Subtest: normalizes and validates an accepted demo request
+ok 1 - normalizes and validates an accepted demo request
+  ---
+  duration_ms: 1.511042
+  type: 'test'
+  ...
+# Subtest: rejects missing consent, invalid email, invalid interest, and oversized message
+ok 2 - rejects missing consent, invalid email, invalid interest, and oversized message
+  ---
+  duration_ms: 0.441083
+  type: 'test'
+  ...
+# Subtest: scores a qualified enterprise lead deterministically
+ok 3 - scores a qualified enterprise lead deterministically
+  ---
+  duration_ms: 0.110042
+  type: 'test'
+  ...
+# Subtest: keeps a low-signal free-email lead deterministic
+ok 4 - keeps a low-signal free-email lead deterministic
+  ---
+  duration_ms: 0.079041
+  type: 'test'
+  ...
+# Subtest: builds a stable automation payload keyed by Firestore leadId
+ok 5 - builds a stable automation payload keyed by Firestore leadId
+  ---
+  duration_ms: 0.203167
+  type: 'test'
+  ...
+# Subtest: skips automation when no webhook is configured
+ok 6 - skips automation when no webhook is configured
+  ---
+  duration_ms: 0.252084
+  type: 'test'
+  ...
+# Subtest: delivers automation payload without credentials and reports success
+ok 7 - delivers automation payload without credentials and reports success
+  ---
+  duration_ms: 11.844708
+  type: 'test'
+  ...
+# Subtest: does not throw when automation returns an error response
+ok 8 - does not throw when automation returns an error response
+  ---
+  duration_ms: 0.15725
+  type: 'test'
+  ...
+# Subtest: bounds automation delivery time and converts timeout into a failed result
+ok 9 - bounds automation delivery time and converts timeout into a failed result
+  ---
+  duration_ms: 11.275792
+  type: 'test'
+  ...
+# Subtest: rejects insecure non-local webhook URLs before network delivery
+ok 10 - rejects insecure non-local webhook URLs before network delivery
+  ---
+  duration_ms: 0.419667
+  type: 'test'
+  ...
+# Subtest: workflow exposes the stable LCH POST webhook and starts inactive
+ok 11 - workflow exposes the stable LCH POST webhook and starts inactive
+  ---
+  duration_ms: 22.5555
+  type: 'test'
+  ...
+# Subtest: workflow contains deterministic validation/scoring and explicit priority routing
+ok 12 - workflow contains deterministic validation/scoring and explicit priority routing
+  ---
+  duration_ms: 3.241375
+  type: 'test'
+  ...
+# Subtest: embedded n8n scorer stays in parity with the canonical TypeScript scorer
+ok 13 - embedded n8n scorer stays in parity with the canonical TypeScript scorer
+  ---
+  duration_ms: 3.170666
+  type: 'test'
+  ...
+# Subtest: embedded n8n validator rejects malformed envelopes
+ok 14 - embedded n8n validator rejects malformed envelopes
+  ---
+  duration_ms: 1.453375
+  type: 'test'
+  ...
+# Subtest: workflow exports no credentials or obvious secrets
+ok 15 - workflow exports no credentials or obvious secrets
+  ---
+  duration_ms: 1.177042
+  type: 'test'
+  ...
+# Subtest: workflow returns accepted and invalid responses with explicit status codes
+ok 16 - workflow returns accepted and invalid responses with explicit status codes
+  ---
+  duration_ms: 0.734459
+  type: 'test'
+  ...
+1..16
+# tests 16
+# suites 0
+# pass 16
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 175.667
+\n### npm run typecheck
+
+> lch-technologies-website@1.0.0 typecheck
+> tsc --noEmit
+
+\n### npm run build
+
+> lch-technologies-website@1.0.0 build
+> vite build
+
+[36mvite v6.4.3 [32mbuilding for production...[36m[39m
+transforming...
+[32m✓[39m 2103 modules transformed.
+rendering chunks...
+computing gzip size...
+[2mdist/[22m[32mindex.html                       [39m[1m[2m  1.83 kB[22m[1m[22m[2m │ gzip:   0.78 kB[22m
+[2mdist/[22m[2massets/[22m[35mindex-C2ol3-37.css        [39m[1m[2m 40.40 kB[22m[1m[22m[2m │ gzip:   7.58 kB[22m
+[2mdist/[22m[2massets/[22m[36mindex-CeV2uJQx.js         [39m[1m[2m383.46 kB[22m[1m[22m[2m │ gzip: 119.82 kB[22m
+[2mdist/[22m[2massets/[22m[36mdemoRequests-DKz2az6n.js  [39m[1m[33m501.09 kB[39m[22m[2m │ gzip: 130.75 kB[22m
+[33m
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.[39m
+[32m✓ built in 17.88s[39m
+\n### npm audit --omit=dev --audit-level=high
+found 0 vulnerabilities
+\n### git diff --check
+
+### secret scan
+secret-scan=PASS
+
+### graph validate
+{"event_count": 28, "project_id": "lch-technologies-corporate-website", "ready_nodes": [], "valid": true}
+
+### sha256

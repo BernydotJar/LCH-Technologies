@@ -1,16 +1,11 @@
 import { initializeApp } from 'firebase/app';
 import { addDoc, collection, getFirestore, serverTimestamp } from 'firebase/firestore';
-
-type DemoRequest = {
-  nombre: string;
-  apellido: string;
-  email: string;
-  empresa: string;
-  cargo: string;
-  interes: string;
-  mensaje: string;
-  consentimiento: boolean;
-};
+import { notifyLeadAutomation, type AutomationDeliveryResult } from './leadAutomation';
+import {
+  buildLeadAutomationPayload,
+  validateDemoRequest,
+  type DemoRequest,
+} from './leadContract';
 
 const requiredConfig = {
   projectId: import.meta.env.VITE_CONTACT_PROJECT_ID,
@@ -39,11 +34,36 @@ const app = initializeApp({
 
 const db = getFirestore(app, requiredConfig.databaseId);
 
-export async function submitDemoRequest(request: DemoRequest) {
-  await addDoc(collection(db, 'demoRequests'), {
-    ...request,
+export type DemoRequestSubmissionResult = {
+  leadId: string;
+  automation: AutomationDeliveryResult;
+};
+
+export async function submitDemoRequest(request: DemoRequest): Promise<DemoRequestSubmissionResult> {
+  const validation = validateDemoRequest(request);
+  if (!validation.valid) {
+    throw new Error(`Invalid demo request: ${validation.errors.join(', ')}`);
+  }
+
+  const lead = validation.value;
+  const document = await addDoc(collection(db, 'demoRequests'), {
+    ...lead,
     createdAt: serverTimestamp(),
     source: 'website',
     status: 'new',
+    automationStatus: 'pending',
   });
+
+  const payload = buildLeadAutomationPayload(document.id, lead);
+  const automation = await notifyLeadAutomation(import.meta.env.VITE_N8N_WEBHOOK_URL, payload);
+
+  if (automation.status === 'failed') {
+    console.warn('Lead persisted but follow-up automation delivery failed.', {
+      leadId: document.id,
+      httpStatus: automation.httpStatus,
+      error: automation.error,
+    });
+  }
+
+  return { leadId: document.id, automation };
 }

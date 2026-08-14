@@ -1,0 +1,6 @@
+case={"case": "HOT", "status": 202, "ok": true, "priority": "HOT", "score": 10, "leadId": "gh19-hot-r2b"}
+case={"case": "LOW", "status": 202, "ok": true, "priority": "LOW", "score": 1, "leadId": "gh19-low-r2b"}
+case={"case": "INVALID", "status": 400, "ok": false, "leadId": "gh19-invalid-r2b", "errors": ["nombre", "apellido", "email", "empresa", "cargo", "interes", "mensaje", "consentimiento"]}
+executions_status=200
+execution_count=9
+result=PASS

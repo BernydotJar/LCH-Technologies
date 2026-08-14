@@ -1,0 +1,122 @@
+{
+  "name": "LCH Website — Firestore Lead Processor",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "id": "lch-firestore-schedule",
+      "name": "Every Minute",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -620,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "resource": "document",
+        "operation": "query",
+        "projectId": "REPLACE_WITH_FIREBASE_PROJECT_ID",
+        "database": "REPLACE_WITH_FIRESTORE_DATABASE_ID",
+        "query": "{\"structuredQuery\":{\"where\":{\"fieldFilter\":{\"field\":{\"fieldPath\":\"automationStatus\"},\"op\":\"EQUAL\",\"value\":{\"stringValue\":\"pending\"}}},\"from\":[{\"collectionId\":\"demoRequests\"}],\"limit\":25}}",
+        "simple": true
+      },
+      "id": "lch-query-pending",
+      "name": "Query Pending Leads",
+      "type": "n8n-nodes-base.googleFirebaseCloudFirestore",
+      "typeVersion": 1.1,
+      "position": [
+        -380,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const freeDomains = new Set(['gmail.com','googlemail.com','hotmail.com','outlook.com','live.com','yahoo.com','icloud.com','me.com','proton.me','protonmail.com']);\nconst seniorTerms = ['ceo','cto','cio','coo','cdo','chief','director','directora','vp','vice president','gerente','head','presidente','president','owner','fundador','founder'];\nconst strategicInterests = new Set(['Inteligencia Artificial','Automatización','Software Empresarial','LCH Evidence AI']);\nreturn $input.all().map((item) => {\n  const lead = item.json;\n  let score = 0;\n  const reasons = [];\n  const email = String(lead.email ?? '').trim().toLowerCase();\n  const domain = email.split('@')[1] ?? '';\n  const role = String(lead.cargo ?? '').toLowerCase();\n  const interest = String(lead.interes ?? '');\n  const message = String(lead.mensaje ?? '').trim();\n  const company = String(lead.empresa ?? '').trim();\n  if (domain && !freeDomains.has(domain)) { score += 2; reasons.push('corporate_email'); }\n  if (seniorTerms.some((term) => role.includes(term))) { score += 3; reasons.push('decision_maker_role'); }\n  if (strategicInterests.has(interest)) { score += 2; reasons.push('strategic_interest'); }\n  if (message.length >= 20) { score += 2; reasons.push('described_operational_challenge'); }\n  if (company.length >= 3) { score += 1; reasons.push('company_identified'); }\n  const priority = score >= 7 ? 'HOT' : score >= 4 ? 'WARM' : 'LOW';\n  const queue = priority === 'HOT' ? 'sales_immediate' : priority === 'WARM' ? 'sales_standard' : 'sales_nurture';\n  const slaMinutes = priority === 'HOT' ? 15 : priority === 'WARM' ? 240 : 1440;\n  return { json: { ...lead, automationStatus: 'processed', automationPriority: priority, automationScore: score, automationReasons: reasons, automationQueue: queue, automationSlaMinutes: slaMinutes, automationProcessedAt: new Date().toISOString() } };\n});"
+      },
+      "id": "lch-score-pending",
+      "name": "Score Pending Leads",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -120,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "resource": "document",
+        "operation": "upsert",
+        "projectId": "REPLACE_WITH_FIREBASE_PROJECT_ID",
+        "database": "REPLACE_WITH_FIRESTORE_DATABASE_ID",
+        "collection": "demoRequests",
+        "updateKey": "_id",
+        "columns": "automationStatus, automationPriority, automationScore, automationReasons, automationQueue, automationSlaMinutes, automationProcessedAt"
+      },
+      "id": "lch-mark-processed",
+      "name": "Mark Lead Processed",
+      "type": "n8n-nodes-base.googleFirebaseCloudFirestore",
+      "typeVersion": 1.1,
+      "position": [
+        160,
+        80
+      ]
+    }
+  ],
+  "connections": {
+    "Every Minute": {
+      "main": [
+        [
+          {
+            "node": "Query Pending Leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Query Pending Leads": {
+      "main": [
+        [
+          {
+            "node": "Score Pending Leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Score Pending Leads": {
+      "main": [
+        [
+          {
+            "node": "Mark Lead Processed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Guatemala"
+  },
+  "pinData": {},
+  "meta": {
+    "lchPurpose": "private-firestore-lead-processing",
+    "credentialExported": false
+  }
+}

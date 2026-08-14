@@ -7,8 +7,9 @@
     "dev": "vite --host 0.0.0.0",
     "build": "vite build",
     "preview": "vite preview --host 0.0.0.0",
+    "test": "node --test --experimental-strip-types tests/*.test.ts",
     "typecheck": "tsc --noEmit",
-    "check": "npm run typecheck && npm run build"
+    "check": "npm run test && npm run typecheck && npm run build"
   },
   "dependencies": {
     "firebase": "^12.17.1",
