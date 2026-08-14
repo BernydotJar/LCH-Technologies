@@ -2,16 +2,18 @@
 
 - GH-18 — Graph recovery/canonicalization: DONE.
 - GH-19 — Durable Firestore-first lead capture + real n8n webhook workflow: DONE, revision 2, live n8n gate PASS.
-- GH-20 — Private production automation transport: RUNNING, revision 2.
-  - Private Firestore polling architecture: implemented.
-  - Firestore service-account auth mode repair: implemented and regression-tested.
-  - Tests: 20/20 PASS; typecheck/build/audit/diff/secret scan: PASS.
-  - Quick Tunnel: externally validated, rejected for production, and stopped.
-  - Live Firestore rules: deployed and independently reloaded from the named LCH database.
-  - Public AI Studio contract: synchronized and verified in the public `ais-pre` bundle.
-  - Public synthetic form submission: PASS under strict live rules.
-  - Dedicated `lch-n8n-firestore` identity: enabled, `roles/datastore.user` assigned, exactly one active user-managed key verified.
-  - Remaining external gate: local n8n editor session must be re-authenticated and the private key pasted locally into the prepared Google Service Account credential. The harness will not extract private-key material from the user's downloaded JSON.
-- GH-17 — Production deployment human gate: pending downstream of GH-20.
+- GH-20 — Private production automation transport: RUNNING, revision 2; technical runtime PASS.
+  - Repository checks: 20/20 tests, typecheck, build, audit, diff/secret checks PASS.
+  - Live strict Firestore rules: PASS.
+  - Public AI Studio contract and form: PASS.
+  - Dedicated least-privilege Firestore service account: PASS.
+  - n8n credential connection test: PASS.
+  - Real pending query -> scoring -> Firestore upsert: PASS.
+  - Synthetic lead no longer eligible for pending queue after processing: PASS.
+  - Private workflow: Published; one-minute Schedule Trigger enabled.
+  - Public n8n ingress: none required; Quick Tunnel remains out of production.
+  - Key hygiene: two unused keys revoked; one n8n key remains active.
+  - Remaining release blocker: delete the downloaded service-account JSON on the user's Mac and clear clipboard residue.
+- GH-17 — Production deployment human gate: pending downstream of GH-20 and still requires explicit release authorization.
 
-Current terminal assessment: not terminal; one human-authenticated secret-entry step can unlock the remaining GH-20 runtime verification.
+Current terminal assessment: not terminal; one local secret-cleanup action can close GH-20, after which GH-17 is the final gated human release decision.
