@@ -14,6 +14,6 @@
   - Public n8n ingress: none required; Quick Tunnel remains out of production.
   - Key hygiene: two unused keys revoked; one n8n key remains active.
   - Remaining release blocker: delete the downloaded service-account JSON on the user's Mac and clear clipboard residue.
-- GH-17 — Production deployment human gate: pending downstream of GH-20 and still requires explicit release authorization.
+- GH-17 — Production deployment human gate: SPEC_READY downstream of GH-20; explicit human release authorization recorded in the append-only ledger.
 
-Current terminal assessment: not terminal; one local secret-cleanup action can close GH-20, after which GH-17 is the final gated human release decision.
+Current terminal assessment: not terminal; one local secret-cleanup action can close GH-20, after which the already-authorized GH-17 gate can execute.
