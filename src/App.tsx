@@ -7,6 +7,7 @@ import { Header } from './components/Header';
 import { Hero } from './components/Hero';
 import { Capabilities } from './components/Capabilities';
 import { EvidenceAI } from './components/EvidenceAI';
+import { ProductReferences } from './components/ProductReferences';
 import { Governance } from './components/Governance';
 import { Process } from './components/Process';
 import { WhyLCH } from './components/WhyLCH';
@@ -21,6 +22,7 @@ export default function App() {
         <Hero />
         <Capabilities />
         <EvidenceAI />
+        <ProductReferences />
         <Governance />
         <Process />
         <WhyLCH />
