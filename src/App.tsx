@@ -10,6 +10,7 @@ import { Hero } from './components/Hero';
 import { Capabilities } from './components/Capabilities';
 import { EvidenceAI } from './components/EvidenceAI';
 import { ProductReferences } from './components/ProductReferences';
+import { CaseStudies } from './components/CaseStudies';
 import { Governance } from './components/Governance';
 import { Process } from './components/Process';
 import { WhyLCH } from './components/WhyLCH';
@@ -34,6 +35,7 @@ export default function App() {
         <Capabilities />
         <EvidenceAI />
         <ProductReferences />
+        <CaseStudies />
         <Governance />
         <Process />
         <WhyLCH />

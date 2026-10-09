@@ -10,7 +10,8 @@ export const Header = () => {
     { name: 'Inicio', href: '#inicio' },
     { name: 'Soluciones', href: '#soluciones' },
     { name: 'Productos', href: '#productos' },
-    { name: 'Proyectos', href: '#productos-reales' },
+    { name: 'Demos', href: '#productos-reales' },
+    { name: 'Casos', href: '#casos-resueltos' },
     { name: 'Nosotros', href: '#nosotros' },
   ];
 
@@ -30,7 +31,7 @@ export const Header = () => {
         </a>
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-8">
+        <nav className="hidden md:flex items-center gap-6">
           {navLinks.map((link) => (
             <a
               key={link.name}
