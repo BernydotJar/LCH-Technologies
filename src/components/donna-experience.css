@@ -1,0 +1,166 @@
+/*
+ * GH-21: Donna signal orb. Product identity is self-contained CSS rather than
+ * animated images, a video, or a runtime model dependency.
+ */
+.donna-signal {
+  --donna-orb-size: 46px;
+  position: relative;
+  display: inline-grid;
+  width: var(--donna-orb-size);
+  height: var(--donna-orb-size);
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  isolation: isolate;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.donna-signal[data-size="compact"] { --donna-orb-size: 38px; }
+.donna-signal[data-size="launcher"] { --donna-orb-size: 46px; }
+
+.donna-signal__aura {
+  position: absolute;
+  inset: -11%;
+  z-index: -1;
+  border-radius: 50%;
+  background: radial-gradient(circle at 42% 48%, rgba(61, 207, 222, .51), rgba(54, 127, 255, .23) 52%, transparent 74%);
+  filter: blur(6px);
+  animation: donna-aura-breathe 5.5s ease-in-out infinite;
+}
+
+.donna-signal__sphere {
+  position: relative;
+  display: block;
+  width: 90%;
+  height: 90%;
+  overflow: hidden;
+  border-radius: 50%;
+  border: 1px solid rgba(213, 250, 255, .72);
+  background:
+    radial-gradient(ellipse at 27% 14%, rgba(253, 255, 255, .95) 0, rgba(174, 248, 244, .70) 12%, transparent 39%),
+    radial-gradient(ellipse at 75% 80%, rgba(31, 49, 162, .96), transparent 63%),
+    linear-gradient(140deg, #6bdbdb 0%, #159ab3 35%, #165d9d 65%, #18315e 100%);
+  box-shadow:
+    0 1px 1px rgba(242, 255, 255, .65) inset,
+    -6px -8px 16px rgba(8, 25, 88, .30) inset,
+    4px 6px 12px rgba(9, 8, 67, .21),
+    0 0 0 1px rgba(76, 198, 228, .20);
+  animation: donna-sphere-breathe 6s ease-in-out infinite;
+}
+
+.donna-signal__lobe {
+  position: absolute;
+  display: block;
+  width: 78%;
+  height: 73%;
+  border-radius: 58% 42% 63% 37% / 58% 48% 52% 42%;
+  opacity: .8;
+  mix-blend-mode: screen;
+  filter: blur(4px);
+  pointer-events: none;
+}
+
+.donna-signal__lobe--a {
+  top: 2%;
+  left: -14%;
+  background: radial-gradient(circle, rgba(181, 255, 251, .95) 2%, rgba(36, 185, 210, .65) 58%, transparent 72%);
+  animation: donna-lobe-drift-a 7.2s ease-in-out infinite alternate;
+}
+
+.donna-signal__lobe--b {
+  right: -17%;
+  bottom: -18%;
+  background: radial-gradient(circle, rgba(136, 195, 255, .92), rgba(83, 111, 248, .72) 54%, transparent 75%);
+  animation: donna-lobe-drift-b 7.8s ease-in-out infinite alternate;
+}
+
+.donna-signal__shine {
+  position: absolute;
+  z-index: 1;
+  inset: 7% 12% 48% 12%;
+  transform: rotate(-17deg);
+  border-radius: 50%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .86), rgba(241, 253, 255, .12) 73%, transparent);
+  filter: blur(1.5px);
+  opacity: .49;
+  pointer-events: none;
+}
+
+.donna-signal__monogram {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  font-family: 'League Spartan', sans-serif;
+  font-size: calc(var(--donna-orb-size) * .36);
+  font-weight: 760;
+  line-height: 1;
+  letter-spacing: -.06em;
+  color: #fff;
+  text-shadow: 0 1px 4px rgba(14, 43, 101, .7);
+}
+
+.donna-signal[data-state="hover"] .donna-signal__aura {
+  opacity: 1;
+  transform: scale(1.12);
+}
+.donna-signal[data-state="shaping"] .donna-signal__sphere {
+  animation-duration: 1.6s;
+}
+.donna-signal[data-state="shaping"] .donna-signal__lobe {
+  animation-duration: 1.2s;
+}
+.donna-signal[data-state="shaping"] .donna-signal__aura {
+  animation-duration: 1.8s;
+}
+.donna-signal[data-state="responding"] .donna-signal__aura {
+  animation: donna-response-glow .9s ease-out 1;
+}
+
+.donna-idea {
+  contain: layout style;
+}
+.donna-idea__content {
+  min-height: 92px;
+}
+.donna-idea__compact {
+  min-height: 100px;
+}
+.donna-idea__eyebrow {
+  letter-spacing: .12em;
+}
+
+@keyframes donna-aura-breathe {
+  0%, 100% { transform: scale(.94); opacity: .56; }
+  50% { transform: scale(1.07); opacity: .9; }
+}
+@keyframes donna-sphere-breathe {
+  0%, 100% { transform: rotate(-2deg) scale(.97); }
+  50% { transform: rotate(3deg) scale(1.025); }
+}
+@keyframes donna-lobe-drift-a {
+  from { transform: translate(-2%, -6%) rotate(-8deg) scale(.96); }
+  to { transform: translate(10%, 12%) rotate(23deg) scale(1.12); }
+}
+@keyframes donna-lobe-drift-b {
+  from { transform: translate(3%, 4%) rotate(12deg) scale(.94); }
+  to { transform: translate(-14%, -10%) rotate(-17deg) scale(1.08); }
+}
+@keyframes donna-response-glow {
+  0% { opacity: .7; transform: scale(.95); }
+  47% { opacity: 1; transform: scale(1.18); }
+  100% { opacity: .7; transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .donna-signal,
+  .donna-signal *,
+  .donna-signal::before,
+  .donna-signal::after {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
+}
