@@ -5,10 +5,12 @@ import {
   ShieldCheck, Sparkles, X,
 } from 'lucide-react';
 import { DONNA_QUICK_PROMPTS } from '../donna/knowledge';
+import { DONNA_IDEA_ROTATION_MS, DONNA_IDEAS, contextualPrompts } from '../donna/experience';
+import './donna-experience.css';
 import { DONNA_LIMITS, isDonnaReply, type DonnaMessage, type DonnaReply } from '../donna/engine';
 import type { InterestArea } from '../integrations/leadContract';
 
-type DonnaUiMessage = DonnaMessage & { id: number; links?: DonnaReply['links']; kind?: DonnaReply['kind'] };
+type DonnaUiMessage = DonnaMessage & { id: number; links?: DonnaReply['links']; kind?: DonnaReply['kind']; interest?: InterestArea };
 export type DonnaHandoff = { interest: InterestArea; message: string };
 type Props = { onHandoff: (data: DonnaHandoff) => void };
 
@@ -26,13 +28,18 @@ const PUBLIC_LINKS = new Set([
 const MAX_VISIBLE = 20;
 const REQUEST_TIMEOUT_MS = 18_000;
 
-function PersonaOrb({ small = false, active = false }: { small?: boolean; active?: boolean }) {
+type OrbState = 'idle' | 'hover' | 'shaping' | 'responding';
+
+function PersonaOrb({ size = 'launcher', state = 'idle' }: { size?: 'compact' | 'launcher'; state?: OrbState }) {
   return (
-    <span className={`relative inline-flex shrink-0 items-center justify-center rounded-full ${small ? 'h-9 w-9' : 'h-12 w-12'}`} aria-hidden="true">
-      <span className={`absolute inset-0 rounded-full bg-cyan-300/35 blur-md ${active ? 'motion-safe:animate-pulse' : ''}`} />
-      <span className="relative flex h-full w-full items-center justify-center rounded-full border border-cyan-100/65 bg-gradient-to-tr from-teal-700 via-sky-500 to-indigo-300 text-base font-bold text-white shadow-[inset_0_2px_9px_rgba(255,255,255,0.5)]">
-        D
+    <span className="donna-signal" data-testid="donna-orb" data-size={size} data-state={state} aria-hidden="true">
+      <span className="donna-signal__aura" />
+      <span className="donna-signal__sphere">
+        <span className="donna-signal__lobe donna-signal__lobe--a" />
+        <span className="donna-signal__lobe donna-signal__lobe--b" />
+        <span className="donna-signal__shine" />
       </span>
+      <span className="donna-signal__monogram">D</span>
     </span>
   );
 }
@@ -46,6 +53,13 @@ export function DonnaChat({ onHandoff }: Props) {
   const [failure, setFailure] = useState('');
   const [announcement, setAnnouncement] = useState('');
   const [lastInterest, setLastInterest] = useState<InterestArea>('Otro');
+  const [ideaIndex, setIdeaIndex] = useState(0);
+  const [invitationHovered, setInvitationHovered] = useState(false);
+  const [invitationFocused, setInvitationFocused] = useState(false);
+  const [ideaHovered, setIdeaHovered] = useState(false);
+  const [ideaFocused, setIdeaFocused] = useState(false);
+  const [pageVisible, setPageVisible] = useState(true);
+  const [replyGlow, setReplyGlow] = useState(false);
   const reducedMotion = useReducedMotion();
   const busy = useRef<AbortController | null>(null);
   const timeoutId = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -55,11 +69,36 @@ export function DonnaChat({ onHandoff }: Props) {
   const launcher = useRef<HTMLButtonElement>(null);
   const lastFailed = useRef<DonnaUiMessage[] | null>(null);
   const isComposing = useRef(false);
+  const replyGlowTimer = useRef<number | null>(null);
+  const currentIdea = DONNA_IDEAS[ideaIndex % DONNA_IDEAS.length];
+  const orbState: OrbState = pending ? 'shaping' : replyGlow ? 'responding' : invitationHovered ? 'hover' : 'idle';
+
+  const nextIdea = () => setIdeaIndex((current) => (current + 1) % DONNA_IDEAS.length);
 
   useEffect(() => () => {
     busy.current?.abort();
     if (timeoutId.current) clearTimeout(timeoutId.current);
+    if (replyGlowTimer.current) clearTimeout(replyGlowTimer.current);
   }, []);
+
+  useEffect(() => {
+    const sync = () => setPageVisible(!document.hidden);
+    sync();
+    document.addEventListener('visibilitychange', sync);
+    return () => document.removeEventListener('visibilitychange', sync);
+  }, []);
+
+  // A single bounded hint timer; no automatic messages are ever sent.
+  // Pauses on hover/focus, hidden tabs, reduced motion, drafts and active turns.
+  useEffect(() => {
+    const paused = reducedMotion || !pageVisible || pending || Boolean(draft.trim())
+      || (open && (messages.length > 0 || ideaHovered || ideaFocused))
+      || (!open && (invitationHovered || invitationFocused));
+    if (paused) return;
+    const timer = window.setTimeout(() => setIdeaIndex((index) => (index + 1) % DONNA_IDEAS.length), DONNA_IDEA_ROTATION_MS);
+    return () => window.clearTimeout(timer);
+  }, [reducedMotion, pageVisible, pending, draft, open, messages.length, ideaHovered, ideaFocused,
+    invitationHovered, invitationFocused, ideaIndex]);
 
   useEffect(() => {
     if (open) composer.current?.focus({ preventScroll: true });
@@ -89,6 +128,9 @@ export function DonnaChat({ onHandoff }: Props) {
     if (timeoutId.current) clearTimeout(timeoutId.current);
     timeoutId.current = null;
     lastFailed.current = null;
+    if (replyGlowTimer.current) clearTimeout(replyGlowTimer.current);
+    replyGlowTimer.current = null;
+    setReplyGlow(false);
     setMessages([]);
     setDraft('');
     setFailure('');
@@ -133,11 +175,20 @@ export function DonnaChat({ onHandoff }: Props) {
         content: value.reply,
         links: value.links.filter((link) => PUBLIC_LINKS.has(link.url)),
         kind: value.kind,
+        interest: value.suggestedInterest,
       };
       setMessages((previous) => [...previous, answer].slice(-MAX_VISIBLE));
       if (value.suggestedInterest !== 'Otro') setLastInterest(value.suggestedInterest);
       lastFailed.current = null;
       setAnnouncement('Donna respondió.');
+      if (!reducedMotion) {
+        if (replyGlowTimer.current) clearTimeout(replyGlowTimer.current);
+        setReplyGlow(true);
+        replyGlowTimer.current = window.setTimeout(() => {
+          setReplyGlow(false);
+          replyGlowTimer.current = null;
+        }, 1_050);
+      }
     } catch (error) {
       if (busy.current !== operation) return;
       const message = operation.signal.aborted ? 'La solicitud se detuvo o excedió el tiempo disponible.'
@@ -193,6 +244,9 @@ export function DonnaChat({ onHandoff }: Props) {
   }
 
   const hasChat = messages.length > 0;
+  const latestQuestion = [...messages].reverse().find((message) => message.role === 'user')?.content ?? '';
+  const latest = messages[messages.length - 1];
+  const nextPrompts = contextualPrompts(latest?.kind, latest?.interest, latestQuestion);
 
   return (
     <div className="fixed bottom-4 right-3 z-[80] flex max-w-[calc(100vw-1.5rem)] flex-col items-end sm:bottom-6 sm:right-6" data-testid="lch-donna">
@@ -212,10 +266,10 @@ export function DonnaChat({ onHandoff }: Props) {
           >
             <header className="flex shrink-0 items-center justify-between gap-3 border-b border-white/10 bg-[#0C0A50] px-4 py-3.5 text-white">
               <div className="flex min-w-0 items-center gap-3">
-                <PersonaOrb small active={pending} />
+                <PersonaOrb size="compact" state={pending ? 'shaping' : replyGlow ? 'responding' : 'idle'} />
                 <div className="min-w-0">
                   <h2 className="text-base font-bold tracking-tight">Donna <span className="ml-1 font-normal text-teal-200">/ LCH</span></h2>
-                  <p className="text-[11px] text-slate-300">{pending ? 'Analizando tu pregunta…' : 'Asistente guiado · información de LCH'}</p>
+                  <p className="text-[11px] text-slate-300">{pending ? 'Preparando una respuesta…' : 'Asistente guiado · información de LCH'}</p>
                 </div>
               </div>
               <div className="flex items-center gap-1">
@@ -245,8 +299,55 @@ export function DonnaChat({ onHandoff }: Props) {
                       Cuéntame qué quieres mejorar en tu negocio. Te ayudo a explorar opciones reales y, cuando haga falta, te conecto con el equipo.
                     </p>
                   </div>
+                  <div
+                    className="donna-idea rounded-2xl border border-teal-100 bg-gradient-to-br from-[#eefbfa] via-white to-[#edf4ff] p-4 shadow-[0_12px_30px_rgba(21,94,117,0.07)]"
+                    role="group" aria-label="Idea para comenzar"
+                    data-testid="donna-idea-card"
+                    onPointerEnter={() => setIdeaHovered(true)}
+                    onPointerLeave={() => setIdeaHovered(false)}
+                    onFocusCapture={() => setIdeaFocused(true)}
+                    onBlurCapture={(event) => {
+                      const next = event.relatedTarget;
+                      if (!(next instanceof Node) || !event.currentTarget.contains(next)) setIdeaFocused(false);
+                    }}
+                  >
+                    <div className="mb-2 flex items-center justify-between gap-2">
+                      <span className="donna-idea__eyebrow text-[10px] font-bold uppercase text-teal-800">
+                        Una idea para empezar
+                      </span>
+                      <span className="text-[11px] font-semibold tabular-nums text-slate-500">
+                        {ideaIndex + 1} / {DONNA_IDEAS.length}
+                      </span>
+                    </div>
+                    <div className="donna-idea__content">
+                      <AnimatePresence mode="wait" initial={false}>
+                        <motion.div
+                          key={currentIdea.id}
+                          initial={reducedMotion ? false : { opacity: 0, y: 5 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={reducedMotion ? undefined : { opacity: 0, y: -4 }}
+                          transition={{ duration: 0.18 }}
+                        >
+                          <p className="mb-1 text-[11px] font-semibold text-teal-700">{currentIdea.eyebrow}</p>
+                          <p data-testid="donna-idea-question" className="text-sm font-bold leading-snug text-primary">{currentIdea.question}</p>
+                          <p className="mt-1 text-xs leading-relaxed text-secondary">{currentIdea.context}</p>
+                        </motion.div>
+                      </AnimatePresence>
+                    </div>
+                    <div className="mt-2 flex items-center justify-between gap-2">
+                      <button type="button" onClick={() => send(currentIdea.prompt)}
+                        className="flex min-h-9 items-center gap-1.5 text-xs font-bold text-teal-900 underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700">
+                        {currentIdea.action}<ArrowRight size={14} aria-hidden="true" />
+                      </button>
+                      <button type="button" onClick={nextIdea} aria-label="Siguiente idea"
+                        className="min-h-9 rounded-lg border border-teal-100 bg-white px-3 text-xs font-semibold text-teal-800 transition-colors hover:bg-teal-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700">
+                        Siguiente
+                      </button>
+                    </div>
+                  </div>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-500">O elige un tema</p>
                   <div className="grid gap-2">
-                    {DONNA_QUICK_PROMPTS.map((prompt) => (
+                    {DONNA_QUICK_PROMPTS.slice(0, 2).map((prompt) => (
                       <button key={prompt.label} type="button" onClick={() => send(prompt.message)}
                         className="group flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 text-left text-sm font-semibold text-primary shadow-sm transition-colors hover:border-teal-400 hover:bg-teal-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600">
                         {prompt.label}<ArrowRight size={16} className="shrink-0 text-teal-700 transition-transform group-hover:translate-x-1" aria-hidden="true" />
@@ -276,6 +377,22 @@ export function DonnaChat({ onHandoff }: Props) {
                           </div>
                         )}
                       </div>
+                      {message.role === 'assistant' && message.id === latest?.id && nextPrompts.length > 0 && (
+                        <div className="mt-2 w-full max-w-[96%]" data-testid="donna-contextual-prompts" aria-label="Sugerencias relacionadas">
+                          <p className="mb-2 pl-1 text-[11px] font-semibold text-slate-500">También puedes explorar</p>
+                          <div className="flex flex-wrap gap-2">
+                            {nextPrompts.map((prompt) => (
+                              <button
+                                type="button"
+                                key={prompt.message}
+                                onClick={() => send(prompt.message)}
+                                disabled={pending}
+                                className="rounded-full border border-teal-200 bg-white px-3 py-2 text-left text-[11px] font-semibold text-teal-900 transition-colors hover:border-teal-400 hover:bg-teal-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600 disabled:opacity-50"
+                              >{prompt.label} <ArrowRight size={12} className="ml-1 inline" aria-hidden="true" /></button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </li>
                   ))}
                 </ol>
@@ -322,14 +439,45 @@ export function DonnaChat({ onHandoff }: Props) {
       </AnimatePresence>
 
       {!open && !nudgeDismissed && (
-        <div className="mb-3 max-w-[260px] rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-[0_10px_30px_rgba(10,15,55,0.15)]">
-          <div className="flex items-start justify-between gap-2">
-            <p className="text-xs font-bold text-primary">¿Qué podríamos mejorar en tu operación?</p>
-            <button type="button" onClick={() => setNudgeDismissed(true)} aria-label="Descartar sugerencia de Donna" className="text-slate-400 hover:text-primary"><X size={14} /></button>
+        <div
+          className="donna-idea mb-3 w-[min(300px,calc(100vw-1.5rem))] overflow-hidden rounded-2xl border border-slate-200/90 bg-white p-4 shadow-[0_14px_45px_rgba(10,15,55,0.16)]"
+          data-testid="donna-invitation"
+          onPointerEnter={() => setInvitationHovered(true)}
+          onPointerLeave={() => setInvitationHovered(false)}
+          onFocusCapture={() => setInvitationFocused(true)}
+          onBlurCapture={(event) => {
+            const next = event.relatedTarget;
+            if (!(next instanceof Node) || !event.currentTarget.contains(next)) setInvitationFocused(false);
+          }}
+        >
+          <div className="mb-2 flex items-center justify-between gap-2">
+            <span className="donna-idea__eyebrow text-[10px] font-bold uppercase text-teal-800">Ideas para tu negocio</span>
+            <button type="button" onClick={() => setNudgeDismissed(true)} aria-label="Descartar sugerencia de Donna"
+              className="rounded-md p-1 text-slate-500 hover:bg-slate-100 hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600">
+              <X size={15} aria-hidden="true" />
+            </button>
           </div>
-          <button type="button" onClick={() => { setOpen(true); setNudgeDismissed(true); }} className="mt-2 flex items-center gap-1 text-xs font-semibold text-teal-800 hover:underline">
-            Conversemos <ArrowRight size={13} aria-hidden="true" />
-          </button>
+          <div className="donna-idea__compact">
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div
+                key={currentIdea.id}
+                initial={reducedMotion ? false : { opacity: 0, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={reducedMotion ? undefined : { opacity: 0, y: -4 }}
+                transition={{ duration: 0.18 }}
+              >
+                <p className="mb-1 text-[11px] font-semibold text-teal-800">{currentIdea.eyebrow}</p>
+                <p data-testid="donna-invitation-question" className="text-sm font-bold leading-snug text-primary">{currentIdea.question}</p>
+                <p className="mt-1 text-xs leading-relaxed text-secondary">{currentIdea.context}</p>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+          <div className="mt-2 flex items-center justify-between gap-2">
+            <button type="button" onClick={() => send(currentIdea.prompt)} className="flex min-h-9 items-center gap-1.5 text-xs font-bold text-teal-900 underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600">
+              {currentIdea.action} <ArrowRight size={14} aria-hidden="true" />
+            </button>
+            <span aria-hidden="true" className="text-[11px] font-medium tabular-nums text-slate-500">{ideaIndex + 1} / {DONNA_IDEAS.length}</span>
+          </div>
         </div>
       )}
 
@@ -337,12 +485,16 @@ export function DonnaChat({ onHandoff }: Props) {
         ref={launcher} type="button" aria-label={open ? 'Cerrar chat de Donna' : 'Hablar con Donna'}
         aria-expanded={open} aria-controls="donna-chat-panel"
         onClick={() => { if (open) close(); else { setOpen(true); setNudgeDismissed(true); } }}
-        className="group flex items-center gap-3 rounded-full border border-white/20 bg-[#0C0A50] py-2.5 pl-2.5 pr-5 text-white shadow-[0_12px_36px_rgba(12,10,80,0.32)] transition-transform hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal-500"
+        onPointerEnter={() => setInvitationHovered(true)}
+        onPointerLeave={() => setInvitationHovered(false)}
+        onFocus={() => setInvitationFocused(true)}
+        onBlur={() => setInvitationFocused(false)}
+        className="group flex w-[224px] max-w-[calc(100vw-1.5rem)] items-center gap-3 rounded-full border border-white/20 bg-[#0C0A50] py-2.5 pl-2.5 pr-5 text-white shadow-[0_12px_36px_rgba(12,10,80,0.32)] transition-transform hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal-500"
       >
-        <PersonaOrb small />
-        <span className="flex flex-col items-start">
+        <PersonaOrb state={orbState} />
+        <span className="flex min-w-0 flex-col items-start">
           <span className="flex items-center gap-1 text-sm font-bold">Donna <MessageCircle size={13} aria-hidden="true" /></span>
-          <span className="text-[11px] font-medium text-teal-200">Asistente LCH</span>
+          <span data-testid="donna-launcher-hint" aria-hidden="true" className="max-w-[165px] truncate text-[11px] font-medium text-teal-200">{currentIdea.action}</span>
         </span>
       </button>
       <span className="sr-only" role="status" aria-live="polite">{announcement}</span>
