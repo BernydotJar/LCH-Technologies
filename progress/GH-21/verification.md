@@ -33,3 +33,7 @@
 Core browser flows, policy safety, LCH knowledge provenance, keyboard focus pause, reduced-motion accessibility, manual switching and consent boundaries are supported by direct evidence across targeted checks. The combined accelerated-desktop regression and Granite evaluator were **not completed** and must not be presented as green tests.
 
 **Release recommendation: PASS WITH DISCLOSED TEST-GAP.** No new service or data migrations; reversible UI-only enhancement. The public-site transport gate is separate and remains pending until after real HTTPS checks.
+
+## Production post-merge
+
+Public health, targeted Evidence AI API and browser smoke PASS on 390px and 1365px for release 3583c340. See `progress/GH-21/public-validation.md`. The standalone combined accelerated experience matrix remains disclosed as INCOMPLETE.
