@@ -51,8 +51,7 @@ export const Footer = () => {
         <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-neutral-500">
           <p>&copy; {new Date().getFullYear()} LCH Technologies. Todos los derechos reservados.</p>
           <div className="flex gap-6">
-            <a href="#" className="hover:text-neutral-300 transition-colors">[Política de Privacidad]</a>
-            <a href="#" className="hover:text-neutral-300 transition-colors">[Términos de Servicio]</a>
+            <a href="#privacidad-contacto" className="hover:text-neutral-300 transition-colors">Aviso de privacidad</a>
           </div>
         </div>
       </div>
