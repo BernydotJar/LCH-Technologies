@@ -37,8 +37,8 @@ const products: ProductReference[] = [
     label: 'Aprendizaje que entiende a la persona, no solo al curso.',
     description:
       'Un Learning Twin explicable conecta objetivos, evidencia, confianza y progreso para decidir la siguiente mejor acción.',
-    url: 'https://luma--luma-learning-intelligence.us-central1.hosted.app/onboarding',
-    displayUrl: 'luma-learning-intelligence / onboarding',
+    url: 'https://luma.lch-app.cloud/onboarding',
+    displayUrl: 'luma.lch-app.cloud / onboarding',
     tags: ['Learning Twin', 'Evidence', 'Adaptive learning'],
     embed: true,
     live: true,
@@ -53,8 +53,8 @@ const products: ProductReference[] = [
     label: 'Operaciones, finanzas y procesos en un solo sistema gobernado.',
     description:
       'ERP/SaaS multi-tenant diseñado para integrar y evolucionar procesos de negocio con un núcleo financiero controlado y arquitectura por servicios.',
-    url: 'https://ido.textilesdemedellin.com/w/colombia/inicio',
-    displayUrl: 'ido.textilesdemedellin.com / colombia',
+    url: 'https://ido.lch-app.cloud/w/colombia/inicio',
+    displayUrl: 'ido.lch-app.cloud / colombia',
     tags: ['ERP', 'Multi-tenant', 'AI-native'],
     embed: false,
     live: true,
@@ -69,8 +69,8 @@ const products: ProductReference[] = [
     label: 'Respuestas jurídicas con trazabilidad antes que confianza ciega.',
     description:
       'Consulta normativa y procedimientos con citas, clasificación de fuentes y límites explícitos de confianza.',
-    url: 'https://bernydotjar.github.io/LA_muni_RAG/',
-    displayUrl: 'evidencia-juridica / public demo',
+    url: 'https://evidencia.lch-app.cloud/',
+    displayUrl: 'evidencia.lch-app.cloud / public demo',
     tags: ['RAG', 'Legal AI', 'Citations'],
     embed: true,
     live: true,
