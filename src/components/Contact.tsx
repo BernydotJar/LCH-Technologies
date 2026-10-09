@@ -1,6 +1,7 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'motion/react';
 import { AlertCircle, ArrowRight, Check, CheckCircle2, LoaderCircle, ShieldCheck } from 'lucide-react';
+import type { ContactHandoff } from '../App';
 import type { DemoRequest } from '../integrations/leadContract';
 
 type FormStatus = 'idle' | 'loading' | 'success' | 'error';
@@ -42,13 +43,25 @@ function errorMessage(error: unknown): string {
   return 'No pudimos confirmar la recepción. Conservamos lo que escribiste para que puedas intentar de nuevo.';
 }
 
-export const Contact = () => {
+export const Contact = ({ handoff }: { handoff: ContactHandoff | null }) => {
   const [status, setStatus] = useState<FormStatus>('idle');
   const [formData, setFormData] = useState<DemoRequest>(EMPTY_REQUEST);
   const [errorText, setErrorText] = useState('');
   const [confirmationId, setConfirmationId] = useState('');
   const [website, setWebsite] = useState('');
   const inFlight = useRef(false);
+  const [handoffActive, setHandoffActive] = useState(false);
+
+  useEffect(() => {
+    if (!handoff) return;
+    setFormData((current) => ({
+      ...current,
+      interes: handoff.interest !== 'Otro' ? handoff.interest : current.interes,
+      mensaje: current.mensaje.trim() || handoff.message.trim().slice(0, 2000),
+    }));
+    setStatus('idle');
+    setHandoffActive(true);
+  }, [handoff?.nonce]);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type } = event.target;
@@ -147,6 +160,9 @@ export const Contact = () => {
             </motion.div>
           ) : (
             <form onSubmit={handleSubmit} className="mx-auto w-full max-w-lg space-y-5" aria-busy={status === 'loading'}>
+              {handoffActive && <div role="status" className="rounded-md border border-teal-200 bg-teal-50 px-4 py-3 text-xs leading-relaxed text-teal-900">
+                Donna te ayudó a preparar esta consulta. Revisa o edita los campos y envíala cuando estés listo; nada se ha enviado todavía.
+              </div>}
               <div>
                 <h3 className="mb-2 text-2xl font-bold text-primary">Cuéntanos qué quieres lograr</h3>
                 <p className="text-sm leading-relaxed text-secondary">
