@@ -32,6 +32,9 @@ async function main() {
       assert.ok(rect && rect.x >= 0 && rect.x + rect.width <= viewport + 2, 'Donna must fit viewport');
 
       await page.getByRole('button', { name: /Continuar con una persona/ }).click();
+      // Handoff fields are populated by a Contact useEffect after React commits.
+      // Wait for the actual state, not just the click event, under production load.
+      await page.waitForFunction(() => document.querySelector('#interes')?.value === 'Inteligencia Artificial', null, { timeout: 8000 });
       assert.equal(await page.locator('#interes').inputValue(), 'Inteligencia Artificial');
       assert.match(await page.locator('#mensaje').inputValue(), /inteligencia artificial ofrece LCH/);
       assert.equal(await page.locator('#consentimiento').isChecked(), false);

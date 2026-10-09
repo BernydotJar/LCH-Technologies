@@ -14,3 +14,7 @@ INCOMPLETE:
 - No Granite-generated critique: local model failed to start due memory pressure.
 
 Independent conclusion: **PASS WITH DISCLOSED GAP** for the bounded production UI change. Re-run combined desktop GH-21 E2E in less-congested CI to close the remaining evidence gap; preserve old release for rollback.
+
+## Production follow-through
+
+Published release 3583c340 was independently verified through `scripts/donna-smoke.cjs` at both mobile and desktop widths, 0 JavaScript page errors, correct chat-to-contact handoff and unchanged consent requirement. The extended accelerated desktop GH-21 scenario remains INCOMPLETE, recorded explicitly in `public-validation.md`.
