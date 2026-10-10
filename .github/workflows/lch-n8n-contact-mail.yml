@@ -1,0 +1,22 @@
+name: LCH n8n Contact Mail validation
+on:
+  pull_request:
+    paths:
+      - 'workflows/n8n/lch-contact-mail-spark.workflow.json'
+      - 'tests/n8nContactMail.test.ts'
+      - '.github/workflows/lch-n8n-contact-mail.yml'
+  workflow_dispatch:
+jobs:
+  verify-workflow:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate workflow schema and code policies
+        run: node --experimental-strip-types --test tests/n8nContactMail.test.ts
+      - name: Verify JSON parse and fail-closed activation
+        run: |
+          node -e 'const p=require("./workflows/n8n/lch-contact-mail-spark.workflow.json");if(p.active!==false||!p.nodes.find(n=>n.name==="Activation UTC").parameters.jsCode.includes("__REPLACE_WITH_ACTIVATION_UTC__"))process.exit(1);'

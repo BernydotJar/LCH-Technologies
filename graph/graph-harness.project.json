@@ -103,6 +103,23 @@
         "independent_verification"
       ],
       "blocking": true
+    },
+    {
+      "id": "gh26_n8n_quality",
+      "required_evidence_kinds": [
+        "critic_review",
+        "verification",
+        "independent_verification"
+      ],
+      "blocking": true
+    },
+    {
+      "id": "gh26_live_delivery",
+      "required_evidence_kinds": [
+        "external_validation",
+        "independent_verification"
+      ],
+      "blocking": true
     }
   ],
   "nodes": [
@@ -594,6 +611,41 @@
         "no_firebase_billing": true,
         "delivery_gate_requires": "real_inbox_receipts",
         "supersedes_pr": 23
+      }
+    },
+    {
+      "id": "GH-26",
+      "kind": "feature",
+      "title": "Reuse existing n8n for LCH Spark lead email to four Outlook mailboxes",
+      "status": "pending",
+      "depends_on": [
+        "GH-23"
+      ],
+      "capability": "automation",
+      "gates": {
+        "done": [
+          "gh26_n8n_quality",
+          "gh26_live_delivery"
+        ]
+      },
+      "allowed_paths": [
+        "workflows/n8n/lch-contact-mail-spark.workflow.json",
+        "tests/n8nContactMail.test.ts",
+        ".github/workflows/lch-n8n-contact-mail.yml",
+        "specs/GH-26/**",
+        "progress/GH-26/**",
+        "docs/lch-n8n-contact-mail.md",
+        "graph/**"
+      ],
+      "metadata": {
+        "mode": "existing-n8n",
+        "firebase_tier": "Spark",
+        "n8n_runtime": "n8n-lina 2.39.6",
+        "recipients": 4,
+        "production": false,
+        "workflow_active": false,
+        "lina_workflow_mutations": false,
+        "alternative_to": "GH-25 Cloudflare Worker (not deployed)"
       }
     }
   ]
