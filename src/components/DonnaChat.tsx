@@ -10,12 +10,13 @@ import './donna-experience.css';
 import { DONNA_LIMITS, isDonnaReply, type DonnaReply } from '../donna/engine';
 import { contactAnswerFeedback, contactIntro, contactProgressLabel, isDirectContactIntent, safeKnowledgeHistory, type HistoryTurn } from '../donna/conversationPolicy';
 import type { InterestArea } from '../integrations/leadContract';
+import type { DonnaPreparedDraft } from '../App';
 import { mergeContactDraft, missingContactFields, type ContactDraft } from '../contact/semanticContract';
 import { containsOutOfSchemaPrivateData, containsPersonalContactData, extractFromDonnaMessages, extractSemanticContact, readGuidedContactAnswer, safeContactMessageFromConversation } from '../contact/semanticDraft';
 
 type DonnaUiMessage = HistoryTurn & { id: number; links?: DonnaReply['links']; kind?: DonnaReply['kind']; interest?: InterestArea };
 export type DonnaHandoff = { interest: InterestArea; message: string; draft: ContactDraft };
-type Props = { onHandoff: (data: DonnaHandoff) => void };
+type Props = { onHandoff: (data: DonnaHandoff) => void; onDraft: (draft: ContactDraft) => void; startContactRequest: DonnaPreparedDraft | null };
 
 const PUBLIC_LINKS = new Set([
   '#contacto',
@@ -47,7 +48,7 @@ function PersonaOrb({ size = 'launcher', state = 'idle' }: { size?: 'compact' | 
   );
 }
 
-export function DonnaChat({ onHandoff }: Props) {
+export function DonnaChat({ onHandoff, onDraft, startContactRequest }: Props) {
   const [open, setOpen] = useState(false);
   const [nudgeDismissed, setNudgeDismissed] = useState(false);
   const [messages, setMessages] = useState<DonnaUiMessage[]>([]);
@@ -143,7 +144,8 @@ export function DonnaChat({ onHandoff }: Props) {
     setLastInterest('Otro');
     setContactMode(false);
     setContactDraft({});
-    setAnnouncement('Nueva conversación iniciada.');
+    onDraft({});
+    setAnnouncement('Nueva conversación iniciada y borrador de Donna reiniciado.');
     composer.current?.focus();
   }
 
@@ -222,15 +224,24 @@ export function DonnaChat({ onHandoff }: Props) {
     setAnnouncement(answer);
   }
 
-  function startContactAssistant(intentText?: string) {
-    if (busy.current || contactMode) return;
+  function startContactAssistant(intentText?: string, seedDraft: ContactDraft = {}) {
+    if (busy.current) return;
+    if (contactMode) {
+      const merged = mergeContactDraft(contactDraft, seedDraft);
+      setContactDraft(merged);
+      onDraft(merged);
+      setOpen(true);
+      setNudgeDismissed(true);
+      return;
+    }
     const directTurn: DonnaUiMessage | null = intentText
       ? { id: nextId.current++, role: 'user', content: intentText, private: true }
       : null;
     const source: DonnaUiMessage[] = directTurn ? [...messages, directTurn] : messages;
-    const prepared = mergeContactDraft(extractFromDonnaMessages(source, lastInterest), contactDraft);
+    const prepared = mergeContactDraft(mergeContactDraft(extractFromDonnaMessages(source, lastInterest), contactDraft), seedDraft);
     const answer = contactIntro(prepared);
     setContactDraft(prepared);
+    onDraft(prepared);
     setContactMode(true);
     setOpen(true);
     setNudgeDismissed(true);
@@ -259,6 +270,7 @@ export function DonnaChat({ onHandoff }: Props) {
     const proposal = expected ? readGuidedContactAnswer(expected.name, text) : extractSemanticContact(text);
     const next = mergeContactDraft(contactDraft, proposal);
     setContactDraft(next);
+    onDraft(next);
     const recognized = Object.keys(proposal).length > 0;
     const answer = contactAnswerFeedback(next, recognized, containsOutOfSchemaPrivateData(text));
     appendLocalContactExchange(text, answer);
@@ -284,6 +296,7 @@ export function DonnaChat({ onHandoff }: Props) {
     if (hasIdentity || containsPersonalContactData(content) || containsOutOfSchemaPrivateData(content)) {
       const prepared = mergeContactDraft(contactDraft, inferred);
       setContactDraft(prepared);
+      onDraft(prepared);
       setContactMode(true);
       const missing = missingContactFields(prepared);
       const answer = Object.keys(inferred).length === 0
@@ -323,10 +336,17 @@ export function DonnaChat({ onHandoff }: Props) {
     const message = proposal.mensaje || safeContactMessageFromConversation(recentUserMessage);
     // This only transfers a typed proposal into React's contact form. It cannot
     // set the consent checkbox, send a request, or write to Firestore.
+    onDraft(proposal);
     onHandoff({ interest: (proposal.interes as InterestArea | undefined) ?? lastInterest, message, draft: proposal });
     setContactMode(false);
     setOpen(false);
   }
+
+  // Starting from Contact uses its already-entered values only to ask for missing fields.
+  useEffect(() => {
+    if (!startContactRequest) return;
+    startContactAssistant(undefined, startContactRequest.draft);
+  }, [startContactRequest?.nonce]);
 
   const hasChat = messages.length > 0;
   const latestQuestion = [...messages].reverse().find((message) => message.role === 'user')?.content ?? '';
