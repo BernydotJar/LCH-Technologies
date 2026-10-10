@@ -1,0 +1,21 @@
+name: LCH lead mail verification
+on:
+  pull_request:
+    paths:
+      - 'functions/**'
+      - 'firebase.json'
+      - '.github/workflows/lch-lead-mail.yml'
+  workflow_dispatch:
+jobs:
+  verify-mailer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: functions/package-lock.json
+      - run: npm ci --prefix functions --ignore-scripts --no-audit --no-fund
+      - run: npm run check --prefix functions

@@ -1,0 +1,16 @@
+{
+  "name": "lch-lead-mail-functions",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": "22" },
+  "main": "index.js",
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "check": "node --check index.js && node --check src/graph.js && node --check src/notification.js && node --check src/process.js && npm test"
+  },
+  "dependencies": {
+    "firebase-admin": "^14.5.0",
+    "firebase-functions": "^7.4.0"
+  }
+}

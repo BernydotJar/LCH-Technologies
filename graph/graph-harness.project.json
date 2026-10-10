@@ -86,6 +86,23 @@
         "independent_verification"
       ],
       "blocking": true
+    },
+    {
+      "id": "gh25_m365_notification_quality",
+      "required_evidence_kinds": [
+        "critic_review",
+        "verification",
+        "independent_verification"
+      ],
+      "blocking": true
+    },
+    {
+      "id": "gh25_m365_inbox_delivery",
+      "required_evidence_kinds": [
+        "external_validation",
+        "independent_verification"
+      ],
+      "blocking": true
     }
   ],
   "nodes": [
@@ -543,6 +560,39 @@
         "product_only": true,
         "privacy": "do not replay personal details to API",
         "baseline": "ed39e349a"
+      }
+    },
+    {
+      "id": "GH-25",
+      "kind": "feature",
+      "title": "Consent-controlled Firestore to Microsoft 365 lead email delivery",
+      "status": "pending",
+      "depends_on": [
+        "GH-23"
+      ],
+      "capability": "backend",
+      "gates": {
+        "done": [
+          "gh25_m365_notification_quality",
+          "gh25_m365_inbox_delivery"
+        ]
+      },
+      "allowed_paths": [
+        "functions/**",
+        "firebase.json",
+        ".github/workflows/lch-lead-mail.yml",
+        "docs/lead-email-alerts.md",
+        "specs/GH-25/**",
+        "progress/GH-25/**",
+        "graph/**"
+      ],
+      "metadata": {
+        "execution_mode": "graph",
+        "mail_provider": "Microsoft Graph",
+        "recipient_count": 4,
+        "requires_enra_admin_approval": true,
+        "secrets_in_git": false,
+        "production_gate": "real_m365_inbox_receipt"
       }
     }
   ]
