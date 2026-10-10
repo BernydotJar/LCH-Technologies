@@ -1,28 +1,24 @@
 # LCH social sharing / Open Graph preview
 
-LCH serves static Open Graph and X Card tags directly in `index.html`. Social crawlers do not render the React hero. The canonical card image is `public/assets/social/lch-preview.png` (1200 × 630, PNG).
+LCH serves static Open Graph and X Card tags directly in `index.html`. Social crawlers do not render the React hero. The canonical card image is `public/assets/social/lch-preview-original.png` (1200 × 630, PNG).
 
 ## Source of truth
 
-- Design source: `scripts/social-preview.html`, based on LCH's production hero colors, business positioning, and official `public/assets/brand/lch-technologies-logo@2x.png`.
-- Published image: `public/assets/social/lch-preview.png`.
+- Design source: `original AI-generated LCH cinematic social image (Antigua Guatemala, Volcán de Agua, Arc de Santa Catalina and technology overlays)`, based on LCH's production hero colors, business positioning, and official `public/assets/brand/lch-technologies-logo@2x.png`.
+- Published image: `public/assets/social/lch-preview-original.png`.
 - Absolute public image URL: `https://lch-app.cloud/assets/social/lch-preview.png`.
 - Both `og:image` and `twitter:image` must use the same public HTTPS PNG. `twitter:card` is `summary_large_image`.
 - GitHub Actions validates the landing page, social image and all existing unit/build tests when any of these files change.
 
+## Image provenance
+
+This asset is a cropped/resized version of the original AI-generated artwork approved in the conversation; do not regenerate from the earlier minimalistic HTML mockup. The original static HTML source has been retired.
+
 ## Regenerate the card
 
-From the repository root, in an environment with Chromium available:
+Re-export the retained first-generation image at 1200 × 630 px. Verify visual fidelity and run `npm run check`.
 
-```sh
-chromium --headless --no-sandbox --disable-gpu --hide-scrollbars \
-  --force-device-scale-factor=1 --window-size=1200,630 \
-  --screenshot="$(pwd)/public/assets/social/lch-preview.png" \
-  "file://$(pwd)/scripts/social-preview.html"
-npm run check
-```
-
-The source HTML is *not* served as the social asset; only the rendered image is. Keep all copy grounded in LCH's actual service capabilities, and retain the approved official brand asset.
+Only the PNG is served as the social asset. Keep all copy grounded in LCH's actual service capabilities, and retain the approved official brand asset.
 
 ## Production release checks
 
