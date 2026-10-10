@@ -137,6 +137,23 @@
         "independent_verification"
       ],
       "blocking": true
+    },
+    {
+      "id": "gh28_n8n_delivery_quality",
+      "required_evidence_kinds": [
+        "critic_review",
+        "verification",
+        "independent_verification"
+      ],
+      "blocking": true
+    },
+    {
+      "id": "gh28_m365_inbox_receipts",
+      "required_evidence_kinds": [
+        "external_validation",
+        "independent_verification"
+      ],
+      "blocking": true
     }
   ],
   "nodes": [
@@ -696,6 +713,44 @@
         "firebase_tier": "Spark",
         "mail_workflow_active": false,
         "host_recreation_verified": false
+      }
+    },
+    {
+      "id": "GH-28",
+      "kind": "feature",
+      "title": "LCH n8n mail provider guards and production activation readiness",
+      "status": "pending",
+      "depends_on": [
+        "GH-23"
+      ],
+      "capability": "backend",
+      "gates": {
+        "done": [
+          "gh28_n8n_delivery_quality",
+          "gh28_m365_inbox_receipts"
+        ]
+      },
+      "allowed_paths": [
+        "workflows/n8n/lch-contact-mail-spark.workflow.json",
+        "tests/n8nContactMail.test.ts",
+        "tests/test_lch_n8n_release_preflight.py",
+        "scripts/lch_n8n_release_preflight.py",
+        ".github/workflows/lch-n8n-contact-mail.yml",
+        "docs/lch-n8n-contact-mail.md",
+        "docs/lch-n8n-activation-runbook.md",
+        "specs/GH-28/**",
+        "progress/GH-28/**",
+        "progress/current.md",
+        "graph/**"
+      ],
+      "metadata": {
+        "firebase_plan": "Spark",
+        "n8n_instances": 2,
+        "active_mail_workflows": 0,
+        "sender": "contacto@lch-technologies.com",
+        "to_count": 4,
+        "requires_external_oauth": true,
+        "production_receipts_received": false
       }
     }
   ]

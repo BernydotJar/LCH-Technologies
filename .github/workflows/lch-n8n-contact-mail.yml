@@ -4,6 +4,8 @@ on:
     paths:
       - 'workflows/n8n/lch-contact-mail-spark.workflow.json'
       - 'tests/n8nContactMail.test.ts'
+      - 'tests/test_lch_n8n_release_preflight.py'
+      - 'scripts/lch_n8n_release_preflight.py'
       - '.github/workflows/lch-n8n-contact-mail.yml'
   workflow_dispatch:
 jobs:
@@ -17,6 +19,11 @@ jobs:
           node-version: '22'
       - name: Validate workflow schema and code policies
         run: node --experimental-strip-types --test tests/n8nContactMail.test.ts
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify read-only release preflight without credentials
+        run: python3 -m unittest tests/test_lch_n8n_release_preflight.py -v
       - name: Verify JSON parse and fail-closed activation
         run: |
           node -e 'const p=require("./workflows/n8n/lch-contact-mail-spark.workflow.json");if(p.active!==false||!p.nodes.find(n=>n.name==="Activation UTC").parameters.jsCode.includes("__REPLACE_WITH_ACTIVATION_UTC__"))process.exit(1);'

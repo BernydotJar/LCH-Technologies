@@ -89,6 +89,21 @@
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify($json.claimBody) }}"
+      },
+      "continueOnFail": true
+    },
+    {
+      "id": "gh28-confirm-cas",
+      "name": "Confirm Firestore Lease",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        180,
+        180
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Only a successful Firestore CAS lease may proceed to Outlook.\n// With continueOnFail, conflicts/errors must never become mail candidates.\nconst out=[];\nfor(let i=0;i<$input.all().length;i++) {\n  const saved=$input.all()[i].json || {};\n  const expected=$('Prepare eligible leads').itemMatching(i).json;\n  const state=saved.fields?.notification?.mapValue?.fields || {};\n  if(saved.name!==expected.documentName || state.state?.stringValue!=='sending' || state.leaseId?.stringValue!==expected.leaseId) continue;\n  out.push({json:{claimConfirmed:true,leadId:expected.leadId},pairedItem:{item:i}});\n}\nreturn out;"
       }
     },
     {
@@ -97,7 +112,7 @@
       "type": "n8n-nodes-base.microsoftOutlook",
       "typeVersion": 2,
       "position": [
-        180,
+        400,
         180
       ],
       "parameters": {
@@ -121,6 +136,21 @@
             ]
           }
         }
+      },
+      "continueOnFail": true
+    },
+    {
+      "id": "gh28-confirm-accepted",
+      "name": "Confirm Outlook Accepted",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        620,
+        180
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Outlook's installed v2 send operation emits {success:true} only after\n// provider acceptance. Failed deliveries may flow here with an error payload.\n// Never ACK Firestore unless the provider explicitly reported success.\nconst out=[];\nfor(let i=0;i<$input.all().length;i++) {\n  const result=$input.all()[i].json || {};\n  if(result.success!==true) continue;\n  const source=$('Prepare eligible leads').itemMatching(i).json;\n  out.push({json:{providerAccepted:true,leadId:source.leadId},pairedItem:{item:i}});\n}\nreturn out;"
       }
     },
     {
@@ -129,7 +159,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        400,
+        840,
         180
       ],
       "parameters": {
@@ -148,7 +178,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        620,
+        1060,
         180
       ],
       "parameters": {
@@ -162,7 +192,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        840,
+        1280,
         180
       ],
       "parameters": {
@@ -176,6 +206,43 @@
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify($json.ackBody) }}"
+      }
+    },
+    {
+      "id": "gh28-exhausted-review",
+      "name": "Select Retry-Exhausted Leads",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -260,
+        450
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Dead-letter exhausted consented leads WITHOUT sending email.\n// This branch writes only notification.needs_review under Firestore CAS.\nconst activation=Date.parse($('Activation UTC').first().json.activationUtc);\nconst rows=$input.all();\nconst out=[];\nfunction decode(v){\n if(v?.stringValue!==undefined)return v.stringValue;\n if(v?.booleanValue!==undefined)return v.booleanValue;\n if(v?.integerValue!==undefined)return Number(v.integerValue);\n if(v?.timestampValue!==undefined)return v.timestampValue;\n if(v?.nullValue!==undefined)return null;\n if(v?.mapValue)return Object.fromEntries(Object.entries(v.mapValue.fields||{}).map(([k,w])=>[k,decode(w)]));\n return undefined;\n}\nfor(let i=0;i<rows.length && out.length<6;i++){\n const doc=rows[i].json.document;\n if(!doc?.name||!doc?.updateTime||!doc.fields||!doc.name.includes('/demoRequests/'))continue;\n const lead=Object.fromEntries(Object.entries(doc.fields).map(([k,v])=>[k,decode(v)]));\n if(lead.consentimiento!==true||lead.source!=='website')continue;\n if(!Number.isFinite(Date.parse(lead.createdAt))||Date.parse(lead.createdAt)<activation)continue;\n const prior=lead.notification||{};\n if(['accepted','needs_review','blocked','invalid'].includes(prior.state))continue;\n if(prior.state==='sending'&&Number(prior.leaseUntilMs||0)>Date.now())continue;\n const count=Number(prior.attempts||0);\n if(!Number.isSafeInteger(count)||count<7)continue;\n const now=new Date().toISOString();\n const reviewBody={name:doc.name,fields:{notification:{mapValue:{fields:{\n  provider:{stringValue:'n8n_outlook'},state:{stringValue:'needs_review'},\n  attempts:{integerValue:String(count)},errorCode:{stringValue:'retry_limit'},\n  leaseUntilMs:{integerValue:'0'},updatedAt:{stringValue:now}\n }}}}};\n out.push({json:{documentName:doc.name,updateTime:doc.updateTime,reviewBody},pairedItem:{item:i}});\n}\nreturn out;"
+      }
+    },
+    {
+      "id": "gh28-record-review",
+      "name": "Record Needs Review",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -40,
+        450
+      ],
+      "continueOnFail": true,
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ 'https://firestore.googleapis.com/v1/' + $json.documentName + '?updateMask.fieldPaths=notification&currentDocument.updateTime=' + encodeURIComponent($json.updateTime) }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "options": {
+          "timeout": 30000
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.reviewBody) }}"
       }
     }
   ],
@@ -209,6 +276,11 @@
             "node": "Prepare eligible leads",
             "type": "main",
             "index": 0
+          },
+          {
+            "node": "Select Retry-Exhausted Leads",
+            "type": "main",
+            "index": 0
           }
         ]
       ]
@@ -228,7 +300,7 @@
       "main": [
         [
           {
-            "node": "Outlook Send Four Recipients",
+            "node": "Confirm Firestore Lease",
             "type": "main",
             "index": 0
           }
@@ -239,7 +311,7 @@
       "main": [
         [
           {
-            "node": "Re-read Firestore Lease",
+            "node": "Confirm Outlook Accepted",
             "type": "main",
             "index": 0
           }
@@ -262,6 +334,39 @@
         [
           {
             "node": "Record Outlook Acceptance",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Confirm Firestore Lease": {
+      "main": [
+        [
+          {
+            "node": "Outlook Send Four Recipients",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Confirm Outlook Accepted": {
+      "main": [
+        [
+          {
+            "node": "Re-read Firestore Lease",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Select Retry-Exhausted Leads": {
+      "main": [
+        [
+          {
+            "node": "Record Needs Review",
             "type": "main",
             "index": 0
           }
