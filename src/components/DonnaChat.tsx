@@ -7,12 +7,13 @@ import {
 import { DONNA_QUICK_PROMPTS } from '../donna/knowledge';
 import { DONNA_IDEA_ROTATION_MS, DONNA_IDEAS, contextualPrompts } from '../donna/experience';
 import './donna-experience.css';
-import { DONNA_LIMITS, isDonnaReply, type DonnaMessage, type DonnaReply } from '../donna/engine';
+import { DONNA_LIMITS, isDonnaReply, type DonnaReply } from '../donna/engine';
+import { contactAnswerFeedback, contactIntro, contactProgressLabel, isDirectContactIntent, safeKnowledgeHistory, type HistoryTurn } from '../donna/conversationPolicy';
 import type { InterestArea } from '../integrations/leadContract';
-import { CONTACT_REQUIRED_FIELDS, countContactFields, mergeContactDraft, missingContactFields, type ContactDraft } from '../contact/semanticContract';
+import { mergeContactDraft, missingContactFields, type ContactDraft } from '../contact/semanticContract';
 import { containsOutOfSchemaPrivateData, containsPersonalContactData, extractFromDonnaMessages, extractSemanticContact, readGuidedContactAnswer, safeContactMessageFromConversation } from '../contact/semanticDraft';
 
-type DonnaUiMessage = DonnaMessage & { id: number; links?: DonnaReply['links']; kind?: DonnaReply['kind']; interest?: InterestArea };
+type DonnaUiMessage = HistoryTurn & { id: number; links?: DonnaReply['links']; kind?: DonnaReply['kind']; interest?: InterestArea };
 export type DonnaHandoff = { interest: InterestArea; message: string; draft: ContactDraft };
 type Props = { onHandoff: (data: DonnaHandoff) => void };
 
@@ -161,7 +162,7 @@ export function DonnaChat({ onHandoff }: Props) {
         cache: 'no-store',
         credentials: 'omit',
         body: JSON.stringify({
-          messages: outbound.slice(-DONNA_LIMITS.maxMessages).map(({ role, content }) => ({ role, content })),
+          messages: safeKnowledgeHistory(outbound, DONNA_LIMITS.maxMessages),
         }),
         signal: operation.signal,
       });
@@ -213,28 +214,38 @@ export function DonnaChat({ onHandoff }: Props) {
   }
 
   function appendLocalContactExchange(text: string, answer: string) {
-    const user: DonnaUiMessage = { id: nextId.current++, role: 'user', content: text };
-    const donna: DonnaUiMessage = { id: nextId.current++, role: 'assistant', content: answer };
+    const user: DonnaUiMessage = { id: nextId.current++, role: 'user', content: text, private: true };
+    const donna: DonnaUiMessage = { id: nextId.current++, role: 'assistant', content: answer, private: true };
     setMessages((previous) => [...previous, user, donna].slice(-MAX_VISIBLE));
     setDraft('');
     setFailure('');
     setAnnouncement(answer);
   }
 
-  function startContactAssistant() {
-    if (busy.current) return;
-    const fromConversation = extractFromDonnaMessages(messages, lastInterest);
-    const prepared = mergeContactDraft(fromConversation, contactDraft);
+  function startContactAssistant(intentText?: string) {
+    if (busy.current || contactMode) return;
+    const directTurn: DonnaUiMessage | null = intentText
+      ? { id: nextId.current++, role: 'user', content: intentText, private: true }
+      : null;
+    const source: DonnaUiMessage[] = directTurn ? [...messages, directTurn] : messages;
+    const prepared = mergeContactDraft(extractFromDonnaMessages(source, lastInterest), contactDraft);
+    const answer = contactIntro(prepared);
     setContactDraft(prepared);
     setContactMode(true);
     setOpen(true);
     setNudgeDismissed(true);
-    const missing = missingContactFields(prepared);
-    const answer = missing.length
-      ? `Puedo ayudarte a preparar la solicitud, sin abrir otras páginas ni enviarla. Identifiqué ${countContactFields(prepared)} datos. ${missing[0].question}`
-      : 'Ya identifiqué los datos básicos. Podemos revisar el formulario ahora; también puedes corregir cualquier campo.';
-    setMessages((previous) => [...previous, { id: nextId.current++, role: 'assistant' as const, content: answer }].slice(-MAX_VISIBLE));
-    setAnnouncement(answer);
+    const assistantTurn: DonnaUiMessage = { id: nextId.current++, role: 'assistant', content: answer, private: true };
+    setMessages((previous) => {
+      // Remove a stale "unrecognized question" prompt once the user explicitly
+      // chooses to prepare a contact. The original user turn remains visible.
+      const cleanHistory = previous.at(-1)?.kind === 'clarify' ? previous.slice(0, -1) : previous;
+      return [
+        ...cleanHistory,
+        ...(directTurn ? [directTurn] : []),
+        assistantTurn,
+      ].slice(-MAX_VISIBLE);
+    });
+    setAnnouncement('Puedes preparar una solicitud con Donna. Nada se ha enviado.');
     window.requestAnimationFrame(() => composer.current?.focus());
   }
 
@@ -248,13 +259,8 @@ export function DonnaChat({ onHandoff }: Props) {
     const proposal = expected ? readGuidedContactAnswer(expected.name, text) : extractSemanticContact(text);
     const next = mergeContactDraft(contactDraft, proposal);
     setContactDraft(next);
-    const missing = missingContactFields(next);
     const recognized = Object.keys(proposal).length > 0;
-    const answer = !recognized
-      ? `No pude identificar ese dato con suficiente certeza y prefiero no inventarlo. ${expected?.question ?? 'Puedes revisar los campos en el formulario.'}`
-      : missing.length
-        ? `Anotado. Ya tenemos ${countContactFields(next)} datos. ${missing[0].question}`
-        : 'Ya tenemos los datos básicos. Pulsa «Revisar formulario» para comprobarlos, completar lo que desees y autorizar el envío.';
+    const answer = contactAnswerFeedback(next, recognized, containsOutOfSchemaPrivateData(text));
     appendLocalContactExchange(text, answer);
   }
 
@@ -281,11 +287,14 @@ export function DonnaChat({ onHandoff }: Props) {
       setContactMode(true);
       const missing = missingContactFields(prepared);
       const answer = Object.keys(inferred).length === 0
-        ? `Ese dato no pertenece al formulario y no lo enviaré al chat ni lo incluiré en la solicitud. ${missing[0]?.question ?? 'Puedes revisar los campos permitidos.'}`
-        : missing.length
-          ? `Puedo preparar un borrador con los datos que compartiste. No los he enviado. ${missing[0].question}`
-        : 'Ya tengo los datos básicos para un borrador. Puedes revisarlo antes de enviarlo.';
+        ? `Ese dato no forma parte del formulario. No lo enviaré ni lo incorporaré a tu solicitud. ${missing[0]?.question ?? 'Puedes revisar los campos permitidos.'}`
+        : contactIntro(prepared);
       appendLocalContactExchange(content, answer);
+      return;
+    }
+    if (isDirectContactIntent(content)) {
+      startContactAssistant(content);
+      setDraft('');
       return;
     }
     const next: DonnaUiMessage[] = [
@@ -431,9 +440,9 @@ export function DonnaChat({ onHandoff }: Props) {
                       </button>
                     ))}
                   </div>
-                  <button type="button" data-testid="donna-start-contact" onClick={startContactAssistant}
+                  <button type="button" data-testid="donna-start-contact" onClick={() => startContactAssistant()}
                     className="flex w-full min-h-10 items-center justify-center gap-2 rounded-xl border border-teal-200 bg-teal-50 px-4 py-3 text-xs font-bold text-teal-900 transition-colors hover:bg-teal-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700">
-                    <Check size={15} aria-hidden="true" /> Donna, ayúdame a preparar una solicitud <ArrowRight size={14} aria-hidden="true" />
+                    <Check size={15} aria-hidden="true" /> Preparar una solicitud <ArrowRight size={14} aria-hidden="true" />
                   </button>
                 </div>
               )}
@@ -444,23 +453,21 @@ export function DonnaChat({ onHandoff }: Props) {
                       <span className="mb-1 text-[11px] font-semibold text-slate-500">{message.role === 'user' ? 'Tú' : 'Donna'}</span>
                       <div className={`max-w-[92%] whitespace-pre-line rounded-2xl px-4 py-3 text-sm leading-relaxed ${message.role === 'user' ? 'rounded-br-sm bg-[#0C0A50] text-white' : 'rounded-bl-sm border border-slate-200 bg-white text-slate-700 shadow-sm'}`}>
                         {message.content}
-                        {message.role === 'assistant' && Boolean(message.links?.length) && (
+                        {message.role === 'assistant' && Boolean(message.links?.some((link) => link.url !== '#contacto')) && (
                           <div className="mt-3 space-y-2 border-t border-slate-100 pt-3">
-                            {message.links?.map((link) => (
-                              link.url === '#contacto'
-                                ? <button key={link.url} type="button" onClick={handoff} className="flex items-center gap-1.5 text-xs font-semibold text-teal-800 underline-offset-4 hover:underline">{link.label}<ArrowRight size={13} aria-hidden="true" /></button>
-                                : <a key={link.url} href={link.url} onClick={(event) => { if (link.url.startsWith('#')) { event.preventDefault(); setOpen(false); document.getElementById(link.url.slice(1))?.scrollIntoView({ behavior: 'smooth' }); } }}
-                                  className="flex items-center gap-1.5 text-xs font-semibold text-teal-800 underline-offset-4 hover:underline"
-                                  {...(!link.url.startsWith('#') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>
-                                  {link.label}<ArrowUpRight size={13} aria-hidden="true" />
-                                </a>
+                            {message.links?.filter((link) => link.url !== '#contacto').map((link) => (
+                              <a key={link.url} href={link.url} onClick={(event) => { if (link.url.startsWith('#')) { event.preventDefault(); setOpen(false); document.getElementById(link.url.slice(1))?.scrollIntoView({ behavior: 'smooth' }); } }}
+                                className="flex items-center gap-1.5 text-xs font-semibold text-teal-800 underline-offset-4 hover:underline"
+                                {...(!link.url.startsWith('#') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>
+                                {link.label}<ArrowUpRight size={13} aria-hidden="true" />
+                              </a>
                             ))}
                           </div>
                         )}
                       </div>
                       {message.role === 'assistant' && message.id === latest?.id && nextPrompts.length > 0 && (
                         <div className="mt-2 w-full max-w-[96%]" data-testid="donna-contextual-prompts" aria-label="Sugerencias relacionadas">
-                          <p className="mb-2 pl-1 text-[11px] font-semibold text-slate-500">También puedes explorar</p>
+                          <p className="mb-2 pl-1 text-[11px] font-semibold text-slate-500">{latest?.kind === 'clarify' ? 'Puedes preguntar sobre' : 'También puedes explorar'}</p>
                           <div className="flex flex-wrap gap-2">
                             {nextPrompts.map((prompt) => (
                               <button
@@ -493,10 +500,10 @@ export function DonnaChat({ onHandoff }: Props) {
                   className="mb-3 rounded-xl border border-teal-200 bg-teal-50 p-3 text-xs leading-relaxed text-teal-950">
                   <div className="flex items-center justify-between gap-2 font-semibold">
                     <span>Tu solicitud · borrador privado</span>
-                    <span data-testid="donna-contact-progress" className="tabular-nums">{countContactFields(contactDraft)}/{CONTACT_REQUIRED_FIELDS.length} datos</span>
+                    <span data-testid="donna-contact-progress" className="tabular-nums">{contactProgressLabel(contactDraft)}</span>
                   </div>
                   <p className="mt-1 text-teal-900">
-                    {contactMissing.length ? `Siguiente: ${contactMissing[0].label}. Puedes responder aquí o revisar los campos en el formulario.` : 'Los datos básicos están listos para revisión; puedes corregirlos antes de enviarlos.'}
+                    {contactMissing.length ? 'Responde en el chat o revisa los campos. Nada se enviará sin tu autorización.' : 'Revisa los datos antes de autorizar el envío.'}
                   </p>
                   <div className="mt-3 flex flex-wrap items-center gap-2">
                     <button type="button" onClick={handoff} data-testid="donna-review-contact"
@@ -504,20 +511,21 @@ export function DonnaChat({ onHandoff }: Props) {
                       Revisar formulario <ArrowRight size={13} className="ml-1 inline" aria-hidden="true" />
                     </button>
                     <button type="button" onClick={() => setContactMode(false)}
-                      className="rounded-md border border-teal-200 bg-white px-3 py-2 font-semibold text-teal-900 hover:bg-teal-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700">
-                      Volver al chat
+                      className="rounded-md px-2 py-2 font-semibold text-teal-900 underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700">
+                      Volver a explorar
                     </button>
                   </div>
                 </div>
               )}
               {hasChat && !contactMode && (
-                <div className="mb-3 grid gap-2">
-                  <button type="button" onClick={startContactAssistant} disabled={pending} data-testid="donna-start-contact"
-                    className="flex w-full min-h-9 items-center justify-center gap-2 rounded-lg border border-teal-200 bg-teal-50 px-3 py-2 text-xs font-bold text-teal-900 transition-colors hover:bg-teal-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700 disabled:opacity-50">
-                    Completar mis datos con Donna <ArrowRight size={14} aria-hidden="true" />
+                <div className="mb-3 flex flex-col items-center gap-1.5" data-testid="donna-contact-actions">
+                  <button type="button" onClick={() => startContactAssistant()} disabled={pending} data-testid="donna-start-contact"
+                    className="flex w-full min-h-10 items-center justify-center gap-2 rounded-xl border border-teal-200 bg-teal-50 px-3 py-2.5 text-sm font-semibold text-teal-950 transition-colors hover:bg-teal-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700 disabled:opacity-50">
+                    Preparar una solicitud <ArrowRight size={15} aria-hidden="true" />
                   </button>
-                  <button type="button" onClick={handoff} className="flex w-full min-h-9 items-center justify-center gap-2 rounded-lg border border-neutral-200 bg-white px-3 py-2 text-xs font-semibold text-secondary transition-colors hover:bg-neutral-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700">
-                    <Check size={14} aria-hidden="true" /> Continuar con una persona <ArrowRight size={14} aria-hidden="true" />
+                  <button type="button" onClick={handoff} data-testid="donna-contact-direct-link" disabled={pending}
+                    className="min-h-7 px-2 text-xs font-medium text-slate-600 underline-offset-4 hover:text-primary hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700 disabled:opacity-50">
+                    Prefiero completar el formulario directamente
                   </button>
                 </div>
               )}
@@ -540,7 +548,7 @@ export function DonnaChat({ onHandoff }: Props) {
               </form>
               <p className="mt-2 flex items-center gap-1.5 text-[10px] leading-tight text-slate-500">
                 <ShieldCheck size={12} className="shrink-0" aria-hidden="true" />
-                No compartas contraseñas ni datos sensibles. Donna prepara borradores; tú autorizas el envío.
+                Donna prepara borradores. Solo tú puedes revisarlos y autorizar el envío; evita compartir datos sensibles.
               </p>
             </div>
           </motion.section>

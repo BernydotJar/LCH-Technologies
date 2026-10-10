@@ -39,10 +39,13 @@ test('GH-21 followups remain grounded and never send arbitrary instructions', ()
   }
 });
 
-test('GH-21 does not add sales prompts after a pricing refusal, privacy redirect or clarification', () => {
-  for (const kind of ['redirect', 'decline', 'clarify'] as const) {
+test('GH-21/23 keeps price and privacy refusals free of prompts, but offers grounded topic clarifications', () => {
+  for (const kind of ['redirect', 'decline'] as const) {
     assert.deepEqual(contextualPrompts(kind, 'Inteligencia Artificial', '¿Cuánto cuesta?'), []);
   }
+  const options = contextualPrompts('clarify', 'Otro', '¿De qué habla LCH?');
+  assert.ok(options.length >= 2);
+  for (const option of options) assert.equal(ask(option.message).kind, 'grounded');
   assert.deepEqual(contextualPrompts('grounded', 'Otro', '¿Qué haces con mis datos?'), []);
   assert.deepEqual(contextualPrompts(undefined, undefined, ''), []);
 });

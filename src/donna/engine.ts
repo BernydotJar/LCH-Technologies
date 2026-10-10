@@ -115,8 +115,9 @@ function safeRedirect(reply: string, kind: DonnaReplyKind = 'redirect'): DonnaRe
 }
 
 function clarifiedAlready(messages: readonly DonnaMessage[]): boolean {
-  return messages.some((message) =>
-    message.role === 'assistant' && message.content.includes(CLARIFICATION_MARKER));
+  // A clarification about an earlier question must not poison a later topic.
+  const mostRecentAssistant = [...messages].reverse().find((message) => message.role === 'assistant');
+  return mostRecentAssistant?.content.includes(CLARIFICATION_MARKER) ?? false;
 }
 
 function buildGrounded(entry: DonnaEntry): DonnaReply {
@@ -155,7 +156,7 @@ export function respondToDonna(messages: readonly DonnaMessage[]): DonnaReply {
   if (routed.kind === 'matched') return buildGrounded(routed.entry);
   if (routed.kind === 'ambiguous') {
     if (clarifiedAlready(messages)) {
-      return safeRedirect('Quiero orientarte con precisión. Para no elegir un tema equivocado, puedes compartir los detalles con el equipo mediante el formulario.');
+      return { kind: 'clarify', reply: 'Puedo hablar de esos temas, pero necesito que elijas uno para darte una respuesta precisa. ¿Cuál quieres explorar primero?', links: [], suggestedInterest: 'Otro' };
     }
     const options = routed.candidates.slice(0, 4).map((candidate) => candidate.label);
     return {
@@ -165,7 +166,12 @@ export function respondToDonna(messages: readonly DonnaMessage[]): DonnaReply {
       suggestedInterest: 'Otro',
     };
   }
-  return safeRedirect('Todavía no tengo información verificada para responder esa pregunta. Puedo orientarte sobre las soluciones de LCH o conectarte con una persona mediante el formulario.');
+  return {
+    kind: 'clarify',
+    reply: 'No encuentro ese detalle entre los temas publicados de LCH. Puedo ayudarte con automatización, inteligencia artificial o nuestros productos. ¿Cuál te interesa explorar?',
+    links: [],
+    suggestedInterest: 'Otro',
+  };
 }
 
 export function parseDonnaRequest(input: unknown): ParseResult {
