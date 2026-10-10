@@ -1,0 +1,25 @@
+name: LCH Spark Cloudflare mail verification
+on:
+  pull_request:
+    paths:
+      - 'workers/lch-lead-mail/**'
+      - '.github/workflows/lch-spark-lead-mail.yml'
+  workflow_dispatch:
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    defaults:
+      run:
+        working-directory: workers/lch-lead-mail
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: workers/lch-lead-mail/package-lock.json
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npm run check
+      - name: Validate Workers bundle without account credentials
+        run: npm run build:check
