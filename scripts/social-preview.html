@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1200, initial-scale=1" />
+  <title>LCH Technologies — vista previa social</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; width: 1200px; height: 630px; overflow: hidden; }
+    body { font-family: Arial, Helvetica, sans-serif; }
+    .card { position: relative; width: 1200px; height: 630px; overflow: hidden; color: white;
+      background: radial-gradient(ellipse 570px 430px at 93% 52%, rgba(19,131,161,.25), transparent 74%),
+      radial-gradient(ellipse 420px 400px at 55% 102%, rgba(0,177,143,.18), transparent 74%),
+      linear-gradient(120deg, #090a2a 0%, #0c0a50 62%, #081937 100%); }
+    .card::before { content: ""; position: absolute; inset: 0; opacity: .19;
+      background: linear-gradient(60deg, transparent 49.6%, #32829f 50%, transparent 50.4%) 0 0 / 100px 173px,
+                  linear-gradient(120deg, transparent 49.6%, #32829f 50%, transparent 50.4%) 0 0 / 100px 173px;
+      mask-image: linear-gradient(to right, transparent 15%, black 95%); }
+    .card::after { content: ""; position: absolute; inset: 17px; border: 1px solid rgba(115,203,214,.17);
+      border-radius: 16px; pointer-events: none; }
+    .logo { position: absolute; top: 30px; left: 67px; width: 224px; height: 110px;
+      object-fit: contain; filter: brightness(0) invert(1); }
+    .topright { position: absolute; top: 62px; right: 67px; color: #8cb8ca;
+      font-size: 12px; font-weight: 700; letter-spacing: 2.8px; }
+    .topright::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+      background: #48e2c0; margin-right: 10px; box-shadow: 0 0 15px #48e2c0; vertical-align: middle; }
+    .eyebrow { position: absolute; top: 176px; left: 74px; font-size: 15px; color: #99dce9;
+      font-weight: 700; letter-spacing: 2.7px; }
+    h1 { position: absolute; top: 209px; left: 70px; margin: 0; width: 700px;
+      font-size: 56px; font-weight: 800; letter-spacing: -2.6px; line-height: 1.12; }
+    .gradient { background: linear-gradient(95deg, #b6e7ff 0%, #8adbdc 45%, #70e9c4 100%);
+      color: transparent; -webkit-background-clip: text; background-clip: text; }
+    .sub { position: absolute; top: 423px; left: 74px; width: 590px; margin: 0;
+      color: #cddce9; font-size: 21px; line-height: 1.36; }
+    .chips { position: absolute; top: 531px; left: 73px; display: flex; gap: 9px; }
+    .chip { border: 1px solid rgba(151,219,228,.36); background: rgba(7,29,59,.64);
+      border-radius: 7px; color: #c9eef1; font-size: 12px; font-weight: 700;
+      letter-spacing: .6px; padding: 10px 11px; }
+    .orbit { position: absolute; top: 145px; left: 742px; width: 400px; height: 393px;
+      border: 1px solid rgba(65,203,216,.18); border-radius: 35px; transform: rotate(8deg); }
+    .system { position: absolute; top: 184px; left: 795px; width: 350px; height: 312px;
+      background: linear-gradient(140deg, rgba(43,111,142,.38), rgba(5,16,56,.83) 66%, rgba(15,96,104,.30));
+      border: 1px solid rgba(151,226,236,.45); border-radius: 19px;
+      box-shadow: 0 24px 60px rgba(0,0,0,.33), 0 0 50px rgba(30,153,190,.20), inset 0 1px rgba(255,255,255,.16); }
+    .system .heading { position: absolute; top: 28px; left: 28px;
+      color: #b6e2ec; font-size: 12px; font-weight: 700; letter-spacing: 1.8px; }
+    .wire { position: absolute; top: 133px; left: 53px; width: 246px; height: 2px;
+      background: linear-gradient(to right, #41cdf4, #4ee6b7); box-shadow: 0 0 15px #42bed9; }
+    .node { position: absolute; top: 87px; width: 91px; height: 105px; text-align: center;
+      border: 1px solid rgba(101,216,240,.56); border-radius: 12px;
+      background: rgba(16,46,76,.95); box-shadow: 0 9px 25px rgba(0,0,0,.23); }
+    .node:nth-of-type(1) { left: 20px; } .node:nth-of-type(2) { left: 130px; }
+    .node:nth-of-type(3) { left: 239px; }
+    .node .num { color: #66ecc5; font-size: 11px; letter-spacing: 1.5px;
+      font-weight: 700; margin-top: 13px; }
+    .node .symbol { color: #defaff; font-weight: 700; font-size: 29px; line-height: 37px; }
+    .node .label { color: #e7faff; font-weight: 700; font-size: 11px; letter-spacing: .5px; }
+    .system .message { position: absolute; top: 224px; left: 28px;
+      color: white; font-size: 19px; letter-spacing: -.5px; font-weight: 700; }
+    .system .secondary { position: absolute; top: 254px; left: 28px;
+      font-size: 12px; color: #aad2da; }
+    .dot { position: absolute; width: 6px; height: 6px; background: #5feac3;
+      box-shadow: 0 0 14px #5feac3; border-radius: 50%; }
+    .one { top: 153px; left: 790px; } .two { top: 514px; left: 1143px; }
+    .domain { position: absolute; bottom: 37px; right: 69px;
+      font-weight: 600; font-size: 15px; color: #adcdd8; }
+    .domain strong { color: #70efc9; }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <div class="orbit"></div>
+    <img class="logo" src="../public/assets/brand/lch-technologies-logo@2x.png" alt="LCH Technologies" />
+    <div class="topright">TECNOLOGÍA CON PROPÓSITO</div>
+    <div class="eyebrow">TRANSFORMACIÓN OPERACIONAL</div>
+    <h1>De operaciones manuales<br />a <span class="gradient">sistemas inteligentes.</span></h1>
+    <p class="sub">Diseñamos IA, automatización y software para procesos empresariales trazables.</p>
+    <div class="chips"><span class="chip">INTELIGENCIA ARTIFICIAL</span><span class="chip">AUTOMATIZACIÓN</span><span class="chip">SOFTWARE</span><span class="chip">CLOUD</span></div>
+    <div class="system">
+      <div class="heading">OPERACIÓN CONECTADA</div>
+      <div class="wire"></div>
+      <div class="node" style="left:20px"><div class="num">01</div><div class="symbol">◈</div><div class="label">DATOS</div></div>
+      <div class="node" style="left:130px"><div class="num">02</div><div class="symbol">✧</div><div class="label">IA</div></div>
+      <div class="node" style="left:239px"><div class="num">03</div><div class="symbol">↗</div><div class="label">IMPACTO</div></div>
+      <div class="message">De la complejidad al control.</div>
+      <div class="secondary">Automatización · Gobierno · Evidencia</div>
+    </div>
+    <div class="dot one"></div><div class="dot two"></div>
+    <div class="domain">Descubre más en <strong>lch-app.cloud</strong></div>
+  </main>
+</body>
+</html>
