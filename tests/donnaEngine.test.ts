@@ -59,10 +59,11 @@ test('private data is not retrieved and no unverified certifications are asserte
   assert.doesNotMatch(compliance.reply, /certificad[oa]s? ISO|SOC.?2/i);
 });
 
-test('unmatched requests redirect honestly', () => {
+test('unmatched requests clarify honestly and offer topics instead of forcing a lead', () => {
   const result = ask('¿Cuál es el número de extensión de la oficina de Lima?');
-  assert.equal(result.kind, 'redirect');
-  assert.match(result.reply, /información verificada/);
+  assert.equal(result.kind, 'clarify');
+  assert.match(result.reply, /No encuentro ese detalle/);
+  assert.deepEqual(result.links, []);
 });
 
 test('an ambiguous request receives a bounded clarification, then a redirect', () => {
@@ -75,7 +76,16 @@ test('an ambiguous request receives a bounded clarification, then a redirect', (
     { role: 'assistant', content: ambiguous.reply },
     { role: 'user', content: 'LUMA e I-DO versus cloud' },
   ]);
-  assert.equal(followUp.kind, 'redirect');
+  assert.equal(followUp.kind, 'clarify');
+  const newTopic = respondToDonna([
+    { role: 'user', content: 'LUMA e I-DO versus cloud' },
+    { role: 'assistant', content: ambiguous.reply },
+    { role: 'user', content: '¿Qué es LUMA?' },
+    { role: 'assistant', content: 'LUMA permite explorar aprendizaje inteligente.' },
+    { role: 'user', content: 'LUMA e I-DO versus cloud' },
+  ]);
+  assert.equal(newTopic.kind, 'clarify');
+  assert.match(newTopic.reply, /¿Podrías precisar/);
 });
 
 test('the engine does not render or trust malicious user-supplied links and claims', () => {

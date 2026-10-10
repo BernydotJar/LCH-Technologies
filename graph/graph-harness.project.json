@@ -69,6 +69,23 @@
         "independent_verification"
       ],
       "blocking": true
+    },
+    {
+      "id": "gh23_conversation_quality",
+      "required_evidence_kinds": [
+        "critic_review",
+        "verification",
+        "independent_verification"
+      ],
+      "blocking": true
+    },
+    {
+      "id": "gh23_public_release",
+      "required_evidence_kinds": [
+        "external_validation",
+        "independent_verification"
+      ],
+      "blocking": true
     }
   ],
   "nodes": [
@@ -487,6 +504,45 @@
         "product_only": true,
         "baseline": "213135e",
         "data_minimization": "consent is human-only"
+      }
+    },
+    {
+      "id": "GH-23",
+      "kind": "feature",
+      "title": "Donna conversation intent, UX and private history refinement",
+      "status": "pending",
+      "depends_on": [
+        "GH-22"
+      ],
+      "capability": "frontend",
+      "gates": {
+        "done": [
+          "gh23_conversation_quality",
+          "gh23_public_release"
+        ]
+      },
+      "allowed_paths": [
+        "src/components/DonnaChat.tsx",
+        "src/components/donna-experience.css",
+        "src/donna/conversationPolicy.ts",
+        "src/donna/experience.ts",
+        "src/donna/engine.ts",
+        "src/donna/knowledge.ts",
+        "src/contact/semanticDraft.ts",
+        "tests/**",
+        "scripts/donna-cx-smoke.cjs",
+        "scripts/donna-smoke.cjs",
+        "scripts/semantic-contact-smoke.cjs",
+        "specs/GH-23/**",
+        "progress/GH-23/**",
+        "docs/donna-conversation-cx.md",
+        "graph/**"
+      ],
+      "metadata": {
+        "execution_mode": "graph",
+        "product_only": true,
+        "privacy": "do not replay personal details to API",
+        "baseline": "ed39e349a"
       }
     }
   ]

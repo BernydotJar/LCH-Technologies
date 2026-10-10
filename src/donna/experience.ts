@@ -105,6 +105,13 @@ export function contextualPrompts(
       { label: 'IA aplicada', message: DONNA_IDEAS[4].prompt },
     ];
   }
+  if (kind === 'clarify') {
+    return [
+      { label: 'Automatización', message: DONNA_IDEAS[0].prompt },
+      { label: 'IA para empresas', message: DONNA_IDEAS[4].prompt },
+      { label: 'Productos LCH', message: DONNA_IDEAS[3].prompt },
+    ];
+  }
   if (kind !== 'grounded' || !interest || interest === 'Otro') return [];
   // These are suggestions for further exploration, not generated follow-up
   // questions or automatic replies. Avoid suggesting exactly what was asked.

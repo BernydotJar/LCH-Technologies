@@ -34,7 +34,7 @@ async function main() {
       await page.getByRole('button', { name: 'Enviar mensaje' }).click();
       const guide = page.getByTestId('donna-contact-guide');
       await guide.waitFor();
-      await page.waitForFunction(() => document.querySelector('[data-testid="donna-contact-progress"]')?.textContent?.includes('6/6'));
+      await page.waitForFunction(() => document.querySelector('[data-testid="donna-contact-progress"]')?.textContent?.includes('Datos listos'));
       assert.equal(apiPosts, 0, 'contact details never sent to /api/chat');
       assert.equal(firestorePosts, 0, 'no auto-write');
       await page.getByTestId('donna-review-contact').click();
@@ -77,7 +77,7 @@ async function main() {
     await ask('Acme Labs');
     await ask('Directora de operaciones');
     await ask('Automatización');
-    await guided.waitForFunction(() => document.querySelector('[data-testid="donna-contact-progress"]')?.textContent?.includes('6/6'));
+    await guided.waitForFunction(() => document.querySelector('[data-testid="donna-contact-progress"]')?.textContent?.includes('Datos listos'));
     await guided.getByTestId('donna-review-contact').click();
     await guided.waitForFunction(() => document.querySelector('#email')?.value === 'maria@example.com');
     assert.equal(await guided.locator('#nombre').inputValue(), 'Nombre escrito manualmente', 'human edit must win');
@@ -103,7 +103,7 @@ async function main() {
     await privatePage.locator('#donna-message').fill('Mi teléfono es 68899999');
     await privatePage.getByRole('button', { name: 'Enviar mensaje' }).click();
     await privatePage.getByTestId('donna-contact-guide').waitFor();
-    assert.match(await privatePage.locator('[data-role="assistant"]').last().innerText(), /no lo enviaré al chat/i);
+    assert.match(await privatePage.locator('[data-role="assistant"]').last().innerText(), /no lo enviaré|no lo incorporaré/i);
     assert.equal(calls.length, 0, 'unsupported private details must stay in the browser');
     await privatePage.getByTestId('donna-review-contact').click();
     assert.equal(await privatePage.locator('#mensaje').inputValue(), '');

@@ -174,7 +174,8 @@ export const LCH_KNOWLEDGE: readonly DonnaEntry[] = [
     keywords: ['contacto', 'hablar con el equipo', 'hablar con alguien', 'quiero conversar',
       'agendar una reunion', 'reservar una demo', 'demostracion', 'solicitar contacto',
       'reunion comercial', 'llamada comercial', 'pedir una propuesta',
-      'contactar ventas', 'hablar con lch'],
+      'contactar ventas', 'hablar con lch', 'como contactar a lch', 'como puedo contactar a lch',
+      'como me comunico con lch', 'como contactar al equipo', 'donde puedo escribirles'],
     facts: [
       'Puedes enviar una solicitud desde el formulario de contacto de LCH. Allí indicas tu organización, el área de interés y, si quieres, el resultado que buscas.',
       'El envío de una solicitud no confirma automáticamente una reunión ni fija una fecha de respuesta.',
