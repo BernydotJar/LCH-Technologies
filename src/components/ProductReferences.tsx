@@ -19,11 +19,15 @@ type ProductReference = {
   kicker: string;
   label: string;
   description: string;
+  whatIsIt: string;
+  idealFor: string[];
   url: string;
   displayUrl: string;
   tags: string[];
   embed: boolean;
   live: boolean;
+  publicAvailable: boolean;
+  availabilityLabel: string;
   stat: string;
   statLabel: string;
   icon: typeof Building2;
@@ -31,49 +35,64 @@ type ProductReference = {
 
 const products: ProductReference[] = [
   {
+    id: 'ido',
+    name: 'I-DO',
+    kicker: 'AI-native Business OS',
+    label: 'Un sistema operativo empresarial para conectar operaciones, finanzas y decisiones.',
+    description:
+      'ERP/SaaS multi-tenant diseñado para integrar procesos, equipos y sistemas con un núcleo financiero gobernado y automatización incorporada.',
+    whatIsIt:
+      'Un SaaS empresarial multi-tenant que reúne finanzas, compras, ventas, inventario, personas y automatizaciones en una misma capa operativa, con IA aplicada donde aporta contexto y decisión.',
+    idealFor: ['Operaciones', 'Finanzas', 'Back office', 'Procesos multi-sistema'],
+    url: 'https://ido.lch-app.cloud/w/colombia/inicio',
+    displayUrl: 'ido.lch-app.cloud / colombia',
+    tags: ['ERP', 'Multi-tenant', 'AI-native'],
+    embed: false,
+    live: false,
+    publicAvailable: false,
+    availabilityLabel: 'Preview disponible · demo pública en mantenimiento',
+    stat: 'BUSINESS OS',
+    statLabel: 'enterprise SaaS',
+    icon: Building2,
+  },
+  {
     id: 'luma',
     name: 'LUMA',
-    kicker: 'Learning intelligence',
+    kicker: 'Learning Intelligence',
     label: 'Aprendizaje que entiende a la persona, no solo al curso.',
     description:
       'Un Learning Twin explicable conecta objetivos, evidencia, confianza y progreso para decidir la siguiente mejor acción.',
+    whatIsIt:
+      'Una plataforma de learning intelligence que construye un Learning Twin de cada participante para adaptar práctica, contenido y acompañamiento según evidencia real de progreso.',
+    idealFor: ['Academias', 'Educación premium', 'L&D', 'Programas high-ticket'],
     url: 'https://luma.lch-app.cloud/onboarding',
     displayUrl: 'luma.lch-app.cloud / onboarding',
     tags: ['Learning Twin', 'Evidence', 'Adaptive learning'],
     embed: true,
     live: true,
+    publicAvailable: true,
+    availabilityLabel: 'Demo interactiva disponible',
     stat: 'LIVE',
     statLabel: 'demo interactiva',
     icon: BookOpenCheck,
   },
   {
-    id: 'ido',
-    name: 'I-DO',
-    kicker: 'AI-native business OS',
-    label: 'Operaciones, finanzas y procesos en un solo sistema gobernado.',
-    description:
-      'ERP/SaaS multi-tenant diseñado para integrar y evolucionar procesos de negocio con un núcleo financiero controlado y arquitectura por servicios.',
-    url: 'https://ido.lch-app.cloud/w/colombia/inicio',
-    displayUrl: 'ido.lch-app.cloud / colombia',
-    tags: ['ERP', 'Multi-tenant', 'AI-native'],
-    embed: false,
-    live: true,
-    stat: '2',
-    statLabel: 'country packs',
-    icon: Building2,
-  },
-  {
     id: 'legal',
     name: 'Evidencia Jurídica',
-    kicker: 'Evidence-first legal RAG',
+    kicker: 'Evidence-first RAG',
     label: 'Respuestas jurídicas con trazabilidad antes que confianza ciega.',
     description:
       'Consulta normativa y procedimientos con citas, clasificación de fuentes y límites explícitos de confianza.',
+    whatIsIt:
+      'Un asistente jurídico RAG que responde desde fuentes normativas verificables y muestra la evidencia, citas y límites de confianza detrás de cada respuesta.',
+    idealFor: ['Legal', 'Compliance', 'Gobierno', 'Knowledge operations'],
     url: 'https://evidencia.lch-app.cloud/',
     displayUrl: 'evidencia.lch-app.cloud / public demo',
     tags: ['RAG', 'Legal AI', 'Citations'],
     embed: true,
     live: true,
+    publicAvailable: true,
+    availabilityLabel: 'Demo interactiva disponible',
     stat: 'RAG',
     statLabel: 'evidence-first',
     icon: Scale,
@@ -171,7 +190,7 @@ const IdoPreview = () => (
 );
 
 export const ProductReferences = () => {
-  const [activeId, setActiveId] = useState<ProductReference['id']>('luma');
+  const [activeId, setActiveId] = useState<ProductReference['id']>('ido');
   const reduceMotion = useReducedMotion();
   const active = useMemo(
     () => products.find((product) => product.id === activeId) ?? products[0],
@@ -250,7 +269,7 @@ export const ProductReferences = () => {
                   <div className="relative min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       <span className="font-bold text-sm sm:text-base truncate">{product.name}</span>
-                      {product.live && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />}
+                      <span className={`w-1.5 h-1.5 rounded-full ${product.publicAvailable ? 'bg-emerald-400' : 'bg-amber-300'}`} aria-hidden="true" />
                     </div>
                     <div className="text-[10px] sm:text-xs mt-0.5 text-white/40 truncate">{product.kicker}</div>
                   </div>
@@ -259,6 +278,39 @@ export const ProductReferences = () => {
             })}
           </div>
         </div>
+
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={`${active.id}-identity`}
+            initial={reduceMotion ? false : { opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={reduceMotion ? undefined : { opacity: 0, y: -6 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className="max-w-[1240px] mx-auto mb-7 grid lg:grid-cols-[1.45fr_0.55fr] gap-4 rounded-[22px] border border-white/10 bg-white/[0.045] p-5 sm:p-6 lg:p-7 backdrop-blur-xl"
+          >
+            <div>
+              <div className="text-[10px] sm:text-xs font-mono uppercase tracking-[0.2em] text-sky-300">¿Qué es?</div>
+              <div className="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                <h3 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">{active.name}</h3>
+                <span className="text-sm sm:text-base font-semibold text-sky-200">{active.kicker}</span>
+              </div>
+              <p className="mt-3 max-w-3xl text-sm sm:text-base leading-relaxed text-white/62">{active.whatIsIt}</p>
+            </div>
+
+            <div className="lg:border-l lg:border-white/10 lg:pl-6">
+              <div className="text-[10px] font-mono uppercase tracking-[0.18em] text-white/35">Tiene sentido para</div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {active.idealFor.map((item) => (
+                  <span key={item} className="rounded-full border border-white/10 bg-white/[0.045] px-3 py-1.5 text-[11px] text-white/60">{item}</span>
+                ))}
+              </div>
+              <div className={`mt-4 inline-flex items-center gap-2 text-[11px] font-medium ${active.publicAvailable ? 'text-emerald-300' : 'text-amber-200'}`}>
+                <span className={`h-1.5 w-1.5 rounded-full ${active.publicAvailable ? 'bg-emerald-400' : 'bg-amber-300'}`} />
+                {active.availabilityLabel}
+              </div>
+            </div>
+          </motion.div>
+        </AnimatePresence>
 
         <motion.div
           layout
@@ -277,15 +329,25 @@ export const ProductReferences = () => {
               <div className="min-w-0 flex-1 max-w-xl mx-auto rounded-lg border border-white/10 bg-white/[0.045] px-3 py-2 text-[10px] sm:text-xs text-white/45 font-mono truncate text-center">
                 {active.displayUrl}
               </div>
-              <a
-                href={active.url}
-                target="_blank"
-                rel="noreferrer"
-                className="w-8 h-8 shrink-0 rounded-lg inline-flex items-center justify-center text-white/55 hover:text-white hover:bg-white/10 transition-colors"
-                aria-label={`Abrir ${active.name} en una pestaña nueva`}
-              >
-                <ArrowUpRight size={16} />
-              </a>
+              {active.publicAvailable ? (
+                <a
+                  href={active.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="w-8 h-8 shrink-0 rounded-lg inline-flex items-center justify-center text-white/55 hover:text-white hover:bg-white/10 transition-colors"
+                  aria-label={`Abrir ${active.name} en una pestaña nueva`}
+                >
+                  <ArrowUpRight size={16} />
+                </a>
+              ) : (
+                <span
+                  className="w-8 h-8 shrink-0 rounded-lg inline-flex items-center justify-center text-amber-200/65 bg-amber-300/[0.06]"
+                  aria-label={`${active.name}: demo pública temporalmente indisponible`}
+                  title="Demo pública temporalmente indisponible"
+                >
+                  <ArrowUpRight size={16} />
+                </span>
+              )}
             </div>
 
             <AnimatePresence mode="wait">
@@ -340,21 +402,27 @@ export const ProductReferences = () => {
               </div>
             </div>
 
-            <a
-              href={active.url}
-              target="_blank"
-              rel="noreferrer"
-              className="group inline-flex items-center justify-center gap-3 bg-white text-primary px-5 py-3.5 rounded-xl font-bold text-sm hover:bg-sky-100 transition-colors"
-            >
-              Explorar {active.name}
-              <ArrowUpRight size={16} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-            </a>
+            {active.publicAvailable ? (
+              <a
+                href={active.url}
+                target="_blank"
+                rel="noreferrer"
+                className="group inline-flex items-center justify-center gap-3 bg-white text-primary px-5 py-3.5 rounded-xl font-bold text-sm hover:bg-sky-100 transition-colors"
+              >
+                Explorar {active.name}
+                <ArrowUpRight size={16} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+              </a>
+            ) : (
+              <div className="inline-flex items-center justify-center gap-3 border border-amber-200/15 bg-amber-300/[0.06] text-amber-100 px-5 py-3.5 rounded-xl font-semibold text-sm cursor-not-allowed">
+                Demo pública en mantenimiento
+              </div>
+            )}
           </motion.div>
         </AnimatePresence>
 
         <div className="max-w-[1240px] mx-auto mt-12 pt-6 border-t border-white/10 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between text-[10px] sm:text-xs text-white/30 font-mono tracking-wide uppercase">
           <span>Built by LCH Technologies · systems, not slides</span>
-          <span>Product Lab / 03 live references</span>
+          <span>Product Lab / 03 product references</span>
         </div>
       </div>
     </section>
