@@ -5,12 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
-    "build": "vite build && node scripts/build-server.mjs",
+    "build": "node scripts/check-production-env.mjs && vite build && node scripts/build-server.mjs",
     "preview": "vite preview --host 0.0.0.0",
     "test": "node --test --experimental-strip-types tests/*.test.ts",
     "typecheck": "tsc --noEmit",
     "check": "npm run test && npm run typecheck && npm run build",
-    "build:deploy": "node scripts/check-production-env.mjs && npm run build"
+    "build:deploy": "npm run build"
   },
   "dependencies": {
     "firebase": "^12.17.1",

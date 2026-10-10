@@ -52,6 +52,23 @@
         "independent_verification"
       ],
       "blocking": true
+    },
+    {
+      "id": "gh22_semantic_quality",
+      "required_evidence_kinds": [
+        "critic_review",
+        "verification",
+        "independent_verification"
+      ],
+      "blocking": true
+    },
+    {
+      "id": "gh22_contact_production",
+      "required_evidence_kinds": [
+        "external_validation",
+        "independent_verification"
+      ],
+      "blocking": true
     }
   ],
   "nodes": [
@@ -433,6 +450,43 @@
         "product_only": true,
         "baseline": "Donna LCH a23f41a",
         "motion_budget": "signal orb + bounded editorial transition"
+      }
+    },
+    {
+      "id": "GH-22",
+      "kind": "feature",
+      "title": "Reliable contact submission and Donna semantic draft",
+      "status": "pending",
+      "depends_on": [
+        "GH-21"
+      ],
+      "capability": "frontend",
+      "gates": {
+        "done": [
+          "gh22_semantic_quality",
+          "gh22_contact_production"
+        ]
+      },
+      "allowed_paths": [
+        "src/components/Contact.tsx",
+        "src/components/DonnaChat.tsx",
+        "src/App.tsx",
+        "src/contact/**",
+        "scripts/check-production-env.mjs",
+        "scripts/semantic-contact-smoke.cjs",
+        "package.json",
+        "tests/**",
+        "specs/GH-22/**",
+        "progress/GH-22/**",
+        "docs/semantic-contact.md",
+        "graph/**"
+      ],
+      "metadata": {
+        "priority": 60,
+        "mode": "graph",
+        "product_only": true,
+        "baseline": "213135e",
+        "data_minimization": "consent is human-only"
       }
     }
   ]

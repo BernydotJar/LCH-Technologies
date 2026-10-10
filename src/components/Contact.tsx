@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { AlertCircle, ArrowRight, Check, CheckCircle2, LoaderCircle, ShieldCheck } from 'lucide-react';
 import type { ContactHandoff } from '../App';
 import type { DemoRequest } from '../integrations/leadContract';
+import { applyContactDraft, CONTACT_FIELD_BY_NAME, countContactFields, normalizeContactDraft, PREPARE_CONTACT_TOOL } from '../contact/semanticContract';
 
 type FormStatus = 'idle' | 'loading' | 'success' | 'error';
 
@@ -51,15 +52,18 @@ export const Contact = ({ handoff }: { handoff: ContactHandoff | null }) => {
   const [website, setWebsite] = useState('');
   const inFlight = useRef(false);
   const [handoffActive, setHandoffActive] = useState(false);
+  const [handoffFieldCount, setHandoffFieldCount] = useState(0);
 
   useEffect(() => {
     if (!handoff) return;
-    setFormData((current) => ({
-      ...current,
-      interes: handoff.interest !== 'Otro' ? handoff.interest : current.interes,
-      mensaje: current.mensaje.trim() || handoff.message.trim().slice(0, 2000),
-    }));
+    const proposal = normalizeContactDraft({
+      ...handoff.draft,
+      interes: handoff.draft?.interes || (handoff.interest !== 'Otro' ? handoff.interest : undefined),
+      mensaje: handoff.draft?.mensaje || handoff.message,
+    });
+    setFormData((current) => applyContactDraft(current, proposal));
     setStatus('idle');
+    setHandoffFieldCount(countContactFields(proposal));
     setHandoffActive(true);
   }, [handoff?.nonce]);
 
@@ -159,9 +163,9 @@ export const Contact = ({ handoff }: { handoff: ContactHandoff | null }) => {
               </button>
             </motion.div>
           ) : (
-            <form onSubmit={handleSubmit} className="mx-auto w-full max-w-lg space-y-5" aria-busy={status === 'loading'}>
+            <form onSubmit={handleSubmit} className="mx-auto w-full max-w-lg space-y-5" aria-busy={status === 'loading'} data-semantic-tool={PREPARE_CONTACT_TOOL.name} data-testid="lch-contact-form">
               {handoffActive && <div role="status" className="rounded-md border border-teal-200 bg-teal-50 px-4 py-3 text-xs leading-relaxed text-teal-900">
-                Donna te ayudó a preparar esta consulta. Revisa o edita los campos y envíala cuando estés listo; nada se ha enviado todavía.
+                Donna preparó un borrador con {handoffFieldCount} datos identificados. Revisa los campos y completa los que falten; nada se ha enviado todavía.
               </div>}
               <div>
                 <h3 className="mb-2 text-2xl font-bold text-primary">Cuéntanos qué quieres lograr</h3>
@@ -195,33 +199,33 @@ export const Contact = ({ handoff }: { handoff: ContactHandoff | null }) => {
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                   <label htmlFor="nombre" className={LABEL_STYLE}>Nombre <span aria-hidden="true">*</span></label>
-                  <input required maxLength={80} autoComplete="given-name" type="text" id="nombre" name="nombre" placeholder="Tu nombre" value={formData.nombre} onChange={handleChange} disabled={status === 'loading'} className={INPUT_STYLE} />
+                  <input required maxLength={CONTACT_FIELD_BY_NAME.nombre.maxLength} autoComplete="given-name" type="text" id="nombre" name="nombre" data-semantic-field="nombre" placeholder="Tu nombre" value={formData.nombre} onChange={handleChange} disabled={status === 'loading'} className={INPUT_STYLE} />
                 </div>
                 <div>
                   <label htmlFor="apellido" className={LABEL_STYLE}>Apellido <span aria-hidden="true">*</span></label>
-                  <input required maxLength={80} autoComplete="family-name" type="text" id="apellido" name="apellido" placeholder="Tu apellido" value={formData.apellido} onChange={handleChange} disabled={status === 'loading'} className={INPUT_STYLE} />
+                  <input required maxLength={CONTACT_FIELD_BY_NAME.apellido.maxLength} autoComplete="family-name" type="text" id="apellido" name="apellido" data-semantic-field="apellido" placeholder="Tu apellido" value={formData.apellido} onChange={handleChange} disabled={status === 'loading'} className={INPUT_STYLE} />
                 </div>
               </div>
 
               <div>
                 <label htmlFor="email" className={LABEL_STYLE}>Correo electrónico <span aria-hidden="true">*</span></label>
-                <input required maxLength={254} autoComplete="email" type="email" id="email" name="email" placeholder="nombre@empresa.com" value={formData.email} onChange={handleChange} disabled={status === 'loading'} className={INPUT_STYLE} />
+                <input required maxLength={CONTACT_FIELD_BY_NAME.email.maxLength} autoComplete="email" type="email" id="email" name="email" data-semantic-field="email" placeholder="nombre@empresa.com" value={formData.email} onChange={handleChange} disabled={status === 'loading'} className={INPUT_STYLE} />
               </div>
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                   <label htmlFor="empresa" className={LABEL_STYLE}>Organización <span aria-hidden="true">*</span></label>
-                  <input required maxLength={160} autoComplete="organization" type="text" id="empresa" name="empresa" placeholder="Nombre de empresa" value={formData.empresa} onChange={handleChange} disabled={status === 'loading'} className={INPUT_STYLE} />
+                  <input required maxLength={CONTACT_FIELD_BY_NAME.empresa.maxLength} autoComplete="organization" type="text" id="empresa" name="empresa" data-semantic-field="empresa" placeholder="Nombre de empresa" value={formData.empresa} onChange={handleChange} disabled={status === 'loading'} className={INPUT_STYLE} />
                 </div>
                 <div>
                   <label htmlFor="cargo" className={LABEL_STYLE}>Tu rol <span aria-hidden="true">*</span></label>
-                  <input required maxLength={160} autoComplete="organization-title" type="text" id="cargo" name="cargo" placeholder="Cargo o función" value={formData.cargo} onChange={handleChange} disabled={status === 'loading'} className={INPUT_STYLE} />
+                  <input required maxLength={CONTACT_FIELD_BY_NAME.cargo.maxLength} autoComplete="organization-title" type="text" id="cargo" name="cargo" data-semantic-field="cargo" placeholder="Cargo o función" value={formData.cargo} onChange={handleChange} disabled={status === 'loading'} className={INPUT_STYLE} />
                 </div>
               </div>
 
               <div>
                 <label htmlFor="interes" className={LABEL_STYLE}>Área de interés <span aria-hidden="true">*</span></label>
-                <select required id="interes" name="interes" value={formData.interes} onChange={handleChange} disabled={status === 'loading'} className={`${INPUT_STYLE} ${formData.interes ? 'text-primary' : 'text-neutral-400'}`}>
+                <select required id="interes" name="interes" data-semantic-field="interes" value={formData.interes} onChange={handleChange} disabled={status === 'loading'} className={`${INPUT_STYLE} ${formData.interes ? 'text-primary' : 'text-neutral-400'}`}>
                   <option value="" disabled>Selecciona el tema principal</option>
                   <option value="Inteligencia Artificial">Inteligencia Artificial</option>
                   <option value="Automatización">Automatización de procesos</option>
@@ -235,7 +239,7 @@ export const Contact = ({ handoff }: { handoff: ContactHandoff | null }) => {
 
               <div>
                 <label htmlFor="mensaje" className={LABEL_STYLE}>¿Qué resultado te gustaría conseguir? <span className="font-normal">(opcional)</span></label>
-                <textarea id="mensaje" name="mensaje" maxLength={2000} rows={3} placeholder="Por ejemplo: reducir el tiempo de aprobación de contratos o conectar datos de varios sistemas." value={formData.mensaje} onChange={handleChange} disabled={status === 'loading'} className={`${INPUT_STYLE} resize-y`} />
+                <textarea id="mensaje" name="mensaje" data-semantic-field="mensaje" maxLength={CONTACT_FIELD_BY_NAME.mensaje.maxLength} rows={3} placeholder="Por ejemplo: reducir el tiempo de aprobación de contratos o conectar datos de varios sistemas." value={formData.mensaje} onChange={handleChange} disabled={status === 'loading'} className={`${INPUT_STYLE} resize-y`} />
                 <p className="mt-1 text-right text-[11px] tabular-nums text-neutral-500">{formData.mensaje.length}/2000</p>
               </div>
 

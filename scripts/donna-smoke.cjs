@@ -38,7 +38,7 @@ async function main() {
       assert.equal(await page.locator('#interes').inputValue(), 'Inteligencia Artificial');
       assert.match(await page.locator('#mensaje').inputValue(), /inteligencia artificial ofrece LCH/);
       assert.equal(await page.locator('#consentimiento').isChecked(), false);
-      assert.ok(await page.getByText(/Donna te ayudó a preparar esta consulta/).count() > 0);
+      assert.ok(await page.getByText(/Donna preparó un borrador con/).count() > 0);
       assert.equal(await page.getByRole('dialog', { name: /Conversación con Donna/ }).count(), 0);
 
       await page.getByRole('button', { name: 'Hablar con Donna' }).click();
