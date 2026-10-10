@@ -1,0 +1,27 @@
+name: LCH n8n keeper verification
+on:
+  pull_request:
+    paths:
+      - 'scripts/lch-n8n-keepalive.sh'
+      - 'tests/lchN8nKeeper.test.ts'
+      - 'infra/lch-n8n-keeper.supervisor.conf'
+      - '.github/workflows/lch-n8n-keeper.yml'
+  workflow_dispatch:
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Lint existing n8n keeper shell script
+        run: bash -n scripts/lch-n8n-keepalive.sh
+      - name: Verify no-op, recovery and crash lock handling
+        run: node --experimental-strip-types --test tests/lchN8nKeeper.test.ts
+      - name: Check configuration contract
+        run: |
+          grep -Fq '[program:lch-n8n-keeper]' infra/lch-n8n-keeper.supervisor.conf
+          grep -Fq 'autorestart=true' infra/lch-n8n-keeper.supervisor.conf
+          grep -Fq 'command=/bin/bash /workspace/.deployment-tools/lch-n8n-keepalive.sh' infra/lch-n8n-keeper.supervisor.conf
