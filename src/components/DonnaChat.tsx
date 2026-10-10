@@ -10,7 +10,7 @@ import './donna-experience.css';
 import { DONNA_LIMITS, isDonnaReply, type DonnaMessage, type DonnaReply } from '../donna/engine';
 import type { InterestArea } from '../integrations/leadContract';
 import { CONTACT_REQUIRED_FIELDS, countContactFields, mergeContactDraft, missingContactFields, type ContactDraft } from '../contact/semanticContract';
-import { containsPersonalContactData, extractFromDonnaMessages, extractSemanticContact, readGuidedContactAnswer, safeContactMessageFromConversation } from '../contact/semanticDraft';
+import { containsOutOfSchemaPrivateData, containsPersonalContactData, extractFromDonnaMessages, extractSemanticContact, readGuidedContactAnswer, safeContactMessageFromConversation } from '../contact/semanticDraft';
 
 type DonnaUiMessage = DonnaMessage & { id: number; links?: DonnaReply['links']; kind?: DonnaReply['kind']; interest?: InterestArea };
 export type DonnaHandoff = { interest: InterestArea; message: string; draft: ContactDraft };
@@ -275,13 +275,15 @@ export function DonnaChat({ onHandoff }: Props) {
     setContactDraft((previous) => mergeContactDraft(previous, inferred));
     // Contact details go to the local semantic form helper, not the chat API.
     const hasIdentity = ['nombre', 'apellido', 'email', 'empresa', 'cargo'].some((key) => key in inferred);
-    if (hasIdentity && (containsPersonalContactData(content) || Boolean(inferred.nombre || inferred.email || inferred.cargo))) {
+    if (hasIdentity || containsPersonalContactData(content) || containsOutOfSchemaPrivateData(content)) {
       const prepared = mergeContactDraft(contactDraft, inferred);
       setContactDraft(prepared);
       setContactMode(true);
       const missing = missingContactFields(prepared);
-      const answer = missing.length
-        ? `Puedo preparar un borrador con los datos que compartiste. No los he enviado. ${missing[0].question}`
+      const answer = Object.keys(inferred).length === 0
+        ? `Ese dato no pertenece al formulario y no lo enviaré al chat ni lo incluiré en la solicitud. ${missing[0]?.question ?? 'Puedes revisar los campos permitidos.'}`
+        : missing.length
+          ? `Puedo preparar un borrador con los datos que compartiste. No los he enviado. ${missing[0].question}`
         : 'Ya tengo los datos básicos para un borrador. Puedes revisarlo antes de enviarlo.';
       appendLocalContactExchange(content, answer);
       return;

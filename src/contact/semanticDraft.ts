@@ -135,6 +135,7 @@ export function readGuidedContactAnswer(expected: ContactField, raw: string): Co
   const text = clean(raw).slice(0, 2100);
   if (!text) return {};
   const semantic = extractSemanticContact(text);
+  if (containsOutOfSchemaPrivateData(text)) return semantic;
   if (semantic[expected]) return semantic;
 
   const prefix = FIELD_PREFIXES[expected];
@@ -166,10 +167,19 @@ export function containsPersonalContactData(text: string): boolean {
   return EMAIL.test(text) || /(?:me llamo|mi nombre es|mi apellido|mi correo|mi email|mi tel[eé]fono|mi cargo es|trabajo en|mi empresa es)\b/iu.test(text);
 }
 
+/** Values that are not part of the lead schema must remain in the browser.
+ * This detects obvious volunteered credentials and identifiers, not every PII case.
+ */
+export function containsOutOfSchemaPrivateData(raw: string): boolean {
+  const value = raw.normalize('NFKC');
+  return /\b(?:mi|mis|el|la)\s+(?:tel[eé]fono|n[uú]mero de tel[eé]fono|whatsapp|dpi|documento de identidad|pasaporte|contrase(?:n|ñ)a|password|clave de acceso|api[ _-]?key|token de acceso|tarjeta de cr[eé]dito)\b/iu.test(value)
+    || /\b(?:password|contrase(?:n|ñ)a|api[ _-]?key|secret(?:o|a)?|access[ _-]?token)\s*[:=]\s*\S+/iu.test(value);
+}
+
 export function safeContactMessageFromConversation(raw: string): string {
   const profile = extractSemanticContact(raw);
   const carriesIdentity = ['nombre', 'apellido', 'email', 'empresa', 'cargo'].some((field) => field in profile);
-  return containsPersonalContactData(raw) || carriesIdentity
+  return containsPersonalContactData(raw) || containsOutOfSchemaPrivateData(raw) || carriesIdentity
     ? profile.mensaje ?? ''
     : clean(raw).slice(0, 2000);
 }

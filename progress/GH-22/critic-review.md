@@ -18,3 +18,7 @@ Scope: `specs/GH-22/semantic-contact.md`, no new LLM/provider integration.
 - No credentials were committed; `.env.production.local` remains ignored.
 
 **Critic recommendation:** PASS for GH-22 scoped implementation and guarded release with public verification required after merge.
+
+## GH-22 revision 1 — additional privacy finding
+
+**MEDIUM, reproduced by source control-flow inspection:** A phone-only or credential-only contact utterance matched no approved lead field and previously fell through to the same-origin chat endpoint. The Graph Harness invalidated the first quality pass, recorded this issue and returned GH-22 to the fixer. The localized guard and adversarial test now keep explicit unsupported private details local, omit them from the lead payload, and provide a transparent explanation. See `privacy-repair.md`. This is bounded detection, not a universal PII classifier.
