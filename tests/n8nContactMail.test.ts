@@ -55,14 +55,18 @@ test('GH-26: separate n8n workflow imported inactive with unique nodes and one l
   assert.equal(workflow.settings.saveManualExecutions, false);
   assert.equal(workflow.settings.saveExecutionProgress, false);
   assert.equal(workflow.id, 'lchContactNotifyN8nGH26');
-  assert.equal(workflow.nodes.length, 9);
-  assert.equal(new Set(workflow.nodes.map((n: { id: string }) => n.id)).size, 9);
-  assert.equal(new Set(workflow.nodes.map((n: { name: string }) => n.name)).size, 9);
+  assert.equal(workflow.nodes.length, 13);
+  assert.equal(new Set(workflow.nodes.map((n: { id: string }) => n.id)).size, 13);
+  assert.equal(new Set(workflow.nodes.map((n: { name: string }) => n.name)).size, 13);
   const names = workflow.nodes.map((n: { name: string }) => n.name);
-  for (let i = 0; i < names.length - 1; i++) {
-    assert.equal(workflow.connections[names[i]].main[0][0].node, names[i + 1]);
+  const primary = names.filter((name: string) => !['Select Retry-Exhausted Leads', 'Record Needs Review'].includes(name));
+  for (let i = 0; i < primary.length - 1; i++) {
+    assert.equal(workflow.connections[primary[i]].main[0][0].node, primary[i + 1]);
   }
-  assert.equal(workflow.connections[names.at(-1)], undefined);
+  assert.equal(workflow.connections['Read Consented Contacts'].main[0][1].node, 'Select Retry-Exhausted Leads');
+  assert.equal(workflow.connections['Select Retry-Exhausted Leads'].main[0][0].node, 'Record Needs Review');
+  assert.equal(workflow.connections['Record Needs Review'], undefined);
+  assert.equal(workflow.connections[primary.at(-1)], undefined);
   assert.match(workflow.name, /LCH/);
   assert.doesNotMatch(JSON.stringify(workflow), /lina-agenda-v1|resend\.com|whatsapp/i);
 });
@@ -192,4 +196,106 @@ test('GH-26: ACK Code requires the same lease before marking accepted', () => {
   const mismatch = structuredClone(leaseDoc);
   mismatch.json.fields.notification.mapValue.fields.leaseId.stringValue = 'another-lease';
   assert.equal(runAck(mismatch).length, 0);
+});
+
+test('GH-28: Firestore claim conflicts are contained before Outlook without faking sends', () => {
+  assert.equal(node('Claim Firestore Lease').continueOnFail, true);
+  const src = prepare([document()])[0].json;
+  const claimed = { json: {
+    name: src.documentName, updateTime: '2026-10-10T10:12:01Z', fields: {
+      notification: { mapValue: { fields: {
+        state: { stringValue: 'sending' }, leaseId: { stringValue: src.leaseId },
+      } } },
+    },
+  } };
+  const run = (value: Record<string, unknown>) => runCode('Confirm Firestore Lease', {
+    $input: { all: () => [value] },
+    $: (_name: string) => ({ itemMatching: (_index: number) => ({ json: src }) }),
+  });
+  assert.equal(run(claimed).length, 1);
+  assert.equal(run(claimed)[0].json.claimConfirmed, true);
+  assert.equal(run({ json: { error: 'firestore_http_400' } }).length, 0);
+  const wrongLease = structuredClone(claimed);
+  wrongLease.json.fields.notification.mapValue.fields.leaseId.stringValue = 'other-writer';
+  assert.equal(run(wrongLease).length, 0);
+  const wrongDocument = structuredClone(claimed);
+  wrongDocument.json.name = 'projects/other/documents/elsewhere';
+  assert.equal(run(wrongDocument).length, 0);
+});
+
+test('GH-28: Graph/Outlook failure cannot set Firestore accepted state', () => {
+  assert.equal(node('Outlook Send Four Recipients').continueOnFail, true);
+  const src = prepare([document()])[0].json;
+  const run = (value: Record<string, unknown>) => runCode('Confirm Outlook Accepted', {
+    $input: { all: () => [{ json: value }] },
+    $: (_name: string) => ({ itemMatching: (_index: number) => ({ json: src }) }),
+  });
+  const good = run({ success: true });
+  assert.equal(good.length, 1);
+  assert.equal(good[0].json.providerAccepted, true);
+  assert.equal(good[0].json.leadId, src.leadId);
+  for (const bad of [{ error: '403 Forbidden' }, { success: false }, { success: 'true' }, {}, { accepted: true }]) {
+    assert.equal(run(bad).length, 0);
+  }
+});
+
+test('GH-28: n8n sends only after successful Firestore claim and records only after confirmed provider acceptance', () => {
+  const names = workflow.nodes.map((n: {name: string}) => n.name);
+  const from = (name: string) => names.indexOf(name);
+  const claim = from('Claim Firestore Lease');
+  const verifiedClaim = from('Confirm Firestore Lease');
+  const outlook = from('Outlook Send Four Recipients');
+  const verifiedOutlook = from('Confirm Outlook Accepted');
+  const reRead = from('Re-read Firestore Lease');
+  const finalWrite = from('Record Outlook Acceptance');
+  assert.ok(claim < verifiedClaim && verifiedClaim < outlook && outlook < verifiedOutlook && verifiedOutlook < reRead && reRead < finalWrite);
+  assert.equal(node('Confirm Firestore Lease').type, 'n8n-nodes-base.code');
+  assert.equal(node('Confirm Outlook Accepted').type, 'n8n-nodes-base.code');
+  assert.equal(workflow.active, false);
+});
+
+test('GH-28: retry-exhausted lead is durably routed to needs_review without Outlook', () => {
+  const cutoff = '2026-10-09T00:00:00Z';
+  const run = (items: Array<Record<string, unknown>>) => runCode('Select Retry-Exhausted Leads', {
+    $input: { all: () => items },
+    $: (_name: string) => ({ first: () => ({ json: { activationUtc: cutoff } }) }),
+  });
+  const item = document(lead({ notification: { state: 'retry', attempts: 7 } }));
+  const result = run([item]);
+  assert.equal(result.length, 1);
+  const record = result[0].json;
+  assert.equal(record.reviewBody.fields.notification.mapValue.fields.state.stringValue, 'needs_review');
+  assert.equal(record.reviewBody.fields.notification.mapValue.fields.errorCode.stringValue, 'retry_limit');
+  assert.equal(record.reviewBody.fields.notification.mapValue.fields.attempts.integerValue, '7');
+  assert.equal(record.reviewBody.name, item.json.document.name);
+  assert.deepEqual(Object.keys(record.reviewBody.fields), ['notification']);
+  assert.equal(result[0].pairedItem.item, 0);
+  assert.equal(Reflect.has(record, 'recipients'), false);
+  assert.equal(Reflect.has(record, 'html'), false);
+  const patch = node('Record Needs Review');
+  assert.equal(patch.continueOnFail, true);
+  assert.equal(patch.parameters.method, 'PATCH');
+  assert.equal(patch.parameters.nodeCredentialType, 'googleApi');
+  assert.match(patch.parameters.url, /currentDocument\.updateTime/);
+  assert.match(patch.parameters.url, /https:\/\/firestore\.googleapis\.com\/v1/);
+  assert.match(patch.parameters.jsonBody, /reviewBody/);
+});
+
+test('GH-28: only valid consented and expired leases reach retry-exhausted review branch', () => {
+  const items = [
+    document(lead({ consentimiento: false, notification: { state: 'retry', attempts: 7 } }), 0),
+    document(lead({ source: 'import', notification: { state: 'retry', attempts: 7 } }), 1),
+    document(lead({ notification: { state: 'accepted', attempts: 9 } }), 2),
+    document(lead({ notification: { state: 'sending', leaseUntilMs: Date.now() + 120000, attempts: 7 } }), 3),
+    document(lead({ notification: { state: 'retry', attempts: 6 } }), 4),
+    document(lead({ createdAt: '2026-10-07T00:00:00Z', notification: { state: 'retry', attempts: 9 } }), 5),
+    document(lead({ notification: { state: 'sending', leaseUntilMs: Date.now() - 1000, attempts: 7 } }), 6),
+  ];
+  const result = runCode('Select Retry-Exhausted Leads', {
+    $input: { all: () => items },
+    $: (_name: string) => ({ first: () => ({ json: { activationUtc: '2026-10-09T00:00:00Z' } }) }),
+  });
+  assert.equal(result.length, 1);
+  assert.equal(result[0].json.reviewBody.fields.notification.mapValue.fields.state.stringValue, 'needs_review');
+  assert.equal(result[0].pairedItem.item, 6);
 });

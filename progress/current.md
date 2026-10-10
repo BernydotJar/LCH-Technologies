@@ -38,3 +38,13 @@ Graph Harness: 143-event append-only chain validated; no READY nodes remain.
 Delivery state: GH-23 release is live, merged to `main`, with public transport and scoped browser verification at `https://lch-app.cloud`. See `progress/GH-23/public-validation.md` for the explicitly documented combined-browser execution limit.
 
 Housekeeping note: automatic deletion of the synthetic GH-20 Firestore verification records was not performed because the environment safety layer blocked direct record manipulation in Firestore Studio. The verified processed record is no longer in the pending automation queue. This does not block the production transport or release gates.
+
+
+## GH-28 — LCH n8n commercial mail activation hardening (2026-10-10)
+
+- Product decision remains Firebase **Spark**, zero new Firebase billing/Cloud Functions, one existing n8n executor only.
+- A confirmed **Mac Chrome n8n** and **Cloud Sandbox n8n-lina** are distinct localhost servers. Mac lists only Lina and zero credentials; sandbox contains Lina + LCH inactive and zero credentials.
+- GH-28 adds Firestore CAS claim verification, strict Outlook `{success:true}` acceptance verification, and a CAS-protected dead-letter branch for >=7 failed attempts, with no unwanted emails.
+- Focused n8n 14/14, preflight 4/4, full LCH 91/91, TypeScript and guarded build PASS. Sandbox n8n 13-node inactive import, unchanged Lina hash and exact runtime/source JSON match PASS; GH-27 keeper still RUNNING.
+- Microsoft OAuth2 Client ID and Client Secret plus Firestore service identity remain unconfigured; no emails sent, no actual four-mailbox delivery evidence. **Public delivery gate NOT PASS**.
+- Runbook: `docs/lch-n8n-activation-runbook.md`; preflight: `scripts/lch_n8n_release_preflight.py`; Graph node GH-28.
