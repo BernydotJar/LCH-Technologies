@@ -65,3 +65,26 @@ Watch n8n execution history, Firestore `notification.state`, repeated `sending` 
 ## Execution-data minimization
 
 This workflow disables saving successful/error/manual executions and execution progress in its n8n settings. Firestore remains the durable record and the `notification` field retains machine status. Do not paste prospect data into debug logs or use n8n pinned data. If manual troubleshooting is needed, use synthetic contacts and turn debugging off before activation.
+
+## GH-27 — local n8n process availability
+
+An operational monitoring guard was installed into the existing LCH Supervisor (same workstation, **no new container**) as `lch-n8n-keeper`. Every 45 seconds, it checks `http://127.0.0.1:5678/healthz`. If the existing runtime is unhealthy, it calls only `/workspace/_shared/lina-n8n-runtime/bin/start.sh`; it does not change Lina's workflow or activate LCH's email workflow. The keeper's source is `scripts/lch-n8n-keepalive.sh`, installed as `/workspace/.deployment-tools/lch-n8n-keepalive.sh`.
+
+To inspect:
+
+```bash
+/workspace/.deployment-tools-venv/bin/supervisorctl -c /workspace/.deployment-tools/lch-site-supervisord.conf status
+/workspace/_shared/lina-n8n-runtime/bin/status-stack.sh
+```
+
+Rollback without touching the website or Lina's data:
+
+```bash
+cp /workspace/.deployment-tools/lch-site-supervisord.conf.pre-gh27-n8n-monitor /workspace/.deployment-tools/lch-site-supervisord.conf
+/workspace/.deployment-tools-venv/bin/supervisorctl -c /workspace/.deployment-tools/lch-site-supervisord.conf reread
+/workspace/.deployment-tools-venv/bin/supervisorctl -c /workspace/.deployment-tools/lch-site-supervisord.conf update
+```
+
+The monitor is **not** proof of service availability across a full Cloud Sandbox workstation recreation. Before LCH's first live email, validate host boot behavior, authenticated ownership, workflow credentials and a full four-recipient test.
+
+**Source of deployed supervisor stanza:** `infra/lch-n8n-keeper.supervisor.conf`. A process-level SIGTERM restart of the corrected keeper was verified; the monitor stays running and does not modify the Lina workflow. A complete host/workstation reboot is still unverified.

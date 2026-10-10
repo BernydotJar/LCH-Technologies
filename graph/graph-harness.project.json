@@ -120,6 +120,23 @@
         "independent_verification"
       ],
       "blocking": true
+    },
+    {
+      "id": "gh27_keeper_quality",
+      "required_evidence_kinds": [
+        "critic_review",
+        "verification",
+        "independent_verification"
+      ],
+      "blocking": true
+    },
+    {
+      "id": "gh27_host_recovery",
+      "required_evidence_kinds": [
+        "external_validation",
+        "independent_verification"
+      ],
+      "blocking": true
     }
   ],
   "nodes": [
@@ -646,6 +663,39 @@
         "workflow_active": false,
         "lina_workflow_mutations": false,
         "alternative_to": "GH-25 Cloudflare Worker (not deployed)"
+      }
+    },
+    {
+      "id": "GH-27",
+      "kind": "feature",
+      "title": "Private n8n existing-container availability monitor for LCH contact mail",
+      "status": "pending",
+      "depends_on": [
+        "GH-23"
+      ],
+      "capability": "backend",
+      "gates": {
+        "done": [
+          "gh27_keeper_quality",
+          "gh27_host_recovery"
+        ]
+      },
+      "allowed_paths": [
+        "scripts/lch-n8n-keepalive.sh",
+        "infra/lch-n8n-keeper.supervisor.conf",
+        ".github/workflows/lch-n8n-keeper.yml",
+        "tests/lchN8nKeeper.test.ts",
+        "docs/lch-n8n-contact-mail.md",
+        "progress/GH-27/**",
+        "specs/GH-27/**",
+        "graph/**"
+      ],
+      "metadata": {
+        "runtime": "n8n-lina",
+        "additional_containers": 0,
+        "firebase_tier": "Spark",
+        "mail_workflow_active": false,
+        "host_recreation_verified": false
       }
     }
   ]
