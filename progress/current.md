@@ -24,8 +24,17 @@
   - Public HTTPS production release: `fe93dcf985dd83508dcef1b5a2a40054ef07ff7f`, rollback preserved.
   - Microsoft 365/Outlook sales notifications remain **not integrated**; Firestore receipt does not imply email delivery.
 
-Graph Harness: 128-event append-only chain validated; no READY nodes remain.
+- GH-23 — Donna conversational CX refinement: DONE; `gh23_conversation_quality` and `gh23_public_release` PASS.
+  - Intent-aware contact flow, a single primary contact action, natural missing-data questions, honest grounded clarification and topic suggestions.
+  - Private form turns are excluded from requests to `/api/chat` after returning to product exploration.
+  - 63/63 tests, TypeScript, Firebase-guarded build, complete 390px/1365px staging Playwright suites and original chat/semantic-contact regressions PASS.
+  - Public HTTPS release: `5e08515ba5a0aec6918dea3dea31d5b924fda0b0`. Health, client asset fingerprint, grounded API, targeted mobile and desktop browser flows PASS.
+  - Combined three-page browser suite on the public host was INCOMPLETE under exceptional shared-sandbox load; its individual critical public scenarios and the complete exact-build staging suite passed.
+  - Cloudflare `/cdn-cgi/rum` telemetry was excluded from the no-lead-POST E2E assertion; the test still forbids unexpected `/api/chat` or Firestore writes.
+  - Microsoft 365 sales notifications remain **not configured** by this work.
 
-Delivery state: GH-22 release is live, merged to `main`, and independently verified on `https://lch-app.cloud`. See `progress/GH-22/public-production-validation.md`.
+Graph Harness: 143-event append-only chain validated; no READY nodes remain.
+
+Delivery state: GH-23 release is live, merged to `main`, with public transport and scoped browser verification at `https://lch-app.cloud`. See `progress/GH-23/public-validation.md` for the explicitly documented combined-browser execution limit.
 
 Housekeeping note: automatic deletion of the synthetic GH-20 Firestore verification records was not performed because the environment safety layer blocked direct record manipulation in Firestore Studio. The verified processed record is no longer in the pending automation queue. This does not block the production transport or release gates.

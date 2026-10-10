@@ -86,7 +86,11 @@ async function main() {
       const directPage = await browser.newPage({ viewport: { width, height: 850 }, reducedMotion: 'reduce' });
       const directCalls = [];
       directPage.on('request', (request) => {
-        if (request.method() === 'POST') directCalls.push(request.url());
+        // Cloudflare sends its own /cdn-cgi/rum telemetry POST in production.
+        // Only a chat API call or a Firestore write would violate this flow.
+        if (request.method() === 'POST' && (request.url().endsWith('/api/chat') || request.url().includes('firestore.googleapis.com'))) {
+          directCalls.push(request.url());
+        }
       });
       await directPage.goto(base, { waitUntil: 'domcontentloaded', timeout: 22_000 });
       await open(directPage);
