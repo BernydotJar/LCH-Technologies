@@ -15,7 +15,7 @@ function meta(key: string): string {
 }
 
 test('LCH advertises a public large social preview in server-rendered HTML', () => {
-  const expectedUrl = 'https://lch-app.cloud/assets/social/lch-preview.png';
+  const expectedUrl = 'https://lch-app.cloud/assets/social/lch-preview-original.png';
   assert.equal(meta('og:image'), expectedUrl);
   assert.equal(meta('og:image:secure_url'), expectedUrl);
   assert.equal(meta('twitter:image'), expectedUrl);

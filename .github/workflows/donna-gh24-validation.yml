@@ -4,7 +4,6 @@ on:
     paths:
       - 'index.html'
       - 'public/assets/social/**'
-      - 'scripts/social-preview.html'
       - 'src/**'
       - 'tests/**'
       - 'scripts/**'
