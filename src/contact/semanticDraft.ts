@@ -23,10 +23,21 @@ function clean(input: string): string {
 }
 
 function sliceSegment(input: string): string {
-  return clean(input.split(/[\n,;!?]/u, 1)[0] ?? '')
-    .replace(/\s+(?:y\s+)?(?:mi correo|correo|mi cargo|trabajo en|trabajo como|mi empresa|mi organizacion|mi organización|soy|necesito|queremos|quiero|busco|escribeme|escríbeme|para contactarme|en la empresa|de la empresa)\b.*$/iu, '')
+  // Respect sentence and semantic field boundaries instead of consuming later
+  // identity and organization facts as part of a person's surname or role.
+  return clean(input.split(/[\n,;!?]|\.\s+(?=[\p{Lu}])/u, 1)[0] ?? '')
+    .replace(/\s+(?:y\s+)?(?:mi correo|correo|mi email|mi cargo|mi rol|trabajo en|trabajo para|trabajo como|laboro en|laboro para|colaboro en|represento a|mi empresa|mi organizacion|mi organización|mi nombre|me llamo|soy|necesito|necesitamos|queremos|quiero|busco|me interesa|nos interesa|escribeme|escríbeme|para contactarme|en la empresa|de la empresa)\b.*$/iu, '')
     .trim()
     .replace(/[.\s]+$/u, '');
+}
+
+/** A clearly marked company suffix is not part of the person's surname.
+ * Unmarked surnames such as "de la Cruz" remain unchanged. */
+function extractNameAndClearOrganization(raw: string): ContactDraft {
+  const segment = sliceSegment(raw);
+  const companySuffix = segment.match(/^(.+?)\s+de\s+([\p{L}\p{M}\p{N}][\p{L}\p{M}\p{N} .-]{1,100}\b(?:Corp(?:oration)?|LLC|Inc|Ltd|Technologies|Tech|GmbH|S\.?A\.?))$/iu);
+  if (companySuffix) return { ...nameParts(companySuffix[1]), empresa: clean(companySuffix[2]) };
+  return nameParts(segment);
 }
 
 function nameParts(text: string): ContactDraft {
@@ -59,10 +70,10 @@ export function inferContactInterest(raw: string): InterestArea | undefined {
 
 function extractBusinessNeed(raw: string): string | undefined {
   const text = clean(raw);
-  const possible = text.match(/\b(?:necesito|necesitamos|quiero|queremos|busco|buscamos|deseo|deseamos|quisiera|nos gustaria|nos gustaría|nuestro reto es|mi reto es|el problema es)\b[^,;.!?\n]*/iu);
+  const possible = text.match(/\b(?:necesito|necesitamos|quiero|queremos|busco|buscamos|deseo|deseamos|quisiera|me interesa|nos interesa|nos gustaria|nos gustaría|nuestro reto es|mi reto es|el problema es)\b[^,;.!?\n]*/iu);
   if (!possible?.[0]) return;
   let proposal = sliceSegment(possible[0]);
-  proposal = proposal.replace(EMAIL, '').replace(/\s+(?:mi nombre|mi correo|mi email|mi tel[eé]fono|mi whatsapp|mi dpi|mi contrase(?:n|ñ)a|mi clave|soy\s+(?:ceo|cto|gerente|directora?|el|la)|trabajo en)\b.*$/iu, '').trim();
+  proposal = proposal.replace(EMAIL, '').replace(/\s+(?:y\s+)?(?:me llamo|mi nombre|mi correo|mi email|mi tel[eé]fono|mi whatsapp|mi dpi|mi contrase(?:n|ñ)a|mi clave|soy\s+(?:ceo|cto|gerente|directora?|el|la)|trabajo en|trabajo para)\b.*$/iu, '').trim();
   proposal = proposal.replace(/\s+y$/iu, '').trim();
   if (proposal.length < 14 || /^(?:quiero|necesito|busco|quisiera)\s+(?:hablar|contacto|una cita|una llamada|un presupuesto|mas informacion|más información)\b/iu.test(proposal)) {
     return;
@@ -81,15 +92,15 @@ export function extractSemanticContact(raw: string): ContactDraft {
 
   const labelledName = capture(text, /\b(?:me llamo|mi nombre es|nombre completo:?)\s+([^\n]+)/iu);
   const shortName = labelledName || capture(text, /(?:^|[,;]\s*)soy\s+([\p{L}][^,;\n]+)/iu);
-  if (shortName && !JOB_START.test(shortName) && !NON_PERSON.test(shortName)) Object.assign(patch, nameParts(shortName));
+  if (shortName && !JOB_START.test(shortName) && !NON_PERSON.test(shortName)) Object.assign(patch, extractNameAndClearOrganization(shortName));
 
   const first = capture(text, /(?:^|[,;]\s*)(?:nombre|nombre de pila):\s*([^,;\n]+)/iu);
   const last = capture(text, /\b(?:mi apellido es|apellidos?:)\s+([^,;\n]+)/iu);
   if (first && NAMES.test(first) && !JOB_START.test(first)) patch.nombre = first;
   if (last && NAMES.test(last)) patch.apellido = last;
 
-  const company = capture(text, /\b(?:mi empresa (?:es|se llama)|mi organizaci[oó]n (?:es|se llama)|trabajo en|represento a|de la empresa|empresa:)\s+([^,;\n]+)/iu)
-    || capture(text, /\b(?:cto|ceo|cio|coo|cfo|directora?|gerente|fundadora?)\s+(?:de\s+[^,;\n]+?\s+)?en\s+([\p{L}][^,;\n]+)/iu);
+  const company = capture(text, /\b(?:mi empresa (?:es|se llama)|mi organizaci[oó]n (?:es|se llama)|trabajo (?:en|para)|laboro (?:en|para)|colaboro en|represento a|de la empresa|empresa:)\s+([^,;\n]+)/iu)
+    || capture(text, /\b(?:soy\s+(?:el|la|un|una)?\s*)?(?:cto|ceo|cio|coo|cfo|directora?|gerente|fundadora?)\b[^,;.!?\n]{0,100}?\s+en\s+([\p{L}][^,;.!?\n]+)/iu);
   if (company && !JOB_START.test(company) && !/@/.test(company) && !/^automatizar\b/i.test(company)) {
     patch.empresa = company.replace(/\s+(?:como|en calidad de|con el cargo de)\s+.+$/iu, '').trim();
   }
@@ -136,7 +147,9 @@ export function readGuidedContactAnswer(expected: ContactField, raw: string): Co
   if (!text) return {};
   const semantic = extractSemanticContact(text);
   if (containsOutOfSchemaPrivateData(text)) return semantic;
-  if (semantic[expected]) return semantic;
+  // Never turn a whole multi-field sentence into a company or job just because
+  // that slot was next: keep the explicit facts and ask again if needed.
+  if (Object.keys(semantic).length > 0) return semantic;
 
   const prefix = FIELD_PREFIXES[expected];
   const value = clean(prefix ? text.replace(prefix, '') : text);

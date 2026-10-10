@@ -5,6 +5,7 @@
 
 import { useState } from 'react';
 import { DonnaChat, type DonnaHandoff } from './components/DonnaChat';
+import type { ContactDraft } from './contact/semanticContract';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
 import { Capabilities } from './components/Capabilities';
@@ -18,9 +19,19 @@ import { Contact } from './components/Contact';
 import { Footer } from './components/Footer';
 
 export type ContactHandoff = DonnaHandoff & { nonce: number };
+export type DonnaPreparedDraft = { draft: ContactDraft; nonce: number };
 
 export default function App() {
   const [handoff, setHandoff] = useState<ContactHandoff | null>(null);
+  const [preparedDraft, setPreparedDraft] = useState<DonnaPreparedDraft | null>(null);
+  const [openDonnaForContact, setOpenDonnaForContact] = useState<DonnaPreparedDraft | null>(null);
+  // The typed draft bridge lives in React memory, not the API or browser DOM.
+  const handleDonnaDraft = (draft: ContactDraft) => {
+    setPreparedDraft((previous) => ({ draft, nonce: (previous?.nonce ?? 0) + 1 }));
+  };
+  const handleStartDonna = (draft: ContactDraft) => {
+    setOpenDonnaForContact((previous) => ({ draft, nonce: (previous?.nonce ?? 0) + 1 }));
+  };
   const handleDonnaHandoff = (data: DonnaHandoff) => {
     setHandoff((previous) => ({ ...data, nonce: (previous?.nonce ?? 0) + 1 }));
     window.location.hash = 'contacto';
@@ -39,10 +50,10 @@ export default function App() {
         <Governance />
         <Process />
         <WhyLCH />
-        <Contact handoff={handoff} />
+        <Contact handoff={handoff} preparedDraft={preparedDraft} onStartDonna={handleStartDonna} />
       </main>
       <Footer />
-      <DonnaChat onHandoff={handleDonnaHandoff} />
+      <DonnaChat onHandoff={handleDonnaHandoff} onDraft={handleDonnaDraft} startContactRequest={openDonnaForContact} />
     </div>
   );
 }

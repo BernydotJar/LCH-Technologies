@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'motion/react';
-import { AlertCircle, ArrowRight, Check, CheckCircle2, LoaderCircle, ShieldCheck } from 'lucide-react';
-import type { ContactHandoff } from '../App';
+import { AlertCircle, ArrowRight, Check, CheckCircle2, LoaderCircle, ShieldCheck, Sparkles } from 'lucide-react';
+import type { ContactHandoff, DonnaPreparedDraft } from '../App';
 import type { DemoRequest } from '../integrations/leadContract';
-import { applyContactDraft, CONTACT_FIELD_BY_NAME, countContactFields, normalizeContactDraft, PREPARE_CONTACT_TOOL } from '../contact/semanticContract';
+import { CONTACT_FIELD_BY_NAME, countContactFields, normalizeContactDraft, PREPARE_CONTACT_TOOL, type ContactDraft, type ContactField } from '../contact/semanticContract';
+import { reconcileAssistantDraft } from '../contact/liveDraft';
 
 type FormStatus = 'idle' | 'loading' | 'success' | 'error';
 
@@ -44,7 +45,9 @@ function errorMessage(error: unknown): string {
   return 'No pudimos confirmar la recepción. Conservamos lo que escribiste para que puedas intentar de nuevo.';
 }
 
-export const Contact = ({ handoff }: { handoff: ContactHandoff | null }) => {
+type Props = { handoff: ContactHandoff | null; preparedDraft: DonnaPreparedDraft | null; onStartDonna: (draft: ContactDraft) => void };
+
+export const Contact = ({ handoff, preparedDraft, onStartDonna }: Props) => {
   const [status, setStatus] = useState<FormStatus>('idle');
   const [formData, setFormData] = useState<DemoRequest>(EMPTY_REQUEST);
   const [errorText, setErrorText] = useState('');
@@ -53,6 +56,23 @@ export const Contact = ({ handoff }: { handoff: ContactHandoff | null }) => {
   const inFlight = useRef(false);
   const [handoffActive, setHandoffActive] = useState(false);
   const [handoffFieldCount, setHandoffFieldCount] = useState(0);
+  const [liveFieldCount, setLiveFieldCount] = useState(0);
+  const manualFields = useRef<Set<ContactField>>(new Set());
+  const lastDonnaDraft = useRef<ContactDraft>({});
+
+  useEffect(() => {
+    if (!preparedDraft) return;
+    const proposal = normalizeContactDraft(preparedDraft.draft);
+    const prior = lastDonnaDraft.current;
+    const edited = new Set(manualFields.current);
+    setFormData((current) => reconcileAssistantDraft(current, prior, proposal, edited));
+    lastDonnaDraft.current = proposal;
+    setLiveFieldCount(countContactFields(proposal));
+    if (!Object.keys(proposal).length) {
+      setHandoffActive(false);
+      setHandoffFieldCount(0);
+    }
+  }, [preparedDraft?.nonce]);
 
   useEffect(() => {
     if (!handoff) return;
@@ -61,7 +81,11 @@ export const Contact = ({ handoff }: { handoff: ContactHandoff | null }) => {
       interes: handoff.draft?.interes || (handoff.interest !== 'Otro' ? handoff.interest : undefined),
       mensaje: handoff.draft?.mensaje || handoff.message,
     });
-    setFormData((current) => applyContactDraft(current, proposal));
+    const prior = lastDonnaDraft.current;
+    const edited = new Set(manualFields.current);
+    setFormData((current) => reconcileAssistantDraft(current, prior, proposal, edited));
+    lastDonnaDraft.current = proposal;
+    setLiveFieldCount(countContactFields(proposal));
     setStatus('idle');
     setHandoffFieldCount(countContactFields(proposal));
     setHandoffActive(true);
@@ -69,6 +93,7 @@ export const Contact = ({ handoff }: { handoff: ContactHandoff | null }) => {
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type } = event.target;
+    if (Object.prototype.hasOwnProperty.call(CONTACT_FIELD_BY_NAME, name)) manualFields.current.add(name as ContactField);
     setFormData((previous) => ({
       ...previous,
       [name]: type === 'checkbox' ? (event.target as HTMLInputElement).checked : value,
@@ -97,6 +122,10 @@ export const Contact = ({ handoff }: { handoff: ContactHandoff | null }) => {
 
       setConfirmationId(result.leadId.slice(0, 10).toUpperCase());
       setFormData({ ...EMPTY_REQUEST });
+      manualFields.current.clear();
+      lastDonnaDraft.current = {};
+      setHandoffActive(false);
+      setLiveFieldCount(0);
       setStatus('success');
     } catch (error) {
       console.error('LCH contact form submission failed', error);
@@ -164,14 +193,20 @@ export const Contact = ({ handoff }: { handoff: ContactHandoff | null }) => {
             </motion.div>
           ) : (
             <form onSubmit={handleSubmit} className="mx-auto w-full max-w-lg space-y-5" aria-busy={status === 'loading'} data-semantic-tool={PREPARE_CONTACT_TOOL.name} data-testid="lch-contact-form">
-              {handoffActive && <div role="status" className="rounded-md border border-teal-200 bg-teal-50 px-4 py-3 text-xs leading-relaxed text-teal-900">
-                Donna preparó un borrador con {handoffFieldCount} datos identificados. Revisa los campos y completa los que falten; nada se ha enviado todavía.
+              {(handoffActive || liveFieldCount > 0) && <div role="status" data-testid="contact-donna-live-status" className="rounded-md border border-teal-200 bg-teal-50 px-4 py-3 text-xs leading-relaxed text-teal-900">
+                {liveFieldCount || handoffFieldCount} datos preparados en el formulario. Puedes corregirlos antes de autorizar el envío; nada se ha enviado todavía.
               </div>}
               <div>
                 <h3 className="mb-2 text-2xl font-bold text-primary">Cuéntanos qué quieres lograr</h3>
                 <p className="text-sm leading-relaxed text-secondary">
                   Selecciona una oportunidad y compártenos tus datos para coordinar el siguiente paso.
                 </p>
+                <button type="button" data-testid="contact-fill-with-donna" disabled={status === 'loading'}
+                  onClick={() => onStartDonna(normalizeContactDraft(formData))}
+                  className="mt-4 inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-teal-200 bg-teal-50 px-4 py-2.5 text-sm font-semibold text-teal-900 transition-colors hover:bg-teal-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700 disabled:opacity-50">
+                  <Sparkles size={16} aria-hidden="true" /> Completar con Donna
+                </button>
+                <p className="mt-2 text-xs leading-relaxed text-secondary">Donna prepara los campos mientras conversas. Tú revisas y decides si los envías.</p>
               </div>
 
               <fieldset>
@@ -185,7 +220,7 @@ export const Contact = ({ handoff }: { handoff: ContactHandoff | null }) => {
                         type="button"
                         aria-pressed={selected}
                         disabled={status === 'loading'}
-                        onClick={() => setFormData((previous) => ({ ...previous, interes: interest }))}
+                        onClick={() => { manualFields.current.add('interes'); setFormData((previous) => ({ ...previous, interes: interest })); }}
                         className={`rounded-md border px-3 py-3 text-left transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${selected ? 'border-accent bg-teal-50 text-primary' : 'border-neutral-200 bg-neutral-50 text-secondary hover:border-accent/50'}`}
                       >
                         <span className="block text-xs font-bold">{title}</span>
