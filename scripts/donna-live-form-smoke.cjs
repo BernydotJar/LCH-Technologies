@@ -17,7 +17,7 @@ async function formValue(page, name, expected) {
 async function main() {
   const url = process.env.LCH_SMOKE_URL || 'http://127.0.0.1:4254/';
   const browser = await chromium.launch({
-    headless: true, executablePath: process.env.CHROMIUM_PATH || '/usr/bin/chromium',
+    headless: true, executablePath: process.env.CHROMIUM_PATH || undefined,
     args: ['--no-sandbox', '--disable-dev-shm-usage', '--disable-gpu'],
   });
   try {
