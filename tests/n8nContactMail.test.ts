@@ -50,6 +50,10 @@ const prepare = (items: Array<Record<string, unknown>>) =>
 
 test('GH-26: separate n8n workflow imported inactive with unique nodes and one linear path', () => {
   assert.equal(workflow.active, false);
+  assert.equal(workflow.settings.saveDataSuccessExecution, 'none');
+  assert.equal(workflow.settings.saveDataErrorExecution, 'none');
+  assert.equal(workflow.settings.saveManualExecutions, false);
+  assert.equal(workflow.settings.saveExecutionProgress, false);
   assert.equal(workflow.id, 'lchContactNotifyN8nGH26');
   assert.equal(workflow.nodes.length, 9);
   assert.equal(new Set(workflow.nodes.map((n: { id: string }) => n.id)).size, 9);

@@ -61,3 +61,7 @@ If n8n is down, `/workspace/_shared/lina-n8n-runtime/bin/start.sh` reactivates t
 Watch n8n execution history, Firestore `notification.state`, repeated `sending` leases and the expiry retry window. Monitor `blocked`/provider authorization errors and the 40-lead query window. Disabling **only** the LCH workflow immediately stops sending without affecting Lina or the LCH website. The existing Cloudflare Worker is an **inactive alternative**, not a simultaneous backup sender.
 
 **Production status:** awaiting Google n8n credential, authorized Outlook OAuth credential, reliable n8n uptime and a real four-mailbox receipt test. Firebase remains **Spark** throughout.
+
+## Execution-data minimization
+
+This workflow disables saving successful/error/manual executions and execution progress in its n8n settings. Firestore remains the durable record and the `notification` field retains machine status. Do not paste prospect data into debug logs or use n8n pinned data. If manual troubleshooting is needed, use synthetic contacts and turn debugging off before activation.

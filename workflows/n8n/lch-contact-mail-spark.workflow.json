@@ -272,7 +272,11 @@
   "active": false,
   "settings": {
     "executionOrder": "v1",
-    "timezone": "America/Guatemala"
+    "timezone": "America/Guatemala",
+    "saveDataSuccessExecution": "none",
+    "saveDataErrorExecution": "none",
+    "saveManualExecutions": false,
+    "saveExecutionProgress": false
   },
   "pinData": {},
   "meta": {
