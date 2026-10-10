@@ -21,8 +21,8 @@ export type ContactHandoff = DonnaHandoff & { nonce: number };
 
 export default function App() {
   const [handoff, setHandoff] = useState<ContactHandoff | null>(null);
-  const handleDonnaHandoff = ({ interest, message }: DonnaHandoff) => {
-    setHandoff((previous) => ({ interest, message, nonce: (previous?.nonce ?? 0) + 1 }));
+  const handleDonnaHandoff = (data: DonnaHandoff) => {
+    setHandoff((previous) => ({ ...data, nonce: (previous?.nonce ?? 0) + 1 }));
     window.location.hash = 'contacto';
     window.requestAnimationFrame(() => document.getElementById('contacto')?.scrollIntoView({ behavior: 'smooth' }));
   };
