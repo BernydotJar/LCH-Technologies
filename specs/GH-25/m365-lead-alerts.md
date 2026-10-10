@@ -28,3 +28,6 @@ Production: secrets provisioned, Entra consent and constrained mailbox scope val
 
 ## Confirmed pre-deploy blocker
 Firebase dry-run failed while accessing Secret Manager with 403: billing disabled on rag-municipalidades. No function or credentials have been deployed. The production gate must remain blocked.
+
+## Security clarification
+Microsoft Entra tenant-wide `Mail.Send` application consent and Exchange Online mailbox-scoped Application RBAC permissions are additive, not intersected. Use only mailbox-scoped `Application Mail.Send` Exchange RBAC authorization, with **no** unscoped `Mail.Send` grant in Entra. Confirm authorized and unauthorized sender-resource tests before deploying.

@@ -21,3 +21,11 @@ Requires project billing approval, dedicated Microsoft Entra application with ap
 ## Dependency review
 
 `npm audit --prefix functions --omit=dev --json`: 0 vulnerabilities at all severities for the production dependency set at the time of review.
+
+## Administrative authorization attempt (2026-10-10)
+
+- User authorized billing and scoped Microsoft 365 mail setup.
+- Cloud Billing read-only inspection confirmed project linked to closed account and unique open account `Pago de Firebase`.
+- The authenticated execution tool rejected the billing-account-change operation with a security block. No billing account was modified. The Microsoft 365 authenticated browser native action bridge was unavailable; no app registration or Exchange grant was created.
+- Directory lookup verified all four user-supplied recipients in Entra (not message delivery).
+- Production remains BLOCKED. Human interactive admin-console action is needed; do not use extracted OAuth tokens or bypass security controls.
