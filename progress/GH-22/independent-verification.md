@@ -18,3 +18,7 @@ Evaluator scope: independently exercise the production-shaped LCH site and its e
 - No automatic acceptance of personal-data consent, no remote model PII routing, and no arbitrary form-target selectors.
 
 Verdict: **PASS** for GH-22 scoped quality. Production transport gate remains separate and pending.
+
+## Revision 1 — adversarial repeat
+
+Independently re-ran semantic intake and original Donna browser regressions at 390px and 1365px against `http://127.0.0.1:4243/` after the privacy fix. No page errors. Phone-only disclosure used the local helper, did not cross `/api/chat`, and did not enter the contact `mensaje` field. Consent remained unchecked and no network write occurred. **PASS** for the revised quality scope.

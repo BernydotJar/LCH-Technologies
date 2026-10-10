@@ -7,7 +7,7 @@ import {
   normalizeContactDraft, PREPARE_CONTACT_TOOL,
 } from '../src/contact/semanticContract.ts';
 import {
-  containsPersonalContactData, extractFromDonnaMessages,
+  containsOutOfSchemaPrivateData, containsPersonalContactData, extractFromDonnaMessages,
   extractSemanticContact, inferContactInterest, readGuidedContactAnswer,
   safeContactMessageFromConversation,
 } from '../src/contact/semanticDraft.ts';
@@ -147,4 +147,21 @@ test('GH-22 all production builds invoke Firebase configuration guard BEFORE bun
   const packageFile = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
   assert.match(packageFile.scripts.build, /^node scripts\/check-production-env\.mjs && vite build/);
   assert.equal(packageFile.scripts['build:deploy'], 'npm run build');
+});
+
+
+test('GH-22 privacy repair: unsupported identifiers and secrets stay outside the chat API and lead message', () => {
+  for (const content of [
+    'Mi teléfono es 68899999',
+    'Mi DPI es 1234567890101',
+    'Mi contraseña es secreto-de-prueba',
+    'password: demo-secret-placeholder',
+    'API key: fake-test-key',
+    'Mi tarjeta de crédito es 4111 1111 1111 1111',
+  ]) {
+    assert.equal(containsOutOfSchemaPrivateData(content), true, content);
+    assert.equal(safeContactMessageFromConversation(content), '', content);
+  }
+  assert.equal(containsOutOfSchemaPrivateData('¿Ofrecen automatización de recuperación de contraseñas?'), false);
+  assert.deepEqual(readGuidedContactAnswer('empresa', 'Mi DPI es 1234567890101'), {});
 });

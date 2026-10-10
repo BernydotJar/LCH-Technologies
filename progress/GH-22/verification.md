@@ -32,3 +32,7 @@ Command: `NODE_PATH=/workspace/projects/LUMA/node_modules LCH_SMOKE_URL=http://1
 - The GH-22 merged code must be deployed as an immutable build with the same Firebase configuration.
 - Public HTTPS health, semantic contact UI and one synthetic end-to-end write must be verified after cutover.
 - Commercial email alerts and live generative LLM integration are outside GH-22 scope.
+
+## Revision 1 — privacy repair verification
+
+The first quality gate was invalidated after a source-based PII fallthrough finding. With the localized repair, the full deterministic suite reports **55/55 PASS** and new Playwright verifies an unsupported phone-only input generates **0** POST to `/api/chat` or Firestore. The original mobile/desktop baseline and guided semantic flows remain PASS. See `progress/GH-22/privacy-repair.md`.

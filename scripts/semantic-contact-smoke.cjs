@@ -89,6 +89,27 @@ async function main() {
     assert.equal(unwantedPosts, 0, 'guided slot filling is local and never sends/saves data');
     console.log(JSON.stringify({ guided: 'PASS', humanEditsPreserved: 'PASS', consentUnchecked: 'PASS', networkWrites: unwantedPosts }));
     await guided.close();
+
+    // A visitor may volunteer a phone or a credential which is NOT a valid
+    // contact field. Donna must keep it local rather than call /api/chat.
+    const privatePage = await browser.newPage({ viewport: { width: 390, height: 850 }, reducedMotion: 'reduce' });
+    privatePage.setDefaultTimeout(10_000);
+    const calls = [];
+    privatePage.on('request', req => {
+      if (req.method() === 'POST' && (req.url().endsWith('/api/chat') || req.url().includes('firestore.googleapis.com'))) calls.push(req.url());
+    });
+    await privatePage.goto(base, { waitUntil: 'domcontentloaded', timeout: 20_000 });
+    await privatePage.getByRole('button', { name: 'Hablar con Donna' }).click();
+    await privatePage.locator('#donna-message').fill('Mi teléfono es 68899999');
+    await privatePage.getByRole('button', { name: 'Enviar mensaje' }).click();
+    await privatePage.getByTestId('donna-contact-guide').waitFor();
+    assert.match(await privatePage.locator('[data-role="assistant"]').last().innerText(), /no lo enviaré al chat/i);
+    assert.equal(calls.length, 0, 'unsupported private details must stay in the browser');
+    await privatePage.getByTestId('donna-review-contact').click();
+    assert.equal(await privatePage.locator('#mensaje').inputValue(), '');
+    assert.equal(await privatePage.locator('#consentimiento').isChecked(), false);
+    console.log(JSON.stringify({ unsupportedPrivateData: 'PASS', allowedFieldsOnly: 'PASS', networkWrites: calls.length }));
+    await privatePage.close();
   } finally {
     await browser.close();
   }
