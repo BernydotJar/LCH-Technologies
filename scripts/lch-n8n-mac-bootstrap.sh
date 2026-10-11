@@ -12,8 +12,8 @@ BACKUP_DIR=${LCH_N8N_BACKUP_DIR:-$HOME/.cloud-sandbox-mcp-data/backups/lch-n8n}
 
 usage() {
   echo 'Usage: bash lch-n8n-mac-bootstrap.sh [--dry-run | --apply] [--source PATH]'
-  echo '  --dry-run checks Mac container, source workflow and duplicates; no import'
-  echo '  --apply creates a SQLite hot backup and imports LCH inactive, verifying Lina unchanged'
+  echo '  --dry-run inspects installed LCH, owner membership, source and Lina; no import'
+  echo '  --apply imports LCH inactive ONLY if absent; matching existing LCH is a no-op'
 }
 while [ "$#" -gt 0 ]; do
   case "$1" in
@@ -62,15 +62,9 @@ ACTUAL_SHA256=$(shasum -a 256 "$WORK/workflow.json" | awk '{print $1}')
 python3 "$GUARD" source "$WORK/workflow.json"
 docker exec "$CONTAINER" n8n export:workflow --all --output="/tmp/$RUN_ID-before.json" >/dev/null
 docker cp "$CONTAINER:/tmp/$RUN_ID-before.json" "$WORK/before.json" >/dev/null 2>&1
-python3 "$GUARD" before "$WORK/before.json"
-echo "n8n_host=mac container=$CONTAINER restart=$RESTART mode=$MODE"
-if [ "$MODE" = dry-run ]; then
-  echo 'READY_FOR_INACTIVE_IMPORT: no workflow database changes'
-  exit 0
-fi
-mkdir -p "$BACKUP_DIR"
-chmod 700 "$BACKUP_DIR"
-TIMESTAMP=$(date -u +%Y%m%dT%H%M%SZ)
+# Read-only inventory always runs, including dry-run. Re-importing an existing
+# workflow risks overwriting its new credentials or orphaning its project owner.
+python3 "$GUARD" inspect "$WORK/workflow.json" "$WORK/before.json"
 DB_PATH=''
 while IFS='|' read -r origin destination; do
   [ -d "$origin" ] || continue
@@ -78,7 +72,39 @@ while IFS='|' read -r origin destination; do
   candidate=$(find "$origin" -maxdepth 4 -name database.sqlite -type f -print -quit 2>/dev/null || true)
   if [ -n "$candidate" ]; then DB_PATH=$candidate; break; fi
 done < <(docker inspect -f '{{range .Mounts}}{{printf "%s|%s\n" .Source .Destination}}{{end}}' "$CONTAINER")
-[ -n "$DB_PATH" ] || { echo 'BLOCKED: cannot find persistent SQLite database for backup' >&2; exit 2; }
+[ -n "$DB_PATH" ] || { echo 'BLOCKED: cannot find persistent SQLite database for read-only membership audit' >&2; exit 2; }
+STATUS=$(python3 "$GUARD" ownership "$WORK/workflow.json" "$WORK/before.json" "$DB_PATH")
+echo "$STATUS"
+CUTOVER=$(printf '%s' "$STATUS" | python3 -c 'import sys,json;print(json.load(sys.stdin)["cutover"])')
+echo "n8n_host=mac container=$CONTAINER restart=$RESTART mode=$MODE"
+case "$CUTOVER" in
+  already_present_skip_import)
+    echo 'ALREADY_INSTALLED_INACTIVE: exact LCH workflow with Lina project membership; NO IMPORT OR CHANGES'
+    echo 'NEXT_GATE: connect Google Firestore and Outlook OAuth, then verify all four mailboxes'
+    exit 0
+    ;;
+  blocked_orphan_existing)
+    echo 'BLOCKED_EXISTING_ORPHAN: LCH is present in n8n database but not owned by a project; it may be invisible in the n8n UI. Do not import again.' >&2
+    echo 'NEXT_GATE: repair LCH ownership with a separately reviewed, backed-up recovery procedure.' >&2
+    exit 2
+    ;;
+  blocked_other_project)
+    echo 'BLOCKED_EXISTING_OTHER_PROJECT: LCH belongs to a different n8n project; do not import or overwrite.' >&2
+    exit 2
+    ;;
+  ready_for_inactive_import)
+    if [ "$MODE" = dry-run ]; then
+      echo 'READY_FOR_INACTIVE_IMPORT: LCH absent and Lina owner verified; no workflow database changes'
+      exit 0
+    fi
+    ;;
+  *) echo 'BLOCKED: unexpected cutover state' >&2; exit 2 ;;
+esac
+# Only the genuinely absent branch can reach the write path.
+python3 "$GUARD" before "$WORK/before.json"
+mkdir -p "$BACKUP_DIR"
+chmod 700 "$BACKUP_DIR"
+TIMESTAMP=$(date -u +%Y%m%dT%H%M%SZ)
 BACKUP_DB="$BACKUP_DIR/n8n-lch-pre-import-$TIMESTAMP.sqlite"
 python3 - "$DB_PATH" "$BACKUP_DB" <<'PY'
 import pathlib,sqlite3,sys
@@ -99,5 +125,8 @@ docker exec "$CONTAINER" n8n import:workflow --input="/tmp/$RUN_ID-input.json" -
 docker exec "$CONTAINER" n8n export:workflow --all --output="/tmp/$RUN_ID-after.json" >/dev/null
 docker cp "$CONTAINER:/tmp/$RUN_ID-after.json" "$WORK/after.json" >/dev/null 2>&1
 python3 "$GUARD" after "$WORK/before.json" "$WORK/after.json"
-echo "IMPORT_VALIDATED: LCH inactive, Lina unchanged; private SQLite backup at $BACKUP_DB"
+POST_STATUS=$(python3 "$GUARD" ownership "$WORK/workflow.json" "$WORK/after.json" "$DB_PATH")
+POST_CUTOVER=$(printf '%s' "$POST_STATUS" | python3 -c 'import json,sys;print(json.load(sys.stdin)["cutover"])')
+[ "$POST_CUTOVER" = already_present_skip_import ] || { echo 'BLOCKED: imported workflow is not owned by Lina project; restore from protected backup' >&2; exit 2; }
+echo "IMPORT_VALIDATED: LCH inactive and owned, Lina unchanged; private SQLite backup at $BACKUP_DB"
 echo 'NEXT_GATE: Google Firestore and Outlook OAuth credentials, real four-inbox receipts; DO NOT activate yet'
