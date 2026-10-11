@@ -1,6 +1,6 @@
 # GH-30: LCH n8n Mac single-executor cutover
 
-**Status: prepared and guard-tested; Mac import and live notification gate NOT YET VERIFIED.**
+**Status: existing Mac LCH record reported by CLI; read-only owner audit and live notification gate NOT YET VERIFIED.**
 **Date:** 2026-10-10. **Firebase:** Spark only. **Authoritative lead source:** `rag-municipalidades` named Firestore database `ai-studio-8963e7a3-87ce-4ca9-938c-9490f698d4c7` / `demoRequests`.
 
 ## Runtime decision
@@ -14,7 +14,7 @@ This choice does not migrate or interrupt Lina. A Mac SQLite backup path was obs
 Files:
 
 - `scripts/lch-n8n-mac-bootstrap.sh` - Mac-host-only dry-run and inactive import, with restart/health checks, pinned source, SQLite backup, owner-project resolution and after-import validation.
-- `scripts/lch_n8n_workflow_guard.py` - rejects duplicate LCH, unexpected recipient list, wrong database, pre-bound credentials, activation before authorization or any modification of Lina.
+- `scripts/lch_n8n_workflow_guard.py` - recognizes exact existing LCH without reimport; distinguishes correctly owned from orphaned or other-project records; rejects changed executable code, wrong database, premature activation and any modification of Lina.
 - `tests/test_lch_n8n_workflow_guard.py` - adversarial regression fixtures for pre-/postconditions.
 - `scripts/lch_entra_mail_audit.py` and `tests/test_lch_entra_mail_audit.py` - Entra identity/consent audit and negative permission fixtures.
 
@@ -29,6 +29,20 @@ cd "$HOME/.cloud-sandbox-mcp-data/shared-auth/deployment/handoff/lch-app/n8n-gh3
 bash lch-n8n-mac-bootstrap.sh --dry-run
 ```
 
+### Existing LCH detected on the Mac (operator finding)
+
+The operator ran the initial GH-30 dry-run. The canonical source guard passed, but `n8n export:workflow --all` **already included LCH** and the original strict importer returned `LCH_N8N_GUARD_BLOCKED: LCH workflow already exists; import would duplicate it`. This is evidence that the record exists, **not** proof that it is correctly project-owned, credentialed, executable or visible in the n8n UI. The Mac browser previously showed Lina alone, so an orphaned LCH record is possible; do not assume this diagnosis without the new read-only membership result.
+
+GH-30's updated dry-run now inspects the existing 13-node workflow and reads only ownership rows from the persistent n8n SQLite database. It **never exports tokens, accesses leads, or changes workflow/project records**. Possible results:
+
+- `ALREADY_INSTALLED_INACTIVE`: LCH matches the canonical workflow, remains inactive, and has the same n8n project owner as Lina. **Skip import**. Continue with secure credentials and delivery tests.
+- `BLOCKED_EXISTING_ORPHAN`: LCH matches the source but has no owning project. Do **not** repeat the import or manipulate Lina. A separately reviewed backed-up orphan adoption is required.
+- `BLOCKED_EXISTING_OTHER_PROJECT`: LCH has a different project owner. Do not reassign or overwrite without operator review.
+- `LCH_N8N_GUARD_BLOCKED`: the stored LCH differs in executable code/routing, was activated, or is otherwise inconsistent. Investigate drift; do not overwrite it.
+- `READY_FOR_INACTIVE_IMPORT`: only when LCH is **absent**, Lina is uniquely owned, and the source checksum passes. This is the sole state in which `--apply` should actually import anything.
+
+Even in `ALREADY_INSTALLED_INACTIVE`, `--apply` is a no-op; it does not reset existing credentials, workflows or activation values. It is unnecessary to run `--apply` for this state.
+
 Only if `--dry-run` reports `READY_FOR_INACTIVE_IMPORT`, run:
 
 ```bash
@@ -37,7 +51,7 @@ bash lch-n8n-mac-bootstrap.sh --apply
 
 Do not run those commands in the Linux Cloud Sandbox container: `docker` there connects to a distinct nested daemon. On Mac, the script refuses a container other than `cloud-sandbox-n8n-lina`, requires an existing active instance, correct restart policy, correct workflow checksum and a unique Lina project. It makes a **hot SQLite backup** before import and checks that Lina's workflow remains identical after the 13-node LCH import. Backups are private at `~/.cloud-sandbox-mcp-data/backups/lch-n8n`. Do not place them in GitHub, chat or Drive.
 
-The script intentionally does **not** restart n8n or manipulate active workflows. Refresh the n8n UI to verify the imported LCH entry remains inactive.
+The script intentionally does **not** restart n8n or manipulate active workflows. For the pre-existing case, it performs a read-only source/owner comparison and exits without creating backups or modifying workflows. Refresh the n8n UI to verify the imported LCH entry remains inactive.
 
 ### Remaining secure credential steps
 
@@ -53,8 +67,9 @@ The script intentionally does **not** restart n8n or manipulate active workflows
 | Gate | Result |
 | --- | --- |
 | Mac n8n owner UI authenticated, only Lina listed | PASS (visual browser evidence) |
-| Mac-host workflow import and same-instance persistence | PENDING |
-| Source contract and duplicate/Lina guard | PASS (11/11 adversarial fixtures) |
+| Existing Mac LCH record detected by CLI export | OBSERVED; owner/visibility/activation unknown |
+| Mac-host idempotent owner audit | PENDING re-run with updated bootstrap |
+| Source contract and duplicate/Lina guard | PASS (26/26 adversarial fixtures; additional CI gate) |
 | Cloud Sandbox n8n duplicate prevention | PASS (existing inactive LCH correctly rejected) |
 | Dedicated Google SA conditioned IAM | PASS (policy only) |
 | Effective Google service-principal Firestore read/write | NOT VERIFIED |
