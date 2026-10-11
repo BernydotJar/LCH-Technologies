@@ -48,3 +48,11 @@ Housekeeping note: automatic deletion of the synthetic GH-20 Firestore verificat
 - Focused n8n 14/14, preflight 4/4, full LCH 91/91, TypeScript and guarded build PASS. Sandbox n8n 13-node inactive import, unchanged Lina hash and exact runtime/source JSON match PASS; GH-27 keeper still RUNNING.
 - Microsoft OAuth2 Client ID and Client Secret plus Firestore service identity remain unconfigured; no emails sent, no actual four-mailbox delivery evidence. **Public delivery gate NOT PASS**.
 - Runbook: `docs/lch-n8n-activation-runbook.md`; preflight: `scripts/lch_n8n_release_preflight.py`; Graph node GH-28.
+
+
+## GH-29 — Google IAM Spark lead-mail principal (2026-10-10)
+
+- Created `lch-lead-mail-n8n@rag-municipalidades.iam.gserviceaccount.com` with exactly one direct conditional `roles/datastore.user` binding scoped to the LCH named Firestore database; prior LCH SA and n8n Lina untouched.
+- Independent read-only Google IAM API audit: 1 conditional project binding, 0 broad grants, 0 user-managed keys. Effective Firestore read/write from the service principal NOT yet verified.
+- Automatic private key creation/import blocked by platform safety control; no credential created or mail sent. n8n LCH workflow remains INACTIVE with 0 credentials, Firebase remains Spark.
+- Runbook `docs/lch-google-iam-lead-mail.md`; Microsoft delegated custom scopes/Send As requirements clarified. External credential and four-inbox delivery gate PENDING.

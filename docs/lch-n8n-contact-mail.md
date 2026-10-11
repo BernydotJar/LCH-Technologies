@@ -113,3 +113,7 @@ python3 scripts/lch_n8n_release_preflight.py
 ```
 
 A missing bound Google or Outlook credential, placeholder start time, old workflow revision, or inactive workflow reports `ready=false`, with machine-readable blocker names and **no secrets**. Even `ready=true` is only a configuration check; it does NOT prove OAuth validity or mail receipt.
+
+## GH-29 — dedicated Firestore identity provisioned, delivery still blocked
+
+A new Google service account `lch-lead-mail-n8n@rag-municipalidades.iam.gserviceaccount.com` was created with **one direct conditional** `roles/datastore.user` project binding limited to the named Firestore database. Existing GH-20 identity unchanged. The independent IAM audit found **zero keys** for the new account and **zero credentials** in n8n; this work did not issue a key, make an Outlook registration, or activate lead notification. See `docs/lch-google-iam-lead-mail.md`.

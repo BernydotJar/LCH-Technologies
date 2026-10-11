@@ -1,6 +1,6 @@
 # LCH commercial email activation: Firebase Spark + n8n + Microsoft 365
 
-**Owner:** LCH technical lead. **Status:** NOT LIVE. **Date:** 2026-10-10. **Graph:** GH-28.
+**Owner:** LCH technical lead. **Status:** NOT LIVE. **Date:** 2026-10-10. **Graph:** GH-28 / GH-29.
 
 ## Business acceptance contract
 
@@ -24,15 +24,15 @@ For each fresh, consented contact submitted at `https://lch-app.cloud`, retain t
 
 ## Microsoft 365 administrator — Outlook delegated OAuth2
 
-1. Confirm `contacto@lch-technologies.com` is a real Exchange Online mailbox and the selected OAuth user may send **as** that mailbox. Being a recipient does not imply Send As.
+1. **Owner confirmed** that `contacto@lch-technologies.com` has its **own Microsoft 365 license and mailbox**. Authenticate OAuth as **that mailbox itself**, rather than using Eduardo as a delegate. An owner mailbox that sends as itself does not need Exchange Send As or the `Mail.Send.Shared` permission.
 2. In Microsoft Entra for the organization `lchtechnologies.onmicrosoft.com`, create a dedicated app registration such as `LCH n8n Lead Mail` (single-tenant), with the correct **Web redirect URI of the chosen n8n executor**. For the authenticated Mac instance the n8n credential UI displays `http://localhost:5678/rest/oauth2-credential/callback`. For Cloud Sandbox use an operator-accessible callback of that container, secured with authentication; do not substitute the Mac localhost callback.
-3. Configure Microsoft Graph **delegated** permissions as required by the installed n8n Microsoft Outlook credential, including `Mail.Send` plus scopes needed for user identity and refresh. Use the least privilege possible; do **not** grant tenant-wide **application** `Mail.Send` just to send from one mailbox. Review tenant consent requirements.
+3. Configure delegated **`Mail.Send`** for the **contacto mailbox signing in as itself**. Do **not** add `Mail.Send.Shared`, Exchange `Send As` or tenant-wide application `Mail.Send` because there is no delegated third-party sender in this confirmed design. The n8n Outlook credential defaults to broader mail/calendar/contacts read-write scopes; use **Custom Scopes** to restrict to `Mail.Send`, `offline_access`, `openid` and profile scopes only if necessary for the installed OAuth2 provider. Use the least privilege possible; do **not** grant tenant-wide **application** `Mail.Send` just to send from one mailbox. Review tenant consent requirements.
 4. Generate a client secret and store it **only inside the selected n8n encrypted credential store**. Never paste the client secret, refresh token, service-account JSON or OAuth browser cookie into this repository, GitHub Actions, chats or client-side JS. Create `Microsoft Outlook OAuth2 API` credential in n8n, enter the Entra Client ID/Secret, then **Connect my account** through the visible Microsoft consent screen.
 5. Confirm the OAuth identity is the desired mailbox or an approved delegated identity with Send As. Test a separate non-production draft/send and inspect From, Reply-To and Received headers. A successful OAuth handshake is not proof that `contacto@...` may send.
 
 ## Google administrator — Firestore service-account credential
 
-1. In Google Cloud IAM for `rag-municipalidades`, create a dedicated service identity for LCH notifications. Grant only Firestore query/read and conditional document update on the **named** database when supported. Do not use a Firebase client API key as an admin credential, open Firestore Security Rules, or use an unrelated Google account's long-lived personal tokens.
+1. A dedicated identity, `lch-lead-mail-n8n@rag-municipalidades.iam.gserviceaccount.com`, was **created and independently IAM-audited** in GH-29. Its direct project `roles/datastore.user` role is conditioned on the one named Firestore database. It has **zero user-managed keys**, and n8n has **zero bound credentials**. See `docs/lch-google-iam-lead-mail.md`. Do not add broad project roles, use a Firebase browser API key for admin actions, open Firestore Security Rules, or substitute a human user's long-lived personal tokens.
 2. Under a policy permitting service-account keys, securely provision the key into the selected n8n's encrypted **Google Service Account API** (`googleApi`) credential. Set the datastore scope `https://www.googleapis.com/auth/datastore` and make it usable by the native Firestore node and HTTP Request's predefined credential. If service-account key creation is disabled by policy, use a properly supported workload-identity design rather than weakening org policy.
 3. Bind that **one** credential to all five service-account nodes: `Read Consented Contacts`, `Claim Firestore Lease`, `Record Needs Review`, `Re-read Firestore Lease`, and `Record Outlook Acceptance`.
 4. Test only the read/query operation first. Verify it sees the correct Firestore named database and observes the `createdAt` timestamp; this must **not** trigger the Outlook node. Recheck Firestore IAM against a different database to ensure scope is appropriately restricted.
@@ -84,3 +84,5 @@ flowchart LR
 ```
 
 *Only one external n8n executor should run this route. Google and Microsoft credentials are server-only. The graph shows control flow, not proof that any external email has been sent.*
+
+**GH-29 IAM evidence:** Google service identity and exact conditional direct project IAM grant verified with the read-only `scripts/lchGoogleIamAudit.cjs`. No key or Google credential was generated; secure import and real Firestore/Outlook mailbox tests remain externally blocked.

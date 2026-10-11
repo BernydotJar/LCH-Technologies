@@ -6,6 +6,8 @@ on:
       - 'tests/n8nContactMail.test.ts'
       - 'tests/test_lch_n8n_release_preflight.py'
       - 'scripts/lch_n8n_release_preflight.py'
+      - 'scripts/lchGoogleIamAudit.cjs'
+      - 'tests/lchGoogleIamAudit.test.cjs'
       - '.github/workflows/lch-n8n-contact-mail.yml'
   workflow_dispatch:
 jobs:
@@ -17,6 +19,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Verify database-restricted IAM grant contract
+        run: node --test tests/lchGoogleIamAudit.test.cjs
       - name: Validate workflow schema and code policies
         run: node --experimental-strip-types --test tests/n8nContactMail.test.ts
       - uses: actions/setup-python@v5
