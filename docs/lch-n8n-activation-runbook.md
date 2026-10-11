@@ -22,6 +22,12 @@ For each fresh, consented contact submitted at `https://lch-app.cloud`, retain t
 
 **Do not activate both.** The Cloudflare Worker GH-25 remains *undeployed*; leave it that way. The product's real Firestore source is a single shared database, so double automation would send the same lead twice.
 
+> **Microsoft Entra registration (2026-10-10):** A dedicated single-tenant application and enterprise service principal now exist. It requests only delegated Graph `Mail.Send`, with Mac n8n redirect `http://localhost:5678/rest/oauth2-credential/callback`; no secret, consent, saved n8n OAuth token or delivered email has been verified. See [LCH Entra registration evidence](lch-entra-m365-lead-mail.md). Do not use this callback for the separate Cloud Sandbox n8n runtime.
+
+> **GH-30 Mac cutover preparation:** [single-executor Mac bootstrap](lch-n8n-mac-cutover.md) adds pinned 13-node source verification, a protected SQLite backup and an adversarial Lina/no-duplicate/no-activation guard. It has been tested in fixtures but not executed on the Mac. The Microsoft OAuth callback belongs to the Mac n8n only.
+> **Mac dry-run duplicate case:** The operator observed an existing LCH record in CLI export. The updated GH-30 guard now performs a read-only 13-node and SQLite ownership check; see [orphan/installed diagnosis](lch-n8n-mac-cutover.md). Do not run `--apply` until the result is classified.
+> **Entra consent hardening (2026-10-10):** only `contacto@lch-technologies.com` is assigned to the dedicated enterprise app, and delegated `Mail.Send` is granted per-user (`Principal`) rather than tenant-wide; verified by `scripts/lch_entra_mail_audit.py --live`. The n8n OAuth session is still missing.
+
 ## Microsoft 365 administrator — Outlook delegated OAuth2
 
 1. **Owner confirmed** that `contacto@lch-technologies.com` has its **own Microsoft 365 license and mailbox**. Authenticate OAuth as **that mailbox itself**, rather than using Eduardo as a delegate. An owner mailbox that sends as itself does not need Exchange Send As or the `Mail.Send.Shared` permission.
