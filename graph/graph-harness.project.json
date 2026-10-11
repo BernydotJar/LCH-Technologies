@@ -154,6 +154,23 @@
         "independent_verification"
       ],
       "blocking": true
+    },
+    {
+      "id": "gh29_firestore_iam_quality",
+      "required_evidence_kinds": [
+        "critic_review",
+        "verification",
+        "independent_verification"
+      ],
+      "blocking": true
+    },
+    {
+      "id": "gh29_m365_four_mailbox_delivery",
+      "required_evidence_kinds": [
+        "external_validation",
+        "independent_verification"
+      ],
+      "blocking": true
     }
   ],
   "nodes": [
@@ -751,6 +768,43 @@
         "to_count": 4,
         "requires_external_oauth": true,
         "production_receipts_received": false
+      }
+    },
+    {
+      "id": "GH-29",
+      "kind": "feature",
+      "title": "Firebase Spark least-privileged IAM principal for LCH n8n mail",
+      "status": "pending",
+      "depends_on": [
+        "GH-23"
+      ],
+      "capability": "backend",
+      "gates": {
+        "done": [
+          "gh29_firestore_iam_quality",
+          "gh29_m365_four_mailbox_delivery"
+        ]
+      },
+      "allowed_paths": [
+        "scripts/lchGoogleIamAudit.cjs",
+        "tests/lchGoogleIamAudit.test.cjs",
+        ".github/workflows/lch-n8n-contact-mail.yml",
+        "docs/lch-google-iam-lead-mail.md",
+        "docs/lch-n8n-contact-mail.md",
+        "docs/lch-n8n-activation-runbook.md",
+        "specs/GH-29/**",
+        "progress/GH-29/**",
+        "progress/current.md",
+        "graph/**"
+      ],
+      "metadata": {
+        "google_identity_created": true,
+        "iam_conditional_project_binding_verified": true,
+        "credential_keys_created": 0,
+        "firebase_tier": "Spark",
+        "n8n_credentials_configured": 0,
+        "mail_workflow_active": false,
+        "four_inbox_receipts_verified": false
       }
     }
   ]
