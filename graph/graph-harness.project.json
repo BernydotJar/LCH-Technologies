@@ -171,6 +171,23 @@
         "independent_verification"
       ],
       "blocking": true
+    },
+    {
+      "id": "gh30_mac_n8n_source_quality",
+      "required_evidence_kinds": [
+        "critic_review",
+        "verification",
+        "independent_verification"
+      ],
+      "blocking": true
+    },
+    {
+      "id": "gh30_mac_n8n_live_delivery",
+      "required_evidence_kinds": [
+        "external_validation",
+        "independent_verification"
+      ],
+      "blocking": true
     }
   ],
   "nodes": [
@@ -805,6 +822,48 @@
         "n8n_credentials_configured": 0,
         "mail_workflow_active": false,
         "four_inbox_receipts_verified": false
+      }
+    },
+    {
+      "id": "GH-30",
+      "kind": "feature",
+      "title": "Mac n8n inactive bootstrap and contacto-only Entra delegated Mail.Send cutover",
+      "status": "pending",
+      "depends_on": [
+        "GH-23"
+      ],
+      "capability": "backend",
+      "gates": {
+        "done": [
+          "gh30_mac_n8n_source_quality",
+          "gh30_mac_n8n_live_delivery"
+        ]
+      },
+      "allowed_paths": [
+        ".gitignore",
+        ".github/workflows/lch-n8n-mac-cutover.yml",
+        "docs/lch-entra-m365-lead-mail.md",
+        "docs/lch-n8n-mac-cutover.md",
+        "docs/lch-n8n-activation-runbook.md",
+        "scripts/lch-n8n-mac-bootstrap.sh",
+        "scripts/lch_entra_mail_audit.py",
+        "scripts/lch_n8n_workflow_guard.py",
+        "tests/test_lch_entra_mail_audit.py",
+        "tests/test_lch_n8n_workflow_guard.py",
+        "specs/GH-30/**",
+        "progress/GH-30/**",
+        "progress/current.md",
+        "graph/**"
+      ],
+      "metadata": {
+        "azure_cli_version": "2.91.0",
+        "principal": "contacto@lch-technologies.com",
+        "delegated_mail_send": true,
+        "app_secrets": 0,
+        "firebase_plan": "Spark",
+        "n8n_mac_import_confirmed": false,
+        "four_mailboxes_received": false,
+        "no_mail_sent": true
       }
     }
   ]

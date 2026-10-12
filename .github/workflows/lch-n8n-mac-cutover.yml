@@ -1,0 +1,30 @@
+name: LCH Mac n8n and Entra cutover guard
+on:
+  pull_request:
+    paths:
+      - 'scripts/lch-n8n-mac-bootstrap.sh'
+      - 'scripts/lch_entra_mail_audit.py'
+      - 'scripts/lch_n8n_workflow_guard.py'
+      - 'tests/test_lch_entra_mail_audit.py'
+      - 'tests/test_lch_n8n_workflow_guard.py'
+      - '.github/workflows/lch-n8n-mac-cutover.yml'
+      - 'docs/lch-n8n-mac-cutover.md'
+      - 'docs/lch-entra-m365-lead-mail.md'
+  workflow_dispatch:
+jobs:
+  static-release-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Bash syntax
+        run: bash -n scripts/lch-n8n-mac-bootstrap.sh
+      - name: Guard pinned inactive workflow source
+        run: |
+          python3 scripts/lch_n8n_workflow_guard.py source workflows/n8n/lch-contact-mail-spark.workflow.json
+          echo 'c419f62402ad6758d9cbef605b3c981f404a66e110d23d488bcca080bf7da1f0  workflows/n8n/lch-contact-mail-spark.workflow.json' | sha256sum --check --status
+      - name: Verify negative Entra permission and workflow import fixtures
+        run: python3 -m unittest tests.test_lch_entra_mail_audit tests.test_lch_n8n_workflow_guard -v
