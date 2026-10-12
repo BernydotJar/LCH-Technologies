@@ -86,6 +86,23 @@
         "independent_verification"
       ],
       "blocking": true
+    },
+    {
+      "id": "gh24_form_completion_quality",
+      "required_evidence_kinds": [
+        "critic_review",
+        "verification",
+        "independent_verification"
+      ],
+      "blocking": true
+    },
+    {
+      "id": "gh24_live_release",
+      "required_evidence_kinds": [
+        "external_validation",
+        "independent_verification"
+      ],
+      "blocking": true
     }
   ],
   "nodes": [
@@ -543,6 +560,41 @@
         "product_only": true,
         "privacy": "do not replay personal details to API",
         "baseline": "ed39e349a"
+      }
+    },
+    {
+      "id": "GH-24",
+      "kind": "feature",
+      "title": "Donna reliable natural-language form completion and live Contact sync",
+      "status": "pending",
+      "depends_on": [
+        "GH-23"
+      ],
+      "capability": "frontend",
+      "gates": {
+        "done": [
+          "gh24_form_completion_quality",
+          "gh24_live_release"
+        ]
+      },
+      "allowed_paths": [
+        "src/App.tsx",
+        "src/components/Contact.tsx",
+        "src/components/DonnaChat.tsx",
+        "src/contact/semanticDraft.ts",
+        "src/contact/semanticContract.ts",
+        "src/contact/liveDraft.ts",
+        "tests/**",
+        "scripts/donna-live-form-smoke.cjs",
+        "specs/GH-24/**",
+        "progress/GH-24/**",
+        "docs/donna-live-form.md",
+        "graph/**"
+      ],
+      "metadata": {
+        "execution_mode": "graph",
+        "privacy": "human-consent-only; no automatic leads",
+        "baseline": "8810ed5"
       }
     }
   ]
