@@ -75,7 +75,7 @@ export const Hero = () => {
                 href="#contacto"
                 className="group inline-flex items-center justify-center gap-3 bg-accent text-white px-7 py-3.5 font-bold text-sm tracking-wide rounded-sm hover:bg-white hover:text-primary transition-all duration-300 shadow-[0_4px_20px_rgba(21,94,117,0.4)]"
               >
-                Agenda una demostración
+                Hablemos de tu proyecto
                 <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
               </a>
 

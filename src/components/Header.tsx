@@ -44,7 +44,7 @@ export const Header = () => {
             href="#contacto"
             className="bg-accent text-white px-6 py-2.5 rounded hover:bg-opacity-90 transition-opacity font-semibold text-sm"
           >
-            Agenda una demostración
+            Conversemos
           </a>
         </nav>
 
@@ -76,7 +76,7 @@ export const Header = () => {
             className="block w-full text-center bg-accent text-white px-6 py-3 rounded font-semibold mt-4"
             onClick={() => setIsOpen(false)}
           >
-            Agenda una demostración
+            Conversemos
           </a>
         </div>
       )}
