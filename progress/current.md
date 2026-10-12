@@ -56,3 +56,11 @@ Housekeeping note: automatic deletion of the synthetic GH-20 Firestore verificat
 - Independent read-only Google IAM API audit: 1 conditional project binding, 0 broad grants, 0 user-managed keys. Effective Firestore read/write from the service principal NOT yet verified.
 - Automatic private key creation/import blocked by platform safety control; no credential created or mail sent. n8n LCH workflow remains INACTIVE with 0 credentials, Firebase remains Spark.
 - Runbook `docs/lch-google-iam-lead-mail.md`; Microsoft delegated custom scopes/Send As requirements clarified. External credential and four-inbox delivery gate PENDING.
+
+## GH-30 — Secure Mac n8n and contacto-only Entra handoff (2026-10-12)
+
+- GitHub GH-29 IAM/code already merged in `main` PR #30; the remaining Mac n8n cutover work has been re-based by copying only new source paths into a clean branch from current `origin/main`.
+- Azure CLI 2.91.0 authenticated tenant review: app single-tenant, only delegated `Mail.Send`, only contacto assigned/consented, correct Mac callback, zero active client secrets. Live read-only audit PASS.
+- Mac n8n bootstrap is an inactive-import plan guarded by workflow source SHA-256, duplicate prevention, SQLite backup and Lina invariance. It is **not** evidence of a completed Mac import.
+- 21/21 GH30 adversarial Python fixtures, 91/91 LCH tests, TypeScript, guarded production build PASS. Firebase still Spark and existing Lina workflow unchanged.
+- Google Firestore and Microsoft Outlook credentials **not configured** in n8n and four actual mailbox receipts **not received**. GH30 code quality gate can pass; production delivery gate must remain pending.
