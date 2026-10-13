@@ -22,7 +22,7 @@ async function main() {
   });
   try {
     for (const width of [390, 1365]) {
-      const page = await browser.newPage({ viewport: { width, height: 850 }, reducedMotion: 'reduce' });
+      const page = await browser.newPage({ viewport: { width, height: 850 }, reducedMotion: 'reduce', locale: 'es-ES' });
       page.setDefaultTimeout(9000);
       const errors = [];
       const forbidden = [];
@@ -63,7 +63,7 @@ async function main() {
       console.log(JSON.stringify({ width, entryFromForm: 'PASS', immediateFill: 'PASS', assistantCorrection: 'PASS', manualWins: 'PASS', consentUnchecked: 'PASS', reset: 'PASS' }));
       await page.close();
     }
-    const page = await browser.newPage({ viewport: { width: 390, height: 850 }, reducedMotion: 'reduce' });
+    const page = await browser.newPage({ viewport: { width: 390, height: 850 }, reducedMotion: 'reduce', locale: 'es-ES' });
     const requests = [];
     page.on('request', req => {
       if (req.method() === 'POST' && (req.url().endsWith('/api/chat') || req.url().includes('firestore.googleapis.com'))) requests.push(req.url());
