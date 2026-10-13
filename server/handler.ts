@@ -7,7 +7,9 @@ import type { IncomingMessage, ServerResponse } from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
 import { extname, resolve, sep } from 'node:path';
 import { isIP } from 'node:net';
-import { DONNA_LIMITS, parseDonnaRequest, respondToDonna } from '../src/donna/engine.ts';
+import { DONNA_LIMITS, parseDonnaRequest } from '../src/donna/engine.ts';
+import { respondToDonnaLocalized } from '../src/donna/localized.ts';
+import { renderLocalizedHead } from './localizedHead.ts';
 
 const CONTENT_TYPES: Readonly<Record<string, string>> = {
   '.html': 'text/html; charset=utf-8',
@@ -162,7 +164,7 @@ export function createSiteHandler(options: SiteHandlerOptions) {
           sendJson(res, 400, { reply: parsed.reason, kind: 'error' });
           return;
         }
-        sendJson(res, 200, respondToDonna(parsed.messages));
+        sendJson(res, 200, respondToDonnaLocalized(parsed.messages, parsed.locale ?? 'es'));
         return;
       }
 
@@ -199,7 +201,8 @@ export function createSiteHandler(options: SiteHandlerOptions) {
         sendJson(res, 404, { error: 'not_found' });
         return;
       }
-      const body = await readFile(finalFile);
+      const rawBody = await readFile(finalFile);
+      const body = ext === '.html' ? Buffer.from(renderLocalizedHead(rawBody.toString('utf8'), url.searchParams.get('lang'))) : rawBody;
       res.writeHead(200, {
         'content-type': type,
         'x-content-type-options': 'nosniff',

@@ -1,16 +1,18 @@
 import React from 'react';
 import { motion } from 'motion/react';
+import { useLocale } from '../i18n/LocaleProvider';
 import { Shield, Database, Lock, GitMerge } from 'lucide-react';
 
 export const Governance = () => {
+  const { t } = useLocale();
   return (
-    <section className="bg-neutral-100 py-32 overflow-hidden">
+    <section className="bg-neutral-100 theme-light-surface py-32 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         <div className="text-center max-w-3xl mx-auto mb-24">
-          <h2 className="text-3xl md:text-4xl font-bold text-primary mb-6 tracking-tight">Arquitectura de Confianza</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-primary mb-6 tracking-tight">{t('Arquitectura de Confianza')}</h2>
           <p className="text-lg text-secondary leading-relaxed">
-            La transformación digital no consiste únicamente en implementar IA. Consiste en construir sistemas donde la información, los procesos y la automatización operen bajo control estricto y trazabilidad absoluta.
+            {t('La transformación digital no consiste únicamente en implementar IA. Consiste en construir sistemas donde la información, los procesos y la automatización operen bajo control estricto y trazabilidad absoluta.')}
           </p>
         </div>
 
@@ -38,8 +40,8 @@ export const Governance = () => {
               <div className="w-16 h-16 bg-white border border-neutral-200 rounded-sm shadow-sm flex items-center justify-center mb-4 transform rotate-45">
                 <Database size={24} className="text-primary transform -rotate-45" strokeWidth={1.5} />
               </div>
-              <h3 className="font-bold text-primary mb-2">Datos Gobernados</h3>
-              <p className="text-sm text-secondary px-4">Orígenes verificables y permisos estructurados.</p>
+              <h3 className="font-bold text-primary mb-2">{t('Datos Gobernados')}</h3>
+              <p className="text-sm text-secondary px-4">{t('Orígenes verificables y permisos estructurados.')}</p>
             </motion.div>
 
             {/* Top Node */}
@@ -53,8 +55,8 @@ export const Governance = () => {
               <div className="w-20 h-20 bg-primary rounded-sm shadow-lg flex items-center justify-center mb-4 transform rotate-45">
                 <Shield size={32} className="text-white transform -rotate-45" strokeWidth={1.5} />
               </div>
-              <h3 className="font-bold text-primary mb-2">Núcleo de Control</h3>
-              <p className="text-sm text-secondary px-4">Supervisión humana, auditoría y políticas de acceso corporativas.</p>
+              <h3 className="font-bold text-primary mb-2">{t('Núcleo de Control')}</h3>
+              <p className="text-sm text-secondary px-4">{t('Supervisión humana, auditoría y políticas de acceso corporativas.')}</p>
             </motion.div>
 
             {/* Right Node */}
@@ -68,8 +70,8 @@ export const Governance = () => {
               <div className="w-16 h-16 bg-white border border-neutral-200 rounded-sm shadow-sm flex items-center justify-center mb-4 transform rotate-45">
                 <GitMerge size={24} className="text-primary transform -rotate-45" strokeWidth={1.5} />
               </div>
-              <h3 className="font-bold text-primary mb-2">Automatización Segura</h3>
-              <p className="text-sm text-secondary px-4">Agentes con alcance limitado y trazabilidad operativa.</p>
+              <h3 className="font-bold text-primary mb-2">{t('Automatización Segura')}</h3>
+              <p className="text-sm text-secondary px-4">{t('Agentes con alcance limitado y trazabilidad operativa.')}</p>
             </motion.div>
 
             {/* Bottom Node */}
@@ -83,8 +85,8 @@ export const Governance = () => {
               <div className="w-16 h-16 bg-accent rounded-sm shadow-md flex items-center justify-center mb-4 transform rotate-45">
                 <Lock size={24} className="text-white transform -rotate-45" strokeWidth={1.5} />
               </div>
-              <h3 className="font-bold text-primary mb-2">Evidencia</h3>
-              <p className="text-sm text-secondary px-4">Cada resultado respaldado por fuentes exactas.</p>
+              <h3 className="font-bold text-primary mb-2">{t('Evidencia')}</h3>
+              <p className="text-sm text-secondary px-4">{t('Cada resultado respaldado por fuentes exactas.')}</p>
             </motion.div>
 
           </div>

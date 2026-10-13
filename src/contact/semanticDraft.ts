@@ -177,7 +177,7 @@ export function readGuidedContactAnswer(expected: ContactField, raw: string): Co
 }
 
 export function containsPersonalContactData(text: string): boolean {
-  return EMAIL.test(text) || /(?:me llamo|mi nombre es|mi apellido|mi correo|mi email|mi tel[eé]fono|mi cargo es|trabajo en|mi empresa es)\b/iu.test(text);
+  return EMAIL.test(text) || /(?:me llamo|mi nombre es|mi apellido|mi correo|mi email|mi tel[eé]fono|mi cargo es|trabajo en|mi empresa es|my name is|my last name is|my email is|my phone|my password|i work at|i work for|my company is|meu nome e|me chamo|meu sobrenome|meu e.mail|meu telefone|minha senha|trabalho na|trabalho em|minha empresa e)\b/iu.test(text.normalize('NFKD').replace(/[\u0300-\u036f]/g, ''));
 }
 
 /** Values that are not part of the lead schema must remain in the browser.
@@ -185,7 +185,7 @@ export function containsPersonalContactData(text: string): boolean {
  */
 export function containsOutOfSchemaPrivateData(raw: string): boolean {
   const value = raw.normalize('NFKC');
-  return /\b(?:mi|mis|el|la)\s+(?:tel[eé]fono|n[uú]mero de tel[eé]fono|whatsapp|dpi|documento de identidad|pasaporte|contrase(?:n|ñ)a|password|clave de acceso|api[ _-]?key|token de acceso|tarjeta de cr[eé]dito)\b/iu.test(value)
+  return /\b(?:mi|mis|el|la|my|meu|minha|meus|minhas)\s+(?:tel[eé]fono|telefone|phone(?: number)?|n[uú]mero de tel[eé]fono|whatsapp|dpi|documento de identidad|identity (?:document|number)|pasaporte|passport|contrase(?:n|ñ)a|senha|password|clave de acceso|api[ _-]?key|token de acceso|access token|tarjeta de cr[eé]dito|credit card)\b/iu.test(value)
     || /\b(?:password|contrase(?:n|ñ)a|api[ _-]?key|secret(?:o|a)?|access[ _-]?token)\s*[:=]\s*\S+/iu.test(value);
 }
 

@@ -7,8 +7,11 @@ import {
 import { DONNA_QUICK_PROMPTS } from '../donna/knowledge';
 import { DONNA_IDEA_ROTATION_MS, DONNA_IDEAS, contextualPrompts } from '../donna/experience';
 import './donna-experience.css';
+import { useLocale } from '../i18n/LocaleProvider';
+import { track } from '../analytics/client';
 import { DONNA_LIMITS, isDonnaReply, type DonnaReply } from '../donna/engine';
-import { contactAnswerFeedback, contactIntro, contactProgressLabel, isDirectContactIntent, safeKnowledgeHistory, type HistoryTurn } from '../donna/conversationPolicy';
+import { isDirectContactIntent, safeKnowledgeHistory, type HistoryTurn } from '../donna/conversationPolicy';
+import { localContactCancel, localContactFeedback, localContactIntro, localContactProgress, localContactQuestion, localContactUnsupported, localizedInterestAnswer } from '../donna/localContact';
 import type { InterestArea } from '../integrations/leadContract';
 import type { DonnaPreparedDraft } from '../App';
 import { mergeContactDraft, missingContactFields, type ContactDraft } from '../contact/semanticContract';
@@ -49,6 +52,7 @@ function PersonaOrb({ size = 'launcher', state = 'idle' }: { size?: 'compact' | 
 }
 
 export function DonnaChat({ onHandoff, onDraft, startContactRequest }: Props) {
+  const { t, locale } = useLocale();
   const [open, setOpen] = useState(false);
   const [nudgeDismissed, setNudgeDismissed] = useState(false);
   const [messages, setMessages] = useState<DonnaUiMessage[]>([]);
@@ -165,6 +169,7 @@ export function DonnaChat({ onHandoff, onDraft, startContactRequest }: Props) {
         credentials: 'omit',
         body: JSON.stringify({
           messages: safeKnowledgeHistory(outbound, DONNA_LIMITS.maxMessages),
+          locale,
         }),
         signal: operation.signal,
       });
@@ -239,7 +244,7 @@ export function DonnaChat({ onHandoff, onDraft, startContactRequest }: Props) {
       : null;
     const source: DonnaUiMessage[] = directTurn ? [...messages, directTurn] : messages;
     const prepared = mergeContactDraft(mergeContactDraft(extractFromDonnaMessages(source, lastInterest), contactDraft), seedDraft);
-    const answer = contactIntro(prepared);
+    const answer = localContactIntro(locale, prepared);
     setContactDraft(prepared);
     onDraft(prepared);
     setContactMode(true);
@@ -263,16 +268,16 @@ export function DonnaChat({ onHandoff, onDraft, startContactRequest }: Props) {
   function guideContactAnswer(text: string) {
     if (/^(?:cancelar|volver al chat|salir del formulario|salir)$/iu.test(text.trim())) {
       setContactMode(false);
-      appendLocalContactExchange(text, 'De acuerdo. Volvemos a explorar las soluciones de LCH. Conservé el borrador en esta sesión, sin enviar ningún dato.');
+      appendLocalContactExchange(text, localContactCancel(locale));
       return;
     }
     const expected = missingContactFields(contactDraft)[0];
     const proposal = expected ? readGuidedContactAnswer(expected.name, text) : extractSemanticContact(text);
-    const next = mergeContactDraft(contactDraft, proposal);
+    const next = mergeContactDraft(contactDraft, mergeContactDraft(proposal, localizedInterestAnswer(locale, expected?.name, text)));
     setContactDraft(next);
     onDraft(next);
-    const recognized = Object.keys(proposal).length > 0;
-    const answer = contactAnswerFeedback(next, recognized, containsOutOfSchemaPrivateData(text));
+    const recognized = Object.keys(proposal).length > 0 || Object.keys(localizedInterestAnswer(locale, expected?.name, text)).length > 0;
+    const answer = localContactFeedback(locale, next, recognized, containsOutOfSchemaPrivateData(text));
     appendLocalContactExchange(text, answer);
   }
 
@@ -298,10 +303,9 @@ export function DonnaChat({ onHandoff, onDraft, startContactRequest }: Props) {
       setContactDraft(prepared);
       onDraft(prepared);
       setContactMode(true);
-      const missing = missingContactFields(prepared);
       const answer = Object.keys(inferred).length === 0
-        ? `Ese dato no forma parte del formulario. No lo enviaré ni lo incorporaré a tu solicitud. ${missing[0]?.question ?? 'Puedes revisar los campos permitidos.'}`
-        : contactIntro(prepared);
+        ? localContactUnsupported(locale, prepared)
+        : localContactIntro(locale, prepared);
       appendLocalContactExchange(content, answer);
       return;
     }
@@ -363,51 +367,51 @@ export function DonnaChat({ onHandoff, onDraft, startContactRequest }: Props) {
             id="donna-chat-panel"
             role="dialog"
             aria-modal="false"
-            aria-label="Conversación con Donna, asistente de LCH"
+            aria-label={t('Conversación con Donna, asistente de LCH')}
             initial={reducedMotion ? false : { opacity: 0, y: 12, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={reducedMotion ? undefined : { opacity: 0, y: 8 }}
             transition={{ duration: 0.2 }}
-            className="mb-3 flex h-[min(76dvh,610px)] w-[min(420px,calc(100vw-1.5rem))] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_22px_80px_rgba(10,15,55,0.28)]"
+            className="theme-donna-surface mb-3 flex h-[min(76dvh,610px)] w-[min(420px,calc(100vw-1.5rem))] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_22px_80px_rgba(10,15,55,0.28)]"
           >
             <header className="flex shrink-0 items-center justify-between gap-3 border-b border-white/10 bg-[#0C0A50] px-4 py-3.5 text-white">
               <div className="flex min-w-0 items-center gap-3">
                 <PersonaOrb size="compact" state={pending ? 'shaping' : replyGlow ? 'responding' : 'idle'} />
                 <div className="min-w-0">
                   <h2 className="text-base font-bold tracking-tight">Donna <span className="ml-1 font-normal text-teal-200">/ LCH</span></h2>
-                  <p className="text-[11px] text-slate-300">{pending ? 'Preparando una respuesta…' : contactMode ? 'Preparando tu solicitud · solo borrador' : 'Asistente guiado · información de LCH'}</p>
+                  <p className="text-[11px] text-slate-300">{t(pending ? 'Preparando una respuesta…' : contactMode ? 'Preparando tu solicitud · solo borrador' : 'Asistente guiado · información de LCH')}</p>
                 </div>
               </div>
               <div className="flex items-center gap-1">
                 {hasChat && (
-                  <button type="button" aria-label="Nueva conversación" title="Nueva conversación" onClick={newConversation}
+                  <button type="button" aria-label={t('Nueva conversación')} title={t('Nueva conversación')} onClick={newConversation}
                     className="rounded-lg p-2 text-slate-200 transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-300">
                     <RotateCcw size={16} aria-hidden="true" />
                   </button>
                 )}
-                <button type="button" aria-label="Cerrar Donna" onClick={close}
+                <button type="button" aria-label={t('Cerrar Donna')} onClick={close}
                   className="rounded-lg p-2 text-slate-200 transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-300">
                   <X size={18} aria-hidden="true" />
                 </button>
               </div>
             </header>
 
-            <div ref={transcript} role="region" aria-label="Historial de la conversación" tabIndex={0}
+            <div ref={transcript} role="region" aria-label={t('Historial de la conversación')} tabIndex={0}
               className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain bg-gradient-to-b from-[#F7FAFD] to-white px-4 py-5">
               {!hasChat && (
                 <div className="space-y-5">
                   <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.14em] text-teal-800">
-                    <Sparkles size={14} aria-hidden="true" /> Un siguiente paso más claro
+                    <Sparkles size={14} aria-hidden="true" /> {t('Un siguiente paso más claro')}
                   </div>
                   <div>
-                    <h3 className="mb-2 text-xl font-bold leading-tight text-primary">Hola, soy Donna.</h3>
+                    <h3 className="mb-2 text-xl font-bold leading-tight text-primary">{t('Hola, soy Donna.')}</h3>
                     <p className="text-sm leading-relaxed text-secondary">
-                      Cuéntame qué quieres mejorar en tu negocio. Te ayudo a explorar opciones reales y, cuando haga falta, te conecto con el equipo.
+                      {t('Cuéntame qué quieres mejorar en tu negocio. Te ayudo a explorar opciones reales y, cuando haga falta, te conecto con el equipo.')}
                     </p>
                   </div>
                   <div
                     className="donna-idea rounded-2xl border border-teal-100 bg-gradient-to-br from-[#eefbfa] via-white to-[#edf4ff] p-4 shadow-[0_12px_30px_rgba(21,94,117,0.07)]"
-                    role="group" aria-label="Idea para comenzar"
+                    role="group" aria-label={t('Idea para comenzar')}
                     data-testid="donna-idea-card"
                     onPointerEnter={() => setIdeaHovered(true)}
                     onPointerLeave={() => setIdeaHovered(false)}
@@ -419,7 +423,7 @@ export function DonnaChat({ onHandoff, onDraft, startContactRequest }: Props) {
                   >
                     <div className="mb-2 flex items-center justify-between gap-2">
                       <span className="donna-idea__eyebrow text-[10px] font-bold uppercase text-teal-800">
-                        Una idea para empezar
+                        {t('Una idea para empezar')}
                       </span>
                       <span className="text-[11px] font-semibold tabular-nums text-slate-500">
                         {ideaIndex + 1} / {DONNA_IDEAS.length}
@@ -434,43 +438,43 @@ export function DonnaChat({ onHandoff, onDraft, startContactRequest }: Props) {
                           exit={reducedMotion ? undefined : { opacity: 0, y: -4 }}
                           transition={{ duration: 0.18 }}
                         >
-                          <p className="mb-1 text-[11px] font-semibold text-teal-700">{currentIdea.eyebrow}</p>
-                          <p data-testid="donna-idea-question" className="text-sm font-bold leading-snug text-primary">{currentIdea.question}</p>
-                          <p className="mt-1 text-xs leading-relaxed text-secondary">{currentIdea.context}</p>
+                          <p className="mb-1 text-[11px] font-semibold text-teal-700">{t(currentIdea.eyebrow)}</p>
+                          <p data-testid="donna-idea-question" className="text-sm font-bold leading-snug text-primary">{t(currentIdea.question)}</p>
+                          <p className="mt-1 text-xs leading-relaxed text-secondary">{t(currentIdea.context)}</p>
                         </motion.div>
                       </AnimatePresence>
                     </div>
                     <div className="mt-2 flex items-center justify-between gap-2">
                       <button type="button" onClick={() => send(currentIdea.prompt)}
                         className="flex min-h-9 items-center gap-1.5 text-xs font-bold text-teal-900 underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700">
-                        {currentIdea.action}<ArrowRight size={14} aria-hidden="true" />
+                        {t(currentIdea.action)}<ArrowRight size={14} aria-hidden="true" />
                       </button>
-                      <button type="button" onClick={nextIdea} aria-label="Siguiente idea"
+                      <button type="button" onClick={nextIdea} aria-label={t('Siguiente idea')}
                         className="min-h-9 rounded-lg border border-teal-100 bg-white px-3 text-xs font-semibold text-teal-800 transition-colors hover:bg-teal-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700">
-                        Siguiente
+                        {t('Siguiente')}
                       </button>
                     </div>
                   </div>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-500">O elige un tema</p>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-500">{t('O elige un tema')}</p>
                   <div className="grid gap-2">
                     {DONNA_QUICK_PROMPTS.slice(0, 2).map((prompt) => (
-                      <button key={prompt.label} type="button" onClick={() => send(prompt.message)}
+                      <button key={prompt.message} type="button" onClick={() => send(prompt.message)}
                         className="group flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 text-left text-sm font-semibold text-primary shadow-sm transition-colors hover:border-teal-400 hover:bg-teal-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600">
-                        {prompt.label}<ArrowRight size={16} className="shrink-0 text-teal-700 transition-transform group-hover:translate-x-1" aria-hidden="true" />
+                        {t(prompt.label)}<ArrowRight size={16} className="shrink-0 text-teal-700 transition-transform group-hover:translate-x-1" aria-hidden="true" />
                       </button>
                     ))}
                   </div>
                   <button type="button" data-testid="donna-start-contact" onClick={() => startContactAssistant()}
                     className="flex w-full min-h-10 items-center justify-center gap-2 rounded-xl border border-teal-200 bg-teal-50 px-4 py-3 text-xs font-bold text-teal-900 transition-colors hover:bg-teal-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700">
-                    <Check size={15} aria-hidden="true" /> Preparar una solicitud <ArrowRight size={14} aria-hidden="true" />
+                    <Check size={15} aria-hidden="true" /> {t('Preparar una solicitud')} <ArrowRight size={14} aria-hidden="true" />
                   </button>
                 </div>
               )}
               {hasChat && (
-                <ol className="space-y-4" aria-label="Mensajes">
+                <ol className="space-y-4" aria-label={t('Mensajes')}>
                   {messages.map((message) => (
                     <li key={message.id} data-role={message.role} className={`flex flex-col ${message.role === 'user' ? 'items-end' : 'items-start'}`}>
-                      <span className="mb-1 text-[11px] font-semibold text-slate-500">{message.role === 'user' ? 'Tú' : 'Donna'}</span>
+                      <span className="mb-1 text-[11px] font-semibold text-slate-500">{message.role === 'user' ? t('Tú') : 'Donna'}</span>
                       <div className={`max-w-[92%] whitespace-pre-line rounded-2xl px-4 py-3 text-sm leading-relaxed ${message.role === 'user' ? 'rounded-br-sm bg-[#0C0A50] text-white' : 'rounded-bl-sm border border-slate-200 bg-white text-slate-700 shadow-sm'}`}>
                         {message.content}
                         {message.role === 'assistant' && Boolean(message.links?.some((link) => link.url !== '#contacto')) && (
@@ -486,8 +490,8 @@ export function DonnaChat({ onHandoff, onDraft, startContactRequest }: Props) {
                         )}
                       </div>
                       {message.role === 'assistant' && message.id === latest?.id && nextPrompts.length > 0 && (
-                        <div className="mt-2 w-full max-w-[96%]" data-testid="donna-contextual-prompts" aria-label="Sugerencias relacionadas">
-                          <p className="mb-2 pl-1 text-[11px] font-semibold text-slate-500">{latest?.kind === 'clarify' ? 'Puedes preguntar sobre' : 'También puedes explorar'}</p>
+                        <div className="mt-2 w-full max-w-[96%]" data-testid="donna-contextual-prompts" aria-label={t('Sugerencias relacionadas')}>
+                          <p className="mb-2 pl-1 text-[11px] font-semibold text-slate-500">{t(latest?.kind === 'clarify' ? 'Puedes preguntar sobre' : 'También puedes explorar')}</p>
                           <div className="flex flex-wrap gap-2">
                             {nextPrompts.map((prompt) => (
                               <button
@@ -496,7 +500,7 @@ export function DonnaChat({ onHandoff, onDraft, startContactRequest }: Props) {
                                 onClick={() => send(prompt.message)}
                                 disabled={pending}
                                 className="rounded-full border border-teal-200 bg-white px-3 py-2 text-left text-[11px] font-semibold text-teal-900 transition-colors hover:border-teal-400 hover:bg-teal-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600 disabled:opacity-50"
-                              >{prompt.label} <ArrowRight size={12} className="ml-1 inline" aria-hidden="true" /></button>
+                              >{t(prompt.label)} <ArrowRight size={12} className="ml-1 inline" aria-hidden="true" /></button>
                             ))}
                           </div>
                         </div>
@@ -505,34 +509,34 @@ export function DonnaChat({ onHandoff, onDraft, startContactRequest }: Props) {
                   ))}
                 </ol>
               )}
-              {pending && <p className="flex items-center gap-2 text-xs text-secondary" role="status"><span className="h-2 w-2 animate-pulse rounded-full bg-teal-500" /> Donna está respondiendo…</p>}
+              {pending && <p className="flex items-center gap-2 text-xs text-secondary" role="status"><span className="h-2 w-2 animate-pulse rounded-full bg-teal-500" /> {t('Donna está respondiendo…')}</p>}
               {failure && (
                 <div role="alert" className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs leading-relaxed text-amber-900">
                   <p>{failure}</p>
-                  {lastFailed.current && <button type="button" onClick={() => { if (lastFailed.current) void runRequest(lastFailed.current); }} className="mt-2 font-bold underline underline-offset-2">Reintentar respuesta</button>}
+                  {lastFailed.current && <button type="button" onClick={() => { if (lastFailed.current) void runRequest(lastFailed.current); }} className="mt-2 font-bold underline underline-offset-2">{t('Reintentar respuesta')}</button>}
                 </div>
               )}
             </div>
 
             <div className="shrink-0 border-t border-slate-200 bg-white p-3.5">
               {contactMode && (
-                <div data-testid="donna-contact-guide" role="group" aria-label="Preparar solicitud con Donna"
+                <div data-testid="donna-contact-guide" role="group" aria-label={t('Preparar solicitud con Donna')}
                   className="mb-3 rounded-xl border border-teal-200 bg-teal-50 p-3 text-xs leading-relaxed text-teal-950">
                   <div className="flex items-center justify-between gap-2 font-semibold">
-                    <span>Tu solicitud · borrador privado</span>
-                    <span data-testid="donna-contact-progress" className="tabular-nums">{contactProgressLabel(contactDraft)}</span>
+                    <span>{t('Tu solicitud · borrador privado')}</span>
+                    <span data-testid="donna-contact-progress" className="tabular-nums">{localContactProgress(locale, contactDraft)}</span>
                   </div>
                   <p className="mt-1 text-teal-900">
-                    {contactMissing.length ? 'Responde en el chat o revisa los campos. Nada se enviará sin tu autorización.' : 'Revisa los datos antes de autorizar el envío.'}
+                    {t(contactMissing.length ? 'Responde en el chat o revisa los campos. Nada se enviará sin tu autorización.' : 'Revisa los datos antes de autorizar el envío.')}
                   </p>
                   <div className="mt-3 flex flex-wrap items-center gap-2">
                     <button type="button" onClick={handoff} data-testid="donna-review-contact"
                       className="rounded-md bg-primary px-3 py-2 font-semibold text-white transition-colors hover:bg-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700">
-                      Revisar formulario <ArrowRight size={13} className="ml-1 inline" aria-hidden="true" />
+                      {t('Revisar formulario')} <ArrowRight size={13} className="ml-1 inline" aria-hidden="true" />
                     </button>
                     <button type="button" onClick={() => setContactMode(false)}
                       className="rounded-md px-2 py-2 font-semibold text-teal-900 underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700">
-                      Volver a explorar
+                      {t('Volver a explorar')}
                     </button>
                   </div>
                 </div>
@@ -541,34 +545,34 @@ export function DonnaChat({ onHandoff, onDraft, startContactRequest }: Props) {
                 <div className="mb-3 flex flex-col items-center gap-1.5" data-testid="donna-contact-actions">
                   <button type="button" onClick={() => startContactAssistant()} disabled={pending} data-testid="donna-start-contact"
                     className="flex w-full min-h-10 items-center justify-center gap-2 rounded-xl border border-teal-200 bg-teal-50 px-3 py-2.5 text-sm font-semibold text-teal-950 transition-colors hover:bg-teal-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700 disabled:opacity-50">
-                    Preparar una solicitud <ArrowRight size={15} aria-hidden="true" />
+                    {t('Preparar una solicitud')} <ArrowRight size={15} aria-hidden="true" />
                   </button>
                   <button type="button" onClick={handoff} data-testid="donna-contact-direct-link" disabled={pending}
                     className="min-h-7 px-2 text-xs font-medium text-slate-600 underline-offset-4 hover:text-primary hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700 disabled:opacity-50">
-                    Prefiero completar el formulario directamente
+                    {t('Prefiero completar el formulario directamente')}
                   </button>
                 </div>
               )}
               <form onSubmit={submit} className="flex gap-2">
-                <label className="sr-only" htmlFor="donna-message">Escribe a Donna</label>
+                <label className="sr-only" htmlFor="donna-message">{t('Escribe a Donna')}</label>
                 <textarea
                   ref={composer} id="donna-message" rows={2} maxLength={DONNA_LIMITS.maxMessageChars}
                   value={draft} onChange={(event) => setDraft(event.target.value)}
                   onKeyDown={handleKeyDown}
                   onCompositionStart={() => { isComposing.current = true; }}
                   onCompositionEnd={() => { isComposing.current = false; }}
-                  placeholder={pending ? 'Esperando respuesta…' : contactMissing[0] ? contactMissing[0].question : contactMode ? 'Puedes indicar una corrección…' : 'Escribe tu pregunta…'}
+                  placeholder={t(pending ? 'Esperando respuesta…' : contactMissing[0] ? localContactQuestion(locale, contactMissing[0].name) : contactMode ? 'Puedes indicar una corrección…' : 'Escribe tu pregunta…')}
                   disabled={pending}
                   className="min-h-12 max-h-28 min-w-0 flex-1 resize-none rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm text-primary placeholder:text-slate-400 focus:border-teal-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-400/20 disabled:opacity-70"
                 />
-                <button type="submit" aria-label="Enviar mensaje" disabled={pending || !draft.trim()}
+                <button type="submit" aria-label={t('Enviar mensaje')} disabled={pending || !draft.trim()}
                   className="flex h-12 w-12 shrink-0 items-center justify-center self-end rounded-xl bg-primary text-white transition-colors hover:bg-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-40">
                   <SendHorizontal size={19} aria-hidden="true" />
                 </button>
               </form>
               <p className="mt-2 flex items-center gap-1.5 text-[10px] leading-tight text-slate-500">
                 <ShieldCheck size={12} className="shrink-0" aria-hidden="true" />
-                Donna prepara borradores. Solo tú puedes revisarlos y autorizar el envío; evita compartir datos sensibles.
+                {t('Donna prepara borradores. Solo tú puedes revisarlos y autorizar el envío; evita compartir datos sensibles.')}
               </p>
             </div>
           </motion.section>
@@ -577,7 +581,7 @@ export function DonnaChat({ onHandoff, onDraft, startContactRequest }: Props) {
 
       {!open && !nudgeDismissed && (
         <div
-          className="donna-idea mb-3 w-[min(300px,calc(100vw-1.5rem))] overflow-hidden rounded-2xl border border-slate-200/90 bg-white p-4 shadow-[0_14px_45px_rgba(10,15,55,0.16)]"
+          className="theme-donna-surface donna-idea mb-3 w-[min(300px,calc(100vw-1.5rem))] overflow-hidden rounded-2xl border border-slate-200/90 bg-white p-4 shadow-[0_14px_45px_rgba(10,15,55,0.16)]"
           data-testid="donna-invitation"
           onPointerEnter={() => setInvitationHovered(true)}
           onPointerLeave={() => setInvitationHovered(false)}
@@ -588,8 +592,8 @@ export function DonnaChat({ onHandoff, onDraft, startContactRequest }: Props) {
           }}
         >
           <div className="mb-2 flex items-center justify-between gap-2">
-            <span className="donna-idea__eyebrow text-[10px] font-bold uppercase text-teal-800">Ideas para tu negocio</span>
-            <button type="button" onClick={() => setNudgeDismissed(true)} aria-label="Descartar sugerencia de Donna"
+            <span className="donna-idea__eyebrow text-[10px] font-bold uppercase text-teal-800">{t('Ideas para tu negocio')}</span>
+            <button type="button" onClick={() => setNudgeDismissed(true)} aria-label={t('Descartar sugerencia de Donna')}
               className="rounded-md p-1 text-slate-500 hover:bg-slate-100 hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600">
               <X size={15} aria-hidden="true" />
             </button>
@@ -603,15 +607,15 @@ export function DonnaChat({ onHandoff, onDraft, startContactRequest }: Props) {
                 exit={reducedMotion ? undefined : { opacity: 0, y: -4 }}
                 transition={{ duration: 0.18 }}
               >
-                <p className="mb-1 text-[11px] font-semibold text-teal-800">{currentIdea.eyebrow}</p>
-                <p data-testid="donna-invitation-question" className="text-sm font-bold leading-snug text-primary">{currentIdea.question}</p>
-                <p className="mt-1 text-xs leading-relaxed text-secondary">{currentIdea.context}</p>
+                <p className="mb-1 text-[11px] font-semibold text-teal-800">{t(currentIdea.eyebrow)}</p>
+                <p data-testid="donna-invitation-question" className="text-sm font-bold leading-snug text-primary">{t(currentIdea.question)}</p>
+                <p className="mt-1 text-xs leading-relaxed text-secondary">{t(currentIdea.context)}</p>
               </motion.div>
             </AnimatePresence>
           </div>
           <div className="mt-2 flex items-center justify-between gap-2">
             <button type="button" onClick={() => send(currentIdea.prompt)} className="flex min-h-9 items-center gap-1.5 text-xs font-bold text-teal-900 underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600">
-              {currentIdea.action} <ArrowRight size={14} aria-hidden="true" />
+              {t(currentIdea.action)} <ArrowRight size={14} aria-hidden="true" />
             </button>
             <span aria-hidden="true" className="text-[11px] font-medium tabular-nums text-slate-500">{ideaIndex + 1} / {DONNA_IDEAS.length}</span>
           </div>
@@ -619,9 +623,9 @@ export function DonnaChat({ onHandoff, onDraft, startContactRequest }: Props) {
       )}
 
       <button
-        ref={launcher} type="button" aria-label={open ? 'Cerrar chat de Donna' : 'Hablar con Donna'}
+        ref={launcher} type="button" aria-label={t(open ? 'Cerrar chat de Donna' : 'Hablar con Donna')}
         aria-expanded={open} aria-controls="donna-chat-panel"
-        onClick={() => { if (open) close(); else { setOpen(true); setNudgeDismissed(true); } }}
+        onClick={() => { if (open) close(); else { setOpen(true); setNudgeDismissed(true); track('donna_open'); } }}
         onPointerEnter={() => setInvitationHovered(true)}
         onPointerLeave={() => setInvitationHovered(false)}
         onFocus={() => setInvitationFocused(true)}
@@ -631,7 +635,7 @@ export function DonnaChat({ onHandoff, onDraft, startContactRequest }: Props) {
         <PersonaOrb state={orbState} />
         <span className="flex min-w-0 flex-col items-start">
           <span className="flex items-center gap-1 text-sm font-bold">Donna <MessageCircle size={13} aria-hidden="true" /></span>
-          <span data-testid="donna-launcher-hint" aria-hidden="true" className="max-w-[165px] truncate text-[11px] font-medium text-teal-200">{currentIdea.action}</span>
+          <span data-testid="donna-launcher-hint" aria-hidden="true" className="max-w-[165px] truncate text-[11px] font-medium text-teal-200">{t(currentIdea.action)}</span>
         </span>
       </button>
       <span className="sr-only" role="status" aria-live="polite">{announcement}</span>

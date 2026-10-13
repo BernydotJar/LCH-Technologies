@@ -4,6 +4,8 @@
  * Server authority: only approved LCH knowledge entries; input is data.
  */
 import { CONTACT_LINK, LCH_KNOWLEDGE, type ApprovedLink, type DonnaEntry } from './knowledge.ts';
+import { LOCALIZED_TOPIC_ALIASES } from './topicAliases.ts';
+import type { Locale } from '../i18n/messages';
 import { INTEREST_AREAS, type InterestArea } from '../integrations/leadContract.ts';
 
 export const DONNA_LIMITS = {
@@ -23,7 +25,7 @@ export type DonnaReply = {
 };
 
 export type ParseResult =
-  | { ok: true; messages: DonnaMessage[] }
+  | { ok: true; messages: DonnaMessage[]; locale?: Locale }
   | { ok: false; reason: string };
 
 const CLARIFICATION_MARKER = '¿Podrías precisar qué tema te interesa más?';
@@ -43,7 +45,7 @@ export function containsPhrase(text: string, phrase: string): boolean {
 
 const GREETINGS = new Set([
   'hola', 'buenos dias', 'buenas tardes', 'buenas noches', 'hello', 'hi', 'hey',
-  'que tal', 'saludos',
+  'que tal', 'saludos', 'ola', 'oi', 'bom dia', 'boa tarde', 'boa noite',
 ]);
 
 // Request-shaped boundaries always outrank normal topic routing.
@@ -51,12 +53,14 @@ const PRICING_BOUNDARIES = [
   'cuanto cuesta', 'cuanto cobran', 'precio de', 'precios de', 'costo de',
   'tarifa de', 'tarifas de', 'cotizacion', 'cotizar', 'presupuesto de',
   'garantizas el precio', 'precio exacto', 'is it free', 'how much does it cost',
+  'how much', 'price for', 'pricing', 'quanto custa', 'qual o preco', 'preco de',
 ];
 const ACCOUNT_BOUNDARIES = [
   'mi contraseña', 'recuperar mi cuenta', 'reiniciar mi clave', 'resetear mi clave',
   'acceder a mi cuenta', 'mis facturas', 'mi expediente', 'mi informacion privada',
   'datos de otro cliente', 'acceso de administrador', 'mi token', 'mi api key',
   'mis credenciales', 'my password', 'reset my password', 'client account',
+  'minha senha', 'minha conta', 'minhas credenciais', 'dados privados',
 ];
 const UNSUPPORTED_BOUNDARIES = [
   'garantizan 100', 'garantizas 100', 'resultado garantizado', 'garantia de resultados',
@@ -71,7 +75,7 @@ function matches(text: string, phrases: readonly string[]): boolean {
 function scoreEntry(text: string, entry: DonnaEntry): number {
   const words = normalize(text).split(' ').filter(Boolean);
   const spans: { start: number; length: number }[] = [];
-  for (const phrase of new Set([...entry.keywords, entry.label].map(normalize))) {
+  for (const phrase of new Set([...entry.keywords, entry.label, ...(LOCALIZED_TOPIC_ALIASES[entry.id] ?? [])].map(normalize))) {
     const parts = phrase.split(' ').filter(Boolean);
     for (let start = 0; parts.length && start <= words.length - parts.length; start += 1) {
       if (parts.every((part, offset) => part === words[start + offset])) {
@@ -197,10 +201,13 @@ export function parseDonnaRequest(input: unknown): ParseResult {
     }
     messages.push({ role: candidate.role, content });
   }
+  if (data.locale !== undefined && data.locale !== 'es' && data.locale !== 'en' && data.locale !== 'pt') {
+    return { ok: false, reason: 'Idioma no compatible.' };
+  }
   if (messages[messages.length - 1].role !== 'user') {
     return { ok: false, reason: 'El último mensaje debe provenir del usuario.' };
   }
-  return { ok: true, messages };
+  return { ok: true, messages, ...(data.locale ? { locale: data.locale as Locale } : {}) };
 }
 
 export function isDonnaReply(value: unknown): value is DonnaReply {
