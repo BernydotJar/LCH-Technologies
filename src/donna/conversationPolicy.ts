@@ -10,6 +10,10 @@ import { countContactFields, missingContactFields, type ContactDraft } from '../
 export type HistoryTurn = DonnaMessage & { private?: boolean };
 
 const DIRECT_CONTACT_INTENTS = [
+  /\b(?:i want|i need|i would like|we want|we need)\s+(?:to\s+)?(?:speak|talk|meet|connect)\s+(?:to|with)\s+(?:your\s+)?(?:team|sales|advisor|representative|person|human)\b/u,
+  /\b(?:i want|i need|i would like|we want|we need)\s+(?:to\s+)?(?:book|schedule|request|arrange)\s+(?:a\s+)?(?:demo|meeting|call|consultation)\b/u,
+  /\b(?:quero|gostaria|preciso|queremos|precisamos)\s+(?:de\s+)?(?:falar|conversar)\s+com\s+(?:a\s+)?(?:equipe|pessoa|vendas|consultor)\b/u,
+  /\b(?:quero|gostaria|preciso|queremos)\s+(?:agendar|marcar|solicitar)\s+(?:uma?\s+)?(?:reuniao|chamada|demonstracao)\b/u,
   /\b(?:quiero|necesito|quisiera|deseo|busco|me gustaria|me encantaria)\s+(?:hablar|conversar)\s+(?:con\s+)?(?:alguien|una persona|un asesor|un humano|el equipo|su equipo|ustedes|ventas|lch)\b/u,
   /\b(?:quiero|necesito|quisiera|deseo|busco|me gustaria|me encantaria)\s+(?:contactar(?:me)?|agendar|reservar|programar)\b/u,
   /\b(?:quiero|necesito|quisiera|deseo|busco|me gustaria)\s+(?:una?\s+)?(?:cotizacion|propuesta|demostracion|demo|reunion|llamada|asesoria|consulta comercial)\b/u,

@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'motion/react';
+import { useLocale } from '../i18n/LocaleProvider';
 
 const steps = [
   { id: '01', name: 'Entender', desc: 'Análisis profundo de procesos, datos y desafíos operativos actuales.' },
@@ -11,6 +12,7 @@ const steps = [
 ];
 
 export const Process = () => {
+  const { t } = useLocale();
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -18,13 +20,13 @@ export const Process = () => {
   });
 
   return (
-    <section id="nosotros" className="bg-white py-32" ref={containerRef}>
+    <section id="nosotros" className="bg-white theme-light-surface py-32" ref={containerRef}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         <div className="max-w-3xl mb-24">
-          <h2 className="text-3xl md:text-4xl font-bold text-primary mb-6 tracking-tight">Metodología de Ingeniería</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-primary mb-6 tracking-tight">{t('Metodología de Ingeniería')}</h2>
           <p className="text-lg text-secondary leading-relaxed">
-            Un marco de trabajo diseñado para asegurar que cada línea de código y cada modelo de IA respondan a una necesidad empresarial real, controlada y medible.
+            {t('Un marco de trabajo diseñado para asegurar que cada línea de código y cada modelo de IA respondan a una necesidad empresarial real, controlada y medible.')}
           </p>
         </div>
 
@@ -56,8 +58,8 @@ export const Process = () => {
                     transition={{ duration: 0.6 }}
                     className={`w-full pl-24 md:w-1/2 md:px-16 ${isEven ? 'md:pr-16 md:pl-0 md:text-right md:ml-0 md:mr-auto' : 'md:pl-16 md:pr-0 md:ml-auto md:mr-0'}`}
                   >
-                    <h3 className="text-2xl font-bold text-primary mb-3">{step.name}</h3>
-                    <p className="text-secondary leading-relaxed">{step.desc}</p>
+                    <h3 className="text-2xl font-bold text-primary mb-3">{t(step.name)}</h3>
+                    <p className="text-secondary leading-relaxed">{t(step.desc)}</p>
                   </motion.div>
 
                 </div>

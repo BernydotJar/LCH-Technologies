@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion, useReducedMotion } from 'motion/react';
+import { useLocale } from '../i18n/LocaleProvider';
 import {
   ArrowRight,
   BrainCircuit,
@@ -114,6 +115,7 @@ const automationExamples: AutomationExample[] = [
 
 const AutomationChip = ({ item }: { item: AutomationExample }) => {
   const Icon = item.icon;
+  const { t } = useLocale();
 
   return (
     <div className="group shrink-0 min-w-[280px] sm:min-w-[330px] rounded-2xl border border-primary/10 bg-white/80 px-4 py-3.5 shadow-[0_8px_30px_rgba(17,24,39,0.05)] backdrop-blur-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-accent/40 hover:shadow-[0_16px_40px_rgba(17,24,39,0.08)]">
@@ -122,8 +124,8 @@ const AutomationChip = ({ item }: { item: AutomationExample }) => {
           <Icon size={17} strokeWidth={1.7} />
         </span>
         <div className="min-w-0">
-          <div className="text-sm font-bold tracking-tight text-primary">{item.title}</div>
-          <div className="mt-1 text-[12px] leading-relaxed text-secondary/75">{item.flow}</div>
+          <div className="text-sm font-bold tracking-tight text-primary">{t(item.title)}</div>
+          <div className="mt-1 text-[12px] leading-relaxed text-secondary/75">{t(item.flow)}</div>
         </div>
       </div>
     </div>
@@ -131,6 +133,7 @@ const AutomationChip = ({ item }: { item: AutomationExample }) => {
 };
 
 const AutomationRecognitionStrip = () => {
+  const { t } = useLocale();
   const reduceMotion = useReducedMotion();
   const firstRow = automationExamples.slice(0, 5);
   const secondRow = automationExamples.slice(5);
@@ -171,17 +174,17 @@ const AutomationRecognitionStrip = () => {
     >
       <div className="px-5 sm:px-7 lg:px-8 mb-6 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-5">
         <div className="max-w-2xl">
-          <div className="text-[11px] font-mono uppercase tracking-[0.2em] text-accent mb-3">¿Tu equipo todavía hace esto a mano?</div>
-          <h5 className="text-2xl sm:text-3xl font-bold tracking-tight text-primary">Probablemente ya tienes procesos listos para automatizar.</h5>
+          <div className="text-[11px] font-mono uppercase tracking-[0.2em] text-accent mb-3">{t('¿Tu equipo todavía hace esto a mano?')}</div>
+          <h5 className="text-2xl sm:text-3xl font-bold tracking-tight text-primary">{t('Probablemente ya tienes procesos listos para automatizar.')}</h5>
           <p className="mt-3 text-sm sm:text-base leading-relaxed text-secondary/80">
-            Cuando hay volumen, reglas, aprobaciones, SLAs, excepciones o varios sistemas involucrados, suele existir una oportunidad clara para automatizar con control y trazabilidad.
+            {t('Cuando hay volumen, reglas, aprobaciones, SLAs, excepciones o varios sistemas involucrados, suele existir una oportunidad clara para automatizar con control y trazabilidad.')}
           </p>
         </div>
         <a
           href="#contacto"
           className="group inline-flex shrink-0 items-center gap-2 text-sm font-semibold text-primary hover:text-accent transition-colors"
         >
-          Cuéntanos cuál haces hoy
+          {t('Cuéntanos cuál haces hoy')}
           <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
         </a>
       </div>
@@ -189,7 +192,7 @@ const AutomationRecognitionStrip = () => {
       {!reduceMotion && (
         <ul className="sr-only">
           {automationExamples.map((item) => (
-            <li key={item.title}>{item.title}: {item.flow}</li>
+            <li key={item.title}>{t(item.title)}: {t(item.flow)}</li>
           ))}
         </ul>
       )}
@@ -200,12 +203,12 @@ const AutomationRecognitionStrip = () => {
       </div>
 
       <div className="px-5 sm:px-7 lg:px-8 mt-6 flex flex-wrap gap-x-5 gap-y-2 text-[11px] sm:text-xs text-secondary/55">
-        <span>Finanzas</span>
-        <span>Compras</span>
-        <span>RR. HH.</span>
-        <span>Servicio</span>
-        <span>Operaciones</span>
-        <span>Logística</span>
+        <span>{t('Finanzas')}</span>
+        <span>{t('Compras')}</span>
+        <span>{t('RR. HH.')}</span>
+        <span>{t('Servicio')}</span>
+        <span>{t('Operaciones')}</span>
+        <span>{t('Logística')}</span>
         <span>Reporting</span>
       </div>
     </motion.div>
@@ -213,17 +216,18 @@ const AutomationRecognitionStrip = () => {
 };
 
 export const Capabilities = () => {
+  const { t } = useLocale();
   return (
-    <section id="soluciones" className="bg-white">
+    <section id="soluciones" className="bg-white theme-light-surface">
       {/* Editorial Introduction */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32">
         <div className="max-w-3xl">
-          <h2 className="text-accent font-semibold tracking-widest uppercase text-xs sm:text-sm mb-6">Nuestras Capacidades</h2>
+          <h2 className="text-accent font-semibold tracking-widest uppercase text-xs sm:text-sm mb-6">{t('Nuestras Capacidades')}</h2>
           <h3 className="text-3xl sm:text-4xl md:text-5xl font-bold text-primary leading-tight mb-8">
-            Construimos tecnología orientada a resultados operacionales.
+            {t('Construimos tecnología orientada a resultados operacionales.')}
           </h3>
           <p className="text-lg md:text-xl text-secondary leading-relaxed">
-            Integramos sistemas complejos para crear ventajas competitivas medibles, pasando de la experimentación tecnológica a la implementación gobernada.
+            {t('Integramos sistemas complejos para crear ventajas competitivas medibles, pasando de la experimentación tecnológica a la implementación gobernada.')}
           </p>
         </div>
       </div>
@@ -248,8 +252,8 @@ export const Capabilities = () => {
                   transition={{ duration: 0.7, ease: 'easeOut' }}
                   className="lg:col-span-8 lg:col-start-5"
                 >
-                  <h4 className="text-4xl sm:text-5xl font-bold mb-8 tracking-tight">{cap.title}</h4>
-                  <p className="text-xl leading-relaxed max-w-2xl opacity-90">{cap.description}</p>
+                  <h4 className="text-4xl sm:text-5xl font-bold mb-8 tracking-tight">{t(cap.title)}</h4>
+                  <p className="text-xl leading-relaxed max-w-2xl opacity-90">{t(cap.description)}</p>
                 </motion.div>
 
                 {cap.id === '02' && <AutomationRecognitionStrip />}

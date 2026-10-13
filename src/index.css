@@ -21,3 +21,114 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/* Night mode: keep brand-dark chapters as designed; recolor editorial chapters. */
+:root {
+  color-scheme: light;
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}
+:root[data-theme="dark"] body {
+  background: #080e1d;
+  color: #eaf3ff;
+}
+:root[data-theme="dark"] .app-shell {
+  background: #080e1d;
+}
+:root[data-theme="dark"] .theme-light-surface,
+:root[data-theme="dark"] .theme-contact-surface,
+:root[data-theme="dark"] .theme-donna-surface {
+  background-color: #10192b !important;
+  color: #ebf4ff;
+}
+:root[data-theme="dark"] .theme-light-surface [class*="bg-white"],
+:root[data-theme="dark"] .theme-light-surface [class*="bg-neutral-"],
+:root[data-theme="dark"] .theme-contact-surface [class*="bg-white"],
+:root[data-theme="dark"] .theme-contact-surface [class*="bg-neutral-"],
+:root[data-theme="dark"] .theme-donna-surface [class*="bg-white"],
+:root[data-theme="dark"] .theme-donna-surface [class*="bg-slate-"],
+:root[data-theme="dark"] .theme-card-light {
+  background-color: #17243a !important;
+}
+:root[data-theme="dark"] .theme-light-surface [class*="text-primary"],
+:root[data-theme="dark"] .theme-contact-surface [class*="text-primary"],
+:root[data-theme="dark"] .theme-donna-surface [class*="text-primary"],
+:root[data-theme="dark"] .theme-card-light {
+  color: #eaf3ff !important;
+}
+:root[data-theme="dark"] .theme-light-surface [class*="text-secondary"],
+:root[data-theme="dark"] .theme-contact-surface [class*="text-secondary"],
+:root[data-theme="dark"] .theme-donna-surface [class*="text-secondary"],
+:root[data-theme="dark"] .theme-card-light [class*="text-secondary"] {
+  color: #bbc9de !important;
+}
+:root[data-theme="dark"] .theme-light-surface [class*="text-accent"],
+:root[data-theme="dark"] .theme-contact-surface [class*="text-accent"],
+:root[data-theme="dark"] .theme-card-light [class*="text-accent"] {
+  color: #77d9e5 !important;
+}
+:root[data-theme="dark"] .theme-light-surface [class*="border-neutral-"],
+:root[data-theme="dark"] .theme-contact-surface [class*="border-neutral-"],
+:root[data-theme="dark"] .theme-donna-surface [class*="border-slate-"],
+:root[data-theme="dark"] .theme-card-light {
+  border-color: #344862 !important;
+}
+:root[data-theme="dark"] .theme-light-surface [class*="border-primary/"],
+:root[data-theme="dark"] .theme-card-light [class*="border-primary/"] {
+  border-color: #344862 !important;
+}
+:root[data-theme="dark"] .theme-contact-surface :is(input:not([type="checkbox"]), textarea, select),
+:root[data-theme="dark"] .theme-donna-surface textarea {
+  background: #111e32 !important;
+  color: #f3f7ff !important;
+  border-color: #3a526d !important;
+}
+:root[data-theme="dark"] .theme-contact-surface :is(input, textarea)::placeholder,
+:root[data-theme="dark"] .theme-donna-surface textarea::placeholder {
+  color: #acbdd3 !important;
+}
+:root[data-theme="dark"] .theme-contact-surface select option {
+  background: #111e32;
+  color: #f3f7ff;
+}
+:root[data-theme="dark"] .theme-contact-surface [class*="bg-teal-50"],
+:root[data-theme="dark"] .theme-donna-surface [class*="bg-teal-50"] {
+  background: #183a45 !important;
+  color: #d2faff !important;
+  border-color: #2f737b !important;
+}
+:root[data-theme="dark"] .theme-contact-surface [class*="text-teal-"],
+:root[data-theme="dark"] .theme-donna-surface [class*="text-teal-"] {
+  color: #a3eff4 !important;
+}
+:root[data-theme="dark"] .theme-donna-surface [class*="text-slate-"] {
+  color: #b5c7dd !important;
+}
+:root[data-theme="dark"] .theme-donna-surface [class*="from-[#F7FAFD]"] {
+  background: linear-gradient(#121e31, #10192b) !important;
+}
+:root[data-theme="dark"] .theme-donna-surface .donna-idea {
+  background: #17243a !important;
+  border-color: #31506a !important;
+}
+:root[data-theme="dark"] .theme-donna-surface [class*="bg-amber-50"],
+:root[data-theme="dark"] .theme-donna-surface [class*="bg-red-50"] {
+  background: #402b28 !important;
+  color: #ffe1bd !important;
+}
+/* Brand logo and embedded product preview deliberately retain their own surfaces. */
+.lch-language option {
+  background-color: #0c0a50;
+  color: #ffffff;
+}
+@media (prefers-reduced-motion: reduce) {
+  :root[data-theme="dark"] * {
+    scroll-behavior: auto;
+  }
+}
+
+
+.app-shell {
+  overflow-x: clip;
+}

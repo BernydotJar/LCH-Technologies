@@ -49,7 +49,7 @@ Vite mostrará la URL local disponible en la terminal.
 | `npm run typecheck` | Valida TypeScript sin emitir archivos. |
 | `npm run build` | Genera el bundle optimizado de producción. |
 | `npm run preview` | Sirve localmente el build generado. |
-| `npm run check` | Ejecuta typecheck y build en secuencia. |
+| `npm run check` | Ejecuta tests, typecheck y build en secuencia. |
 
 ## Estructura
 
@@ -66,6 +66,14 @@ Vite mostrará la URL local disponible en la terminal.
 ├── vite.config.ts          # Configuración de Vite y Tailwind
 └── tsconfig.json           # Configuración de TypeScript
 ```
+
+## Idiomas, tema nocturno y analítica
+
+El sitio ofrece español, inglés y portugués mediante el selector del encabezado; guarda la elección de idioma y tema, y respeta el modo nocturno del sistema. Los metadatos SEO se adaptan al idioma sin añadir dominios.
+
+Google Analytics 4 es opcional y requiere consentimiento previo. Para activarlo, configurar la variable pública VITE_GA_MEASUREMENT_ID con un identificador real de GA4 en el entorno de build. No se registran textos privados de Donna ni contenido del formulario.
+
+Guía técnica, medidas de privacidad, eventos permitidos, activación y verificación: [i18n, tema nocturno y analítica](docs/i18n-dark-analytics.md).
 
 ## Identidad visual
 

@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { ShieldCheck, Check, Cpu, FileText, Database, GitMerge, Layers, ArrowRight } from 'lucide-react';
+import { useLocale } from '../i18n/LocaleProvider';
 
 interface HeroSystemAnimationProps {
   isPlaying?: boolean;
 }
 
 export const HeroSystemAnimation: React.FC<HeroSystemAnimationProps> = ({ isPlaying = true }) => {
+  const { t } = useLocale();
   const [phase, setPhase] = useState(0);
 
   useEffect(() => {
@@ -60,10 +62,10 @@ export const HeroSystemAnimation: React.FC<HeroSystemAnimationProps> = ({ isPlay
       <div className="w-full flex items-center justify-between mb-2 px-1 text-[11px] font-mono tracking-wider text-neutral-300">
         <span className="flex items-center gap-1.5 font-semibold text-accent uppercase">
           <span className="w-2 h-2 rounded-full bg-accent animate-pulse"></span>
-          Fuentes dispersas
+          {t('Fuentes dispersas')}
         </span>
         <ArrowRight size={12} className="text-neutral-400" />
-        <span className="font-semibold text-emerald-400 uppercase">Sistema trazable</span>
+        <span className="font-semibold text-emerald-400 uppercase">{t('Sistema trazable')}</span>
       </div>
 
       {/* Main Interactive Diagram SVG */}
@@ -152,7 +154,7 @@ export const HeroSystemAnimation: React.FC<HeroSystemAnimationProps> = ({ isPlay
                 fontWeight="700"
                 letterSpacing="0.08em"
               >
-                {node.label}
+                {t(node.label)}
               </text>
 
               <circle
@@ -227,7 +229,7 @@ export const HeroSystemAnimation: React.FC<HeroSystemAnimationProps> = ({ isPlay
             letterSpacing="0.12em"
             opacity={activePhase >= 2 ? 1 : 0.6}
           >
-            SISTEMA
+            {t('SISTEMA')}
           </text>
 
           {activePhase >= 2 && (
@@ -275,7 +277,7 @@ export const HeroSystemAnimation: React.FC<HeroSystemAnimationProps> = ({ isPlay
                 {item.isVerified ? <Check size={11} strokeWidth={3} /> : <div className="w-1.5 h-1.5 rounded-full bg-neutral-400" />}
               </div>
               <span className="truncate tracking-tight font-semibold text-[11px] sm:text-xs">
-                {item.label}
+                {t(item.label)}
               </span>
             </div>
           );

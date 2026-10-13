@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Search, ShieldCheck, Layers, FileText, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { useLocale } from '../i18n/LocaleProvider';
 
 export const EvidenceAI = () => {
+  const { t } = useLocale();
   const [step, setStep] = useState(0);
 
   // Auto-advance the demonstration steps when in view
@@ -20,23 +22,23 @@ export const EvidenceAI = () => {
 
           <div className="lg:col-span-5">
             <span className="text-accent font-semibold tracking-widest uppercase text-xs mb-6 block">
-              Producto Destacado
+              {t('Producto Destacado')}
             </span>
             <h2 className="text-4xl sm:text-5xl font-bold mb-6 tracking-tight">
               LCH Evidence AI
             </h2>
             <h3 className="text-2xl font-medium text-neutral-300 mb-8 leading-tight">
-              Encuentra respuestas confiables. <br /> No solo información.
+              {t('Encuentra respuestas confiables.')} <br /> {t('No solo información.')}
             </h3>
             <p className="text-lg text-neutral-400 leading-relaxed mb-10 max-w-lg">
-              Las organizaciones generan miles de documentos, políticas y procedimientos. El verdadero reto es extraer la información correcta cuando se necesita, con total certeza de su origen. LCH Evidence AI permite consultar el conocimiento corporativo respaldado por evidencia y trazabilidad.
+              {t('Las organizaciones generan miles de documentos, políticas y procedimientos. El verdadero reto es extraer la información correcta cuando se necesita, con total certeza de su origen. LCH Evidence AI permite consultar el conocimiento corporativo respaldado por evidencia y trazabilidad.')}
             </p>
 
             <ul className="space-y-4 mb-10">
               {['Evidencia verificable', 'IA empresarial', 'Trazabilidad total'].map((item, i) => (
                 <li key={i} className="flex items-center gap-3 text-neutral-300">
                   <div className="w-1.5 h-1.5 bg-accent rounded-full"></div>
-                  {item}
+                  {t(item)}
                 </li>
               ))}
             </ul>
@@ -45,7 +47,7 @@ export const EvidenceAI = () => {
               href="#contacto"
               className="inline-flex items-center gap-2 text-white hover:text-accent font-medium tracking-wide transition-colors duration-300 group"
             >
-              <span className="border-b border-white/30 group-hover:border-accent transition-colors pb-1">Implementar Evidence AI</span>
+              <span className="border-b border-white/30 group-hover:border-accent transition-colors pb-1">{t('Implementar Evidence AI')}</span>
               <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
             </a>
           </div>
@@ -71,7 +73,7 @@ export const EvidenceAI = () => {
                 >
                   <div className="w-8 h-8 rounded-sm bg-white/5 flex-shrink-0 flex items-center justify-center text-xs text-neutral-400 border border-white/10">U</div>
                   <div className="bg-white/5 border border-white/10 p-4 rounded-sm text-sm text-neutral-200">
-                    ¿Cuál es el protocolo de seguridad para acceso a servidores de producción?
+                    {t('¿Cuál es el protocolo de seguridad para acceso a servidores de producción?')}
                   </div>
                 </motion.div>
 
@@ -102,7 +104,7 @@ export const EvidenceAI = () => {
                   </div>
                   <div className="flex-1 space-y-4">
                     <div className="bg-accent/10 border border-accent/20 p-4 rounded-sm text-sm text-white leading-relaxed">
-                      El protocolo estipula autenticación MFA obligatoria y conexión exclusiva mediante VPN corporativa. Las bitácoras de acceso deben retenerse por un mínimo de 90 días.
+                      {t('El protocolo estipula autenticación MFA obligatoria y conexión exclusiva mediante VPN corporativa. Las bitácoras de acceso deben retenerse por un mínimo de 90 días.')}
                     </div>
 
                     {/* Step 4: Traceability */}
@@ -113,10 +115,10 @@ export const EvidenceAI = () => {
                     >
                       <FileText size={14} className="text-accent mt-0.5 flex-shrink-0" />
                       <div>
-                        <div className="font-mono text-neutral-300 mb-1">Fuente Verificada</div>
-                        <div>Politica_Seguridad_Infra_2026.pdf (Pág. 14, Sec. 4.2)</div>
+                        <div className="font-mono text-neutral-300 mb-1">{t('Fuente Verificada')}</div>
+                        <div>{t('Politica_Seguridad_Infra_2026.pdf (Pág. 14, Sec. 4.2)')}</div>
                         <div className="flex items-center gap-1 mt-2 text-success/80">
-                          <ShieldCheck size={12} /> Nivel de Confianza: 98%
+                          <ShieldCheck size={12} /> {t('Nivel de Confianza: 98%')}
                         </div>
                       </div>
                     </motion.div>

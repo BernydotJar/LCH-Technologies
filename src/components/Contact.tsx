@@ -5,6 +5,8 @@ import type { ContactHandoff, DonnaPreparedDraft } from '../App';
 import type { DemoRequest } from '../integrations/leadContract';
 import { CONTACT_FIELD_BY_NAME, countContactFields, normalizeContactDraft, PREPARE_CONTACT_TOOL, type ContactDraft, type ContactField } from '../contact/semanticContract';
 import { reconcileAssistantDraft } from '../contact/liveDraft';
+import { useLocale } from '../i18n/LocaleProvider';
+import { track } from '../analytics/client';
 
 type FormStatus = 'idle' | 'loading' | 'success' | 'error';
 
@@ -48,6 +50,7 @@ function errorMessage(error: unknown): string {
 type Props = { handoff: ContactHandoff | null; preparedDraft: DonnaPreparedDraft | null; onStartDonna: (draft: ContactDraft) => void };
 
 export const Contact = ({ handoff, preparedDraft, onStartDonna }: Props) => {
+  const { t } = useLocale();
   const [status, setStatus] = useState<FormStatus>('idle');
   const [formData, setFormData] = useState<DemoRequest>(EMPTY_REQUEST);
   const [errorText, setErrorText] = useState('');
@@ -127,10 +130,12 @@ export const Contact = ({ handoff, preparedDraft, onStartDonna }: Props) => {
       setHandoffActive(false);
       setLiveFieldCount(0);
       setStatus('success');
+      track('contact_submit_success', { section: 'contact' });
     } catch (error) {
       console.error('LCH contact form submission failed', error);
       setErrorText(errorMessage(error));
       setStatus('error');
+      track('contact_submit_error', { section: 'contact' });
     } finally {
       inFlight.current = false;
     }
@@ -140,12 +145,12 @@ export const Contact = ({ handoff, preparedDraft, onStartDonna }: Props) => {
     <section id="contacto" className="border-t border-white/10 bg-primary">
       <div className="mx-auto flex min-h-[80vh] max-w-7xl flex-col px-4 sm:px-6 lg:flex-row lg:px-8">
         <div className="flex flex-col justify-center py-20 lg:w-1/2 lg:py-28 lg:pr-16">
-          <p className="mb-5 text-xs font-bold uppercase tracking-[0.2em] text-teal-300">Hablemos de resultados</p>
+          <p className="mb-5 text-xs font-bold uppercase tracking-[0.2em] text-teal-300">{t('Hablemos de resultados')}</p>
           <h2 className="mb-7 text-4xl font-bold leading-[1.1] tracking-tight text-white sm:text-5xl lg:text-6xl">
-            El próximo avance comienza con una conversación.
+            {t('El próximo avance comienza con una conversación.')}
           </h2>
           <p className="mb-11 max-w-lg text-lg leading-relaxed text-neutral-300">
-            Cuéntanos qué proceso, decisión o sistema quieres mejorar. Nos enfocamos en el impacto que buscas y en el siguiente paso más útil para tu organización.
+            {t('Cuéntanos qué proceso, decisión o sistema quieres mejorar. Nos enfocamos en el impacto que buscas y en el siguiente paso más útil para tu organización.')}
           </p>
 
           <div className="space-y-6 text-neutral-300">
@@ -158,13 +163,13 @@ export const Contact = ({ handoff, preparedDraft, onStartDonna }: Props) => {
                 <div className="mt-0.5 rounded-md border border-white/10 bg-white/5 p-1 text-teal-200">
                   <Check size={16} aria-hidden="true" />
                 </div>
-                <p className="text-sm leading-relaxed sm:text-base">{benefit}</p>
+                <p className="text-sm leading-relaxed sm:text-base">{t(benefit)}</p>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="flex flex-col justify-center border-neutral-200 bg-white px-5 py-14 sm:px-10 lg:w-1/2 lg:border-l lg:px-14 lg:py-20">
+        <div className="theme-contact-surface flex flex-col justify-center border-neutral-200 bg-white px-5 py-14 sm:px-10 lg:w-1/2 lg:border-l lg:px-14 lg:py-20">
           {status === 'success' ? (
             <motion.div
               initial={{ opacity: 0, y: 12 }}
@@ -176,41 +181,41 @@ export const Contact = ({ handoff, preparedDraft, onStartDonna }: Props) => {
               <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full border border-emerald-200 bg-emerald-50 text-emerald-700">
                 <CheckCircle2 size={32} aria-hidden="true" />
               </div>
-              <h3 className="mb-3 text-2xl font-bold text-primary">Recibimos tu solicitud</h3>
+              <h3 className="mb-3 text-2xl font-bold text-primary">{t('Recibimos tu solicitud')}</h3>
               <p className="mx-auto mb-5 max-w-sm leading-relaxed text-secondary">
-                Gracias. Revisaremos tu solicitud y te contactaremos usando los datos que compartiste.
+                {t('Gracias. Revisaremos tu solicitud y te contactaremos usando los datos que compartiste.')}
               </p>
               <p className="mb-8 text-xs font-medium tracking-wide text-secondary">
-                Referencia: <span className="font-mono text-primary">{confirmationId}</span>
+                {t('Referencia:')} <span className="font-mono text-primary">{confirmationId}</span>
               </p>
               <button
                 type="button"
                 onClick={() => { setStatus('idle'); setConfirmationId(''); }}
                 className="font-semibold text-accent underline-offset-4 transition-colors hover:text-primary hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
               >
-                Enviar otra solicitud
+                {t('Enviar otra solicitud')}
               </button>
             </motion.div>
           ) : (
             <form onSubmit={handleSubmit} className="mx-auto w-full max-w-lg space-y-5" aria-busy={status === 'loading'} data-semantic-tool={PREPARE_CONTACT_TOOL.name} data-testid="lch-contact-form">
               {(handoffActive || liveFieldCount > 0) && <div role="status" data-testid="contact-donna-live-status" className="rounded-md border border-teal-200 bg-teal-50 px-4 py-3 text-xs leading-relaxed text-teal-900">
-                {liveFieldCount || handoffFieldCount} datos preparados en el formulario. Puedes corregirlos antes de autorizar el envío; nada se ha enviado todavía.
+                {liveFieldCount || handoffFieldCount} {t('datos preparados en el formulario. Puedes corregirlos antes de autorizar el envío; nada se ha enviado todavía.')}
               </div>}
               <div>
-                <h3 className="mb-2 text-2xl font-bold text-primary">Cuéntanos qué quieres lograr</h3>
+                <h3 className="mb-2 text-2xl font-bold text-primary">{t('Cuéntanos qué quieres lograr')}</h3>
                 <p className="text-sm leading-relaxed text-secondary">
-                  Selecciona una oportunidad y compártenos tus datos para coordinar el siguiente paso.
+                  {t('Selecciona una oportunidad y compártenos tus datos para coordinar el siguiente paso.')}
                 </p>
                 <button type="button" data-testid="contact-fill-with-donna" disabled={status === 'loading'}
                   onClick={() => onStartDonna(normalizeContactDraft(formData))}
                   className="mt-4 inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-teal-200 bg-teal-50 px-4 py-2.5 text-sm font-semibold text-teal-900 transition-colors hover:bg-teal-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700 disabled:opacity-50">
-                  <Sparkles size={16} aria-hidden="true" /> Completar con Donna
+                  <Sparkles size={16} aria-hidden="true" /> {t('Completar con Donna')}
                 </button>
-                <p className="mt-2 text-xs leading-relaxed text-secondary">Donna prepara los campos mientras conversas. Tú revisas y decides si los envías.</p>
+                <p className="mt-2 text-xs leading-relaxed text-secondary">{t('Donna prepara los campos mientras conversas. Tú revisas y decides si los envías.')}</p>
               </div>
 
               <fieldset>
-                <legend className="mb-3 text-xs font-semibold tracking-wide text-secondary">¿Dónde podemos aportar valor?</legend>
+                <legend className="mb-3 text-xs font-semibold tracking-wide text-secondary">{t('¿Dónde podemos aportar valor?')}</legend>
                 <div className="grid gap-2 sm:grid-cols-3">
                   {OPPORTUNITIES.map(({ title, detail, interest }) => {
                     const selected = formData.interes === interest;
@@ -223,8 +228,8 @@ export const Contact = ({ handoff, preparedDraft, onStartDonna }: Props) => {
                         onClick={() => { manualFields.current.add('interes'); setFormData((previous) => ({ ...previous, interes: interest })); }}
                         className={`rounded-md border px-3 py-3 text-left transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${selected ? 'border-accent bg-teal-50 text-primary' : 'border-neutral-200 bg-neutral-50 text-secondary hover:border-accent/50'}`}
                       >
-                        <span className="block text-xs font-bold">{title}</span>
-                        <span className="mt-1 block text-[11px] leading-snug">{detail}</span>
+                        <span className="block text-xs font-bold">{t(title)}</span>
+                        <span className="mt-1 block text-[11px] leading-snug">{t(detail)}</span>
                       </button>
                     );
                   })}
@@ -233,92 +238,92 @@ export const Contact = ({ handoff, preparedDraft, onStartDonna }: Props) => {
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
-                  <label htmlFor="nombre" className={LABEL_STYLE}>Nombre <span aria-hidden="true">*</span></label>
-                  <input required maxLength={CONTACT_FIELD_BY_NAME.nombre.maxLength} autoComplete="given-name" type="text" id="nombre" name="nombre" data-semantic-field="nombre" placeholder="Tu nombre" value={formData.nombre} onChange={handleChange} disabled={status === 'loading'} className={INPUT_STYLE} />
+                  <label htmlFor="nombre" className={LABEL_STYLE}>{t('Nombre')} <span aria-hidden="true">*</span></label>
+                  <input required maxLength={CONTACT_FIELD_BY_NAME.nombre.maxLength} autoComplete="given-name" type="text" id="nombre" name="nombre" data-semantic-field="nombre" placeholder={t('Tu nombre')} value={formData.nombre} onChange={handleChange} disabled={status === 'loading'} className={INPUT_STYLE} />
                 </div>
                 <div>
-                  <label htmlFor="apellido" className={LABEL_STYLE}>Apellido <span aria-hidden="true">*</span></label>
-                  <input required maxLength={CONTACT_FIELD_BY_NAME.apellido.maxLength} autoComplete="family-name" type="text" id="apellido" name="apellido" data-semantic-field="apellido" placeholder="Tu apellido" value={formData.apellido} onChange={handleChange} disabled={status === 'loading'} className={INPUT_STYLE} />
+                  <label htmlFor="apellido" className={LABEL_STYLE}>{t('Apellido')} <span aria-hidden="true">*</span></label>
+                  <input required maxLength={CONTACT_FIELD_BY_NAME.apellido.maxLength} autoComplete="family-name" type="text" id="apellido" name="apellido" data-semantic-field="apellido" placeholder={t('Tu apellido')} value={formData.apellido} onChange={handleChange} disabled={status === 'loading'} className={INPUT_STYLE} />
                 </div>
               </div>
 
               <div>
-                <label htmlFor="email" className={LABEL_STYLE}>Correo electrónico <span aria-hidden="true">*</span></label>
+                <label htmlFor="email" className={LABEL_STYLE}>{t('Correo electrónico')} <span aria-hidden="true">*</span></label>
                 <input required maxLength={CONTACT_FIELD_BY_NAME.email.maxLength} autoComplete="email" type="email" id="email" name="email" data-semantic-field="email" placeholder="nombre@empresa.com" value={formData.email} onChange={handleChange} disabled={status === 'loading'} className={INPUT_STYLE} />
               </div>
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
-                  <label htmlFor="empresa" className={LABEL_STYLE}>Organización <span aria-hidden="true">*</span></label>
-                  <input required maxLength={CONTACT_FIELD_BY_NAME.empresa.maxLength} autoComplete="organization" type="text" id="empresa" name="empresa" data-semantic-field="empresa" placeholder="Nombre de empresa" value={formData.empresa} onChange={handleChange} disabled={status === 'loading'} className={INPUT_STYLE} />
+                  <label htmlFor="empresa" className={LABEL_STYLE}>{t('Organización')} <span aria-hidden="true">*</span></label>
+                  <input required maxLength={CONTACT_FIELD_BY_NAME.empresa.maxLength} autoComplete="organization" type="text" id="empresa" name="empresa" data-semantic-field="empresa" placeholder={t('Nombre de empresa')} value={formData.empresa} onChange={handleChange} disabled={status === 'loading'} className={INPUT_STYLE} />
                 </div>
                 <div>
-                  <label htmlFor="cargo" className={LABEL_STYLE}>Tu rol <span aria-hidden="true">*</span></label>
-                  <input required maxLength={CONTACT_FIELD_BY_NAME.cargo.maxLength} autoComplete="organization-title" type="text" id="cargo" name="cargo" data-semantic-field="cargo" placeholder="Cargo o función" value={formData.cargo} onChange={handleChange} disabled={status === 'loading'} className={INPUT_STYLE} />
+                  <label htmlFor="cargo" className={LABEL_STYLE}>{t('Tu rol')} <span aria-hidden="true">*</span></label>
+                  <input required maxLength={CONTACT_FIELD_BY_NAME.cargo.maxLength} autoComplete="organization-title" type="text" id="cargo" name="cargo" data-semantic-field="cargo" placeholder={t('Cargo o función')} value={formData.cargo} onChange={handleChange} disabled={status === 'loading'} className={INPUT_STYLE} />
                 </div>
               </div>
 
               <div>
-                <label htmlFor="interes" className={LABEL_STYLE}>Área de interés <span aria-hidden="true">*</span></label>
+                <label htmlFor="interes" className={LABEL_STYLE}>{t('Área de interés')} <span aria-hidden="true">*</span></label>
                 <select required id="interes" name="interes" data-semantic-field="interes" value={formData.interes} onChange={handleChange} disabled={status === 'loading'} className={`${INPUT_STYLE} ${formData.interes ? 'text-primary' : 'text-neutral-400'}`}>
-                  <option value="" disabled>Selecciona el tema principal</option>
-                  <option value="Inteligencia Artificial">Inteligencia Artificial</option>
-                  <option value="Automatización">Automatización de procesos</option>
-                  <option value="Software Empresarial">Software empresarial y plataformas</option>
-                  <option value="Cloud">Cloud e infraestructura</option>
+                  <option value="" disabled>{t('Selecciona el tema principal')}</option>
+                  <option value="Inteligencia Artificial">{t('Inteligencia Artificial')}</option>
+                  <option value="Automatización">{t('Automatización de procesos')}</option>
+                  <option value="Software Empresarial">{t('Software empresarial y plataformas')}</option>
+                  <option value="Cloud">{t('Cloud e infraestructura')}</option>
                   <option value="LCH Evidence AI">LCH Evidence AI</option>
-                  <option value="Otro">Otro desafío</option>
+                  <option value="Otro">{t('Otro desafío')}</option>
                 </select>
-                {formData.interes && <p className="mt-2 text-xs leading-relaxed text-secondary">{INTEREST_HELP[formData.interes]}</p>}
+                {formData.interes && <p className="mt-2 text-xs leading-relaxed text-secondary">{t(INTEREST_HELP[formData.interes] ?? '')}</p>}
               </div>
 
               <div>
-                <label htmlFor="mensaje" className={LABEL_STYLE}>¿Qué resultado te gustaría conseguir? <span className="font-normal">(opcional)</span></label>
-                <textarea id="mensaje" name="mensaje" data-semantic-field="mensaje" maxLength={CONTACT_FIELD_BY_NAME.mensaje.maxLength} rows={3} placeholder="Por ejemplo: reducir el tiempo de aprobación de contratos o conectar datos de varios sistemas." value={formData.mensaje} onChange={handleChange} disabled={status === 'loading'} className={`${INPUT_STYLE} resize-y`} />
+                <label htmlFor="mensaje" className={LABEL_STYLE}>{t('¿Qué resultado te gustaría conseguir?')} <span className="font-normal">{t('(opcional)')}</span></label>
+                <textarea id="mensaje" name="mensaje" data-semantic-field="mensaje" maxLength={CONTACT_FIELD_BY_NAME.mensaje.maxLength} rows={3} placeholder={t('Por ejemplo: reducir el tiempo de aprobación de contratos o conectar datos de varios sistemas.')} value={formData.mensaje} onChange={handleChange} disabled={status === 'loading'} className={`${INPUT_STYLE} resize-y`} />
                 <p className="mt-1 text-right text-[11px] tabular-nums text-neutral-500">{formData.mensaje.length}/2000</p>
               </div>
 
               <div className="absolute -left-[10000px] top-auto h-px w-px overflow-hidden" aria-hidden="true">
-                <label htmlFor="website">Deja este campo vacío</label>
+                <label htmlFor="website">{t('Deja este campo vacío')}</label>
                 <input type="text" name="website" id="website" value={website} onChange={(event) => setWebsite(event.target.value)} tabIndex={-1} autoComplete="off" />
               </div>
 
               <div className="flex items-start gap-3 pt-1">
                 <input required type="checkbox" id="consentimiento" name="consentimiento" checked={formData.consentimiento} onChange={handleChange} disabled={status === 'loading'} className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer rounded border-neutral-300 text-accent focus:ring-accent" />
                 <label htmlFor="consentimiento" className="text-xs leading-relaxed text-secondary">
-                  Autorizo el tratamiento de mis datos para evaluar y responder esta solicitud. Consulta el <a href="#privacidad-contacto" className="font-semibold text-accent underline underline-offset-2 hover:text-primary">aviso de privacidad</a>.
+                  {t('Autorizo el tratamiento de mis datos para evaluar y responder esta solicitud. Consulta el')} <a href="#privacidad-contacto" className="font-semibold text-accent underline underline-offset-2 hover:text-primary">{t('aviso de privacidad')}</a>.
                 </label>
               </div>
 
               {status === 'error' && (
                 <div role="alert" className="flex items-start gap-2 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-800">
                   <AlertCircle size={18} aria-hidden="true" className="mt-0.5 shrink-0" />
-                  <span>{errorText}</span>
+                  <span>{t(errorText)}</span>
                 </div>
               )}
 
               <button type="submit" disabled={status === 'loading'} className="group flex w-full items-center justify-center gap-2 rounded-md bg-primary px-8 py-4 text-sm font-semibold tracking-wide text-white transition-colors hover:bg-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-60">
                 {status === 'loading' ? (
-                  <><LoaderCircle size={18} className="animate-spin" aria-hidden="true" /> Enviando solicitud...</>
+                  <><LoaderCircle size={18} className="animate-spin" aria-hidden="true" /> {t('Enviando solicitud...')}</>
                 ) : (
-                  <>Quiero conversar con LCH <ArrowRight size={18} aria-hidden="true" className="transition-transform group-hover:translate-x-1" /></>
+                  <>{t('Quiero conversar con LCH')} <ArrowRight size={18} aria-hidden="true" className="transition-transform group-hover:translate-x-1" /></>
                 )}
               </button>
 
               <p className="flex items-center justify-center gap-2 text-center text-xs leading-relaxed text-secondary">
                 <ShieldCheck size={15} className="shrink-0 text-accent" aria-hidden="true" />
-                Datos utilizados para gestionar tu solicitud. Sin necesidad de crear una cuenta.
+                {t('Datos utilizados para gestionar tu solicitud. Sin necesidad de crear una cuenta.')}
               </p>
 
             </form>
           )}
           <details id="privacidad-contacto" className="rounded-md border border-neutral-200 bg-neutral-50 px-4 py-3 text-xs text-secondary">
-            <summary className="cursor-pointer font-semibold text-primary">Aviso de privacidad del formulario</summary>
+            <summary className="cursor-pointer font-semibold text-primary">{t('Aviso de privacidad del formulario')}</summary>
             <p className="mt-3 leading-relaxed">
-              LCH Technologies registra los datos que envías (identificación, organización, correo y descripción del desafío) para analizar tu consulta, organizar el seguimiento y contactarte. La información se almacena en los sistemas de gestión de solicitudes y puede ser procesada mediante automatizaciones internas de clasificación.
+              {t('LCH Technologies registra los datos que envías (identificación, organización, correo y descripción del desafío) para analizar tu consulta, organizar el seguimiento y contactarte. La información se almacena en los sistemas de gestión de solicitudes y puede ser procesada mediante automatizaciones internas de clasificación.')}
             </p>
             <p className="mt-2 leading-relaxed">
-              Comparte solo la información necesaria para la conversación inicial. No incluyas contraseñas, secretos comerciales ni datos personales sensibles.
+              {t('Comparte solo la información necesaria para la conversación inicial. No incluyas contraseñas, secretos comerciales ni datos personales sensibles.')}
             </p>
           </details>
         </div>

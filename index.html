@@ -7,6 +7,22 @@
     <meta name="description" content="Diseñamos e implementamos Inteligencia Artificial, automatización, software empresarial y soluciones cloud para transformar procesos críticos con gobierno y trazabilidad." />
     <link rel="icon" type="image/svg+xml" href="/assets/brand/favicon.svg" />
     <link rel="canonical" href="https://lch-app.cloud/" />
+    <link rel="alternate" hreflang="es" href="https://lch-app.cloud/" />
+    <link rel="alternate" hreflang="en" href="https://lch-app.cloud/?lang=en" />
+    <link rel="alternate" hreflang="pt" href="https://lch-app.cloud/?lang=pt" />
+    <link rel="alternate" hreflang="x-default" href="https://lch-app.cloud/" />
+    <script>
+      // Apply the saved/system theme before first paint to avoid a bright flash.
+      try {
+        const storedTheme = localStorage.getItem('lch.theme');
+        const dark = storedTheme === 'dark' ||
+          (storedTheme !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches);
+        document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+        if (dark) document.querySelector('meta[name="theme-color"]').content = '#070d1c';
+      } catch {
+        document.documentElement.dataset.theme = 'light';
+      }
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@300;400;500;600;700&display=swap" rel="stylesheet" />

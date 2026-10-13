@@ -12,6 +12,8 @@ import {
   ShieldCheck,
   Sparkles,
 } from 'lucide-react';
+import { useLocale } from '../i18n/LocaleProvider';
+import { track } from '../analytics/client';
 
 type ProductReference = {
   id: 'ido' | 'luma' | 'legal';
@@ -99,7 +101,9 @@ const products: ProductReference[] = [
   },
 ];
 
-const IdoPreview = () => (
+const IdoPreview = () => {
+  const { t } = useLocale();
+  return (
   <div className="relative h-full overflow-hidden bg-[#f5f7fb] text-primary">
     <div className="absolute inset-0 opacity-60 bg-[radial-gradient(circle_at_80%_10%,rgba(21,94,117,0.20),transparent_32%)]" />
     <div className="relative h-full grid grid-cols-[72px_1fr] sm:grid-cols-[86px_1fr]">
@@ -123,7 +127,7 @@ const IdoPreview = () => (
           </div>
           <div className="hidden sm:flex items-center gap-2 text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-100 px-3 py-2 rounded-full">
             <span className="w-2 h-2 rounded-full bg-emerald-500" />
-            Operación saludable
+            {t('Operación saludable')}
           </div>
         </div>
 
@@ -135,9 +139,9 @@ const IdoPreview = () => (
             ['Alertas', '03', 'controladas'],
           ].map(([name, value, delta]) => (
             <div key={name} className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
-              <div className="text-[10px] sm:text-xs text-slate-400 mb-2">{name}</div>
+              <div className="text-[10px] sm:text-xs text-slate-400 mb-2">{t(name)}</div>
               <div className="text-lg sm:text-2xl font-bold">{value}</div>
-              <div className="text-[10px] sm:text-xs text-accent mt-1">{delta}</div>
+              <div className="text-[10px] sm:text-xs text-accent mt-1">{t(delta)}</div>
             </div>
           ))}
         </div>
@@ -146,8 +150,8 @@ const IdoPreview = () => (
           <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm min-h-[230px]">
             <div className="flex items-center justify-between mb-8">
               <div>
-                <div className="font-semibold">Operación consolidada</div>
-                <div className="text-xs text-slate-400 mt-1">Últimos 6 periodos</div>
+                <div className="font-semibold">{t('Operación consolidada')}</div>
+                <div className="text-xs text-slate-400 mt-1">{t('Últimos 6 periodos')}</div>
               </div>
               <span className="text-[10px] border border-slate-200 px-2 py-1 rounded-md text-slate-500">COP</span>
             </div>
@@ -171,13 +175,13 @@ const IdoPreview = () => (
                 <Sparkles size={14} />
                 AI operations
               </div>
-              <div className="text-lg font-bold leading-tight">3 decisiones requieren atención.</div>
-              <p className="text-sm text-white/55 mt-3 leading-relaxed">I-DO priorizó impacto financiero, inventario y riesgo operativo.</p>
+              <div className="text-lg font-bold leading-tight">{t('3 decisiones requieren atención.')}</div>
+              <p className="text-sm text-white/55 mt-3 leading-relaxed">{t('I-DO priorizó impacto financiero, inventario y riesgo operativo.')}</p>
             </div>
             <div className="space-y-2 mt-6">
               {['Inventario crítico', 'Conciliación pendiente', 'Orden fuera de SLA'].map((item) => (
                 <div key={item} className="flex items-center justify-between text-xs bg-white/5 border border-white/10 rounded-lg px-3 py-2.5">
-                  <span>{item}</span>
+                  <span>{t(item)}</span>
                   <ArrowRight size={13} className="text-sky-300" />
                 </div>
               ))}
@@ -187,9 +191,11 @@ const IdoPreview = () => (
       </div>
     </div>
   </div>
-);
+  );
+};
 
 export const ProductReferences = () => {
+  const { t } = useLocale();
   const [activeId, setActiveId] = useState<ProductReference['id']>('ido');
   const reduceMotion = useReducedMotion();
   const active = useMemo(
@@ -214,7 +220,7 @@ export const ProductReferences = () => {
             className="inline-flex items-center gap-2 text-[11px] sm:text-xs font-mono tracking-[0.22em] uppercase text-sky-200 border border-white/10 bg-white/[0.04] px-4 py-2 rounded-full mb-7"
           >
             <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_18px_rgba(52,211,153,0.8)]" />
-            Real products · real environments
+            {t('Real products · real environments')}
           </motion.div>
 
           <motion.h2
@@ -224,8 +230,8 @@ export const ProductReferences = () => {
             transition={{ delay: 0.05 }}
             className="text-5xl sm:text-6xl lg:text-8xl font-bold tracking-[-0.04em] leading-[0.92]"
           >
-            ¿Quieres ver demos?
-            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-white via-sky-200 to-cyan-400">Mira.</span>
+            {t('¿Quieres ver demos?')}
+            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-white via-sky-200 to-cyan-400">{t('Mira.')}</span>
           </motion.h2>
 
           <motion.p
@@ -235,11 +241,11 @@ export const ProductReferences = () => {
             transition={{ delay: 0.1 }}
             className="mt-7 max-w-2xl mx-auto text-base sm:text-lg text-white/55 leading-relaxed"
           >
-            Las ideas son fáciles. Los productos funcionando, no tanto. Explora sistemas que LCH ya convirtió en software real.
+            {t('Las ideas son fáciles. Los productos funcionando, no tanto. Explora sistemas que LCH ya convirtió en software real.')}
           </motion.p>
         </div>
 
-        <div className="max-w-5xl mx-auto mb-7" role="tablist" aria-label="Demos de productos LCH">
+        <div className="max-w-5xl mx-auto mb-7" role="tablist" aria-label={t('Demos de productos LCH')}>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 p-2 rounded-2xl bg-white/[0.045] border border-white/10 backdrop-blur-xl">
             {products.map((product) => {
               const Icon = product.icon;
@@ -251,7 +257,7 @@ export const ProductReferences = () => {
                   role="tab"
                   aria-selected={selected}
                   aria-controls="product-demo-stage"
-                  onClick={() => setActiveId(product.id)}
+                  onClick={() => { setActiveId(product.id); track('product_demo_select', { product: product.id }); }}
                   className={`relative overflow-hidden flex items-center gap-3 text-left px-4 py-4 rounded-xl transition-colors duration-300 ${
                     selected ? 'text-white' : 'text-white/55 hover:text-white hover:bg-white/[0.04]'
                   }`}
@@ -289,24 +295,24 @@ export const ProductReferences = () => {
             className="max-w-[1240px] mx-auto mb-7 grid lg:grid-cols-[1.45fr_0.55fr] gap-4 rounded-[22px] border border-white/10 bg-white/[0.045] p-5 sm:p-6 lg:p-7 backdrop-blur-xl"
           >
             <div>
-              <div className="text-[10px] sm:text-xs font-mono uppercase tracking-[0.2em] text-sky-300">¿Qué es?</div>
+              <div className="text-[10px] sm:text-xs font-mono uppercase tracking-[0.2em] text-sky-300">{t('¿Qué es?')}</div>
               <div className="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-1">
                 <h3 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">{active.name}</h3>
-                <span className="text-sm sm:text-base font-semibold text-sky-200">{active.kicker}</span>
+                <span className="text-sm sm:text-base font-semibold text-sky-200">{t(active.kicker)}</span>
               </div>
-              <p className="mt-3 max-w-3xl text-sm sm:text-base leading-relaxed text-white/62">{active.whatIsIt}</p>
+              <p className="mt-3 max-w-3xl text-sm sm:text-base leading-relaxed text-white/62">{t(active.whatIsIt)}</p>
             </div>
 
             <div className="lg:border-l lg:border-white/10 lg:pl-6">
-              <div className="text-[10px] font-mono uppercase tracking-[0.18em] text-white/35">Tiene sentido para</div>
+              <div className="text-[10px] font-mono uppercase tracking-[0.18em] text-white/35">{t('Tiene sentido para')}</div>
               <div className="mt-3 flex flex-wrap gap-2">
                 {active.idealFor.map((item) => (
-                  <span key={item} className="rounded-full border border-white/10 bg-white/[0.045] px-3 py-1.5 text-[11px] text-white/60">{item}</span>
+                  <span key={item} className="rounded-full border border-white/10 bg-white/[0.045] px-3 py-1.5 text-[11px] text-white/60">{t(item)}</span>
                 ))}
               </div>
               <div className={`mt-4 inline-flex items-center gap-2 text-[11px] font-medium ${active.publicAvailable ? 'text-emerald-300' : 'text-amber-200'}`}>
                 <span className={`h-1.5 w-1.5 rounded-full ${active.publicAvailable ? 'bg-emerald-400' : 'bg-amber-300'}`} />
-                {active.availabilityLabel}
+                {t(active.availabilityLabel)}
               </div>
             </div>
           </motion.div>
@@ -335,15 +341,15 @@ export const ProductReferences = () => {
                   target="_blank"
                   rel="noreferrer"
                   className="w-8 h-8 shrink-0 rounded-lg inline-flex items-center justify-center text-white/55 hover:text-white hover:bg-white/10 transition-colors"
-                  aria-label={`Abrir ${active.name} en una pestaña nueva`}
+                  aria-label={t('Abrir') + ' ' + active.name + ' ' + t('en una pestaña nueva')}
                 >
                   <ArrowUpRight size={16} />
                 </a>
               ) : (
                 <span
                   className="w-8 h-8 shrink-0 rounded-lg inline-flex items-center justify-center text-amber-200/65 bg-amber-300/[0.06]"
-                  aria-label={`${active.name}: demo pública temporalmente indisponible`}
-                  title="Demo pública temporalmente indisponible"
+                  aria-label={active.name + ': ' + t('Demo pública temporalmente indisponible')}
+                  title={t('Demo pública temporalmente indisponible')}
                 >
                   <ArrowUpRight size={16} />
                 </span>
@@ -362,7 +368,7 @@ export const ProductReferences = () => {
                 {active.embed ? (
                   <iframe
                     src={active.url}
-                    title={`${active.name} — demo interactiva`}
+                    title={active.name + ' — ' + t('demo interactiva')}
                     loading="lazy"
                     referrerPolicy="strict-origin-when-cross-origin"
                     sandbox="allow-forms allow-modals allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"
@@ -387,16 +393,16 @@ export const ProductReferences = () => {
           >
             <div className="max-w-3xl">
               <div className="flex flex-wrap items-center gap-2 mb-3">
-                <span className="text-xs font-semibold uppercase tracking-[0.18em] text-sky-300">{active.kicker}</span>
+                <span className="text-xs font-semibold uppercase tracking-[0.18em] text-sky-300">{t(active.kicker)}</span>
                 <span className="text-white/20">/</span>
-                <span className="text-xs text-white/40">{active.stat} · {active.statLabel}</span>
+                <span className="text-xs text-white/40">{active.stat} · {t(active.statLabel)}</span>
               </div>
-              <h3 className="text-2xl sm:text-3xl font-bold tracking-tight">{active.label}</h3>
-              <p className="mt-3 text-sm sm:text-base text-white/50 leading-relaxed max-w-2xl">{active.description}</p>
+              <h3 className="text-2xl sm:text-3xl font-bold tracking-tight">{t(active.label)}</h3>
+              <p className="mt-3 text-sm sm:text-base text-white/50 leading-relaxed max-w-2xl">{t(active.description)}</p>
               <div className="flex flex-wrap gap-2 mt-5">
                 {active.tags.map((tag) => (
                   <span key={tag} className="text-[11px] text-white/55 border border-white/10 bg-white/[0.035] rounded-full px-3 py-1.5">
-                    {tag}
+                    {t(tag)}
                   </span>
                 ))}
               </div>
@@ -409,20 +415,20 @@ export const ProductReferences = () => {
                 rel="noreferrer"
                 className="group inline-flex items-center justify-center gap-3 bg-white text-primary px-5 py-3.5 rounded-xl font-bold text-sm hover:bg-sky-100 transition-colors"
               >
-                Explorar {active.name}
+                {t('Explorar')} {active.name}
                 <ArrowUpRight size={16} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
               </a>
             ) : (
               <div className="inline-flex items-center justify-center gap-3 border border-amber-200/15 bg-amber-300/[0.06] text-amber-100 px-5 py-3.5 rounded-xl font-semibold text-sm cursor-not-allowed">
-                Demo pública en mantenimiento
+                {t('Demo pública en mantenimiento')}
               </div>
             )}
           </motion.div>
         </AnimatePresence>
 
         <div className="max-w-[1240px] mx-auto mt-12 pt-6 border-t border-white/10 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between text-[10px] sm:text-xs text-white/30 font-mono tracking-wide uppercase">
-          <span>Built by LCH Technologies · systems, not slides</span>
-          <span>Product Lab / 03 product references</span>
+          <span>{t('Built by LCH Technologies · systems, not slides')}</span>
+          <span>{t('Product Lab / 03 product references')}</span>
         </div>
       </div>
     </section>
