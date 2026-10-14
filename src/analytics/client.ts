@@ -9,7 +9,7 @@ export type AnalyticsEvent =
 export type SafeDimensions = {
   language?: 'es' | 'en' | 'pt';
   theme?: 'dark' | 'light';
-  product?: 'ido' | 'luma' | 'legal';
+  product?: 'ido' | 'luma' | 'legal' | 'meridian';
   section?: 'hero' | 'capabilities' | 'product' | 'contact' | 'cases';
   page_path?: '/';
 };
@@ -105,7 +105,7 @@ export function track(event: AnalyticsEvent, values: SafeDimensions = {}): void 
   const dimensions: Record<string, string> = {};
   if (values.language && ['es', 'en', 'pt'].includes(values.language)) dimensions.language = values.language;
   if (values.theme && ['dark', 'light'].includes(values.theme)) dimensions.theme = values.theme;
-  if (values.product && ['ido', 'luma', 'legal'].includes(values.product)) dimensions.product = values.product;
+  if (values.product && ['ido', 'luma', 'legal', 'meridian'].includes(values.product)) dimensions.product = values.product;
   if (values.section && ['hero', 'capabilities', 'product', 'contact', 'cases'].includes(values.section)) dimensions.section = values.section;
   if (values.page_path === '/') dimensions.page_path = '/';
   window.gtag?.('event', event, dimensions);
