@@ -125,20 +125,22 @@ export const LCH_KNOWLEDGE: readonly DonnaEntry[] = [
   },
   {
     id: 'products',
-    label: 'productos LUMA e I-DO',
-    keywords: ['luma e i do', 'luma y i do', 'luma e ido', 'luma y ido',
+    label: 'productos I-DO, LUMA y Meridian',
+    keywords: ['luma e i do', 'luma y i do', 'luma e ido', 'luma y ido', 'i do luma y meridian', 'ido luma y meridian',
+      'que hacen i do luma y meridian', 'que hacen ido luma y meridian', 'meridian', 'talent intelligence',
       'productos de lch', 'productos lch', 'que productos ofrecen', 'que productos tienen'],
     facts: [
-      'LCH presenta productos con enfoques distintos: LUMA trabaja inteligencia de aprendizaje y evidencia de progreso mediante un Learning Twin; I-DO concentra operaciones, finanzas y procesos empresariales en un Business OS multi-tenant.',
-      'También presenta Evidencia Jurídica, una experiencia de consulta normativa respaldada por fuentes. Puedes explorar los productos desde la sección de proyectos.',
+      'LCH presenta tres productos principales con enfoques distintos: I-DO concentra operaciones, finanzas y procesos empresariales en un Business OS multi-tenant; LUMA trabaja inteligencia de aprendizaje mediante un Learning Twin; Meridian organiza recruiting y Talent Intelligence con evidencia y revisión humana.',
+      'Evidencia Jurídica se presenta aparte como una referencia de Academia / Knowledge Lab para consulta normativa con fuentes y citas, no como producto principal.',
     ],
     interest: 'Software Empresarial',
     links: [
       { label: 'Probar LUMA', url: 'https://luma.lch-app.cloud/onboarding' },
       { label: 'Explorar I-DO', url: 'https://ido.lch-app.cloud/w/colombia/inicio' },
-      { label: 'Ver todos los proyectos', url: '#productos-reales' },
+      { label: 'Ver Meridian', url: '#productos-reales' },
+      { label: 'Ver todos los productos', url: '#productos-reales' },
     ],
-    followUp: '¿Te interesa aprendizaje, operaciones empresariales o consulta documental?',
+    followUp: '¿Te interesa aprendizaje, operaciones empresariales o talento y recruiting?',
   },
   {
     id: 'luma',
@@ -167,6 +169,20 @@ export const LCH_KNOWLEDGE: readonly DonnaEntry[] = [
     interest: 'Software Empresarial',
     links: [{ label: 'Conocer I-DO', url: 'https://ido.lch-app.cloud/w/colombia/inicio' }, CONTACT_LINK],
     followUp: '¿Qué parte de la operación quisieras unificar?',
+  },
+
+  {
+    id: 'meridian',
+    label: 'Meridian Talent Intelligence',
+    keywords: ['meridian', 'talent intelligence', 'recruiting crm', 'reclutamiento', 'seleccion de talento',
+      'candidatos', 'vacantes', 'talent acquisition', 'hr operations'],
+    facts: [
+      'Meridian es un Recruiting CRM multi-organización para candidatos, vacantes, aplicaciones, analítica y trazabilidad del proceso de selección.',
+      'La IA se usa para extraer evidencia relacionada con criterios del rol y preparar preguntas; las decisiones de contratación permanecen bajo revisión humana.',
+    ],
+    interest: 'Software Empresarial',
+    links: [{ label: 'Ver Meridian', url: '#productos-reales' }, CONTACT_LINK],
+    followUp: '¿Qué parte de recruiting o Talent Acquisition quieres hacer más consistente?',
   },
   {
     id: 'contact',
