@@ -38,8 +38,8 @@ Stop troubleshooting the historical n8n LCH record. Rebuild **only the LCH notif
 | --- | --- |
 | Source pipeline and live contact form | PASS (previous live form E2E) |
 | Clean inactive JSON and contract tests | PASS locally, see CI |
-| Mac n8n owner authentication | **PENDING** (previous Playwright reload ended on `/signin`) |
-| Fresh workflow import into Mac instance | **PENDING** |
+| Mac n8n owner authentication | **PASS via saved Chrome credentials**: actual UI request `POST /rest/login` and workflow/credential APIs returned HTTP 200 |
+| Fresh workflow import into Mac instance | **PASS**: personal project shows the imported inactive 13-node LCH workflow and the unchanged published Lina workflow |
 | Google Firestore service-principal authenticated query | **PENDING** |
 | Microsoft 365 OAuth2 credential connected | **PENDING** |
 | Actual four-mailbox delivery plus no replay | **PENDING** |
@@ -56,3 +56,15 @@ python3 scripts/lch_n8n_release_preflight.py --database /path/to/a/readable/data
 ```
 
 It rejects two simultaneously active LCH workflows; this is a **configuration check**, never a substitute for actual OAuth, Firestore and four-recipient inbox confirmation.
+
+## Verified live import evidence — 14 October 2026
+
+- Attached Playwright via existing Chrome CDP port `9222`; reused the existing browser and autofilled login (no password, cookies, or token contents exported).
+- Logged in using the actual n8n Sign in button; in-app workflows and credentials requests returned `200`.
+- Created a blank workflow in the **existing** Personal project, selected Import, then supplied the private checked JSON to the editor's file input via Playwright. Its canvas contained **13** `canvas-node` elements, with the expected `LCH | Contact Notifications | CLEAN v1 (INACTIVE)` title.
+- The editor exited `new=true` mode. The Personal project list showed **exactly two visible workflows**: LCH CLEAN (unpublished) and `Lina · Agenda Orchestrator` (Published).
+- The UI import assigned ID `iPYnXzUIq9Vog1PM` rather than the source JSON ID. Read-only preflight now explicitly accepts both this Mac runtime ID and the canonical source ID while rejecting concurrent active LCH pollers.
+- The credentials page displayed **Create your first credential**, confirming that Google/Outlook are not yet configured in this n8n instance.
+- No workflow was published and no email was sent. Historical inactive LCH in SQLite was not deleted or modified.
+
+**Remaining NO-GO:** bind Google and Microsoft credentials, test authorized Firestore read, send a new consented synthetic lead, verify four recipient inboxes and replay idempotency before publishing.

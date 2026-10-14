@@ -7,7 +7,10 @@ from pathlib import Path
 
 WORKFLOW_ID = 'lchContactNotifyN8nGH26'
 CLEAN_WORKFLOW_ID = 'lchContactNotifyClean20261014'
-ALLOWED_LCH_WORKFLOW_IDS = frozenset((WORKFLOW_ID, CLEAN_WORKFLOW_ID))
+# n8n 2.x assigns an instance-local ID when importing the clean JSON via its UI.
+# Verified on the Mac Personal project on 2026-10-14.
+MAC_CLEAN_WORKFLOW_ID = 'iPYnXzUIq9Vog1PM'
+ALLOWED_LCH_WORKFLOW_IDS = frozenset((WORKFLOW_ID, CLEAN_WORKFLOW_ID, MAC_CLEAN_WORKFLOW_ID))
 FIRESTORE_NODES = ('Read Consented Contacts', 'Claim Firestore Lease',
                    'Record Needs Review', 'Re-read Firestore Lease',
                    'Record Outlook Acceptance')
@@ -27,8 +30,11 @@ def audit(database: str, workflow_id: str = WORKFLOW_ID) -> dict:
         if row is None:
             return {'ready': False, 'blockers': ['lch_workflow_missing'], 'workflow_active': False}
         nodes, active = json.loads(row[0]), bool(row[1])
-        other_workflow_id = CLEAN_WORKFLOW_ID if workflow_id == WORKFLOW_ID else WORKFLOW_ID
-        other = conn.execute('SELECT active FROM workflow_entity WHERE id=?', (other_workflow_id,)).fetchone()
+        other_workflow_ids = tuple(sorted(ALLOWED_LCH_WORKFLOW_IDS - {workflow_id}))
+        other = conn.execute(
+            'SELECT COUNT(*) FROM workflow_entity WHERE active=1 AND id IN (' +
+            ','.join('?' for _ in other_workflow_ids) + ')', other_workflow_ids
+        ).fetchone()
         by_name = {n['name']: n for n in nodes}
         blockers = []
         if len(nodes) != 13:
@@ -44,7 +50,7 @@ def audit(database: str, workflow_id: str = WORKFLOW_ID) -> dict:
         code = by_name.get('Activation UTC', {}).get('parameters', {}).get('jsCode', '')
         if '__REPLACE_WITH_ACTIVATION_UTC__' in code or 'const ACTIVATION_UTC' not in code:
             blockers.append('activation_time_not_configured')
-        if other is not None and bool(other[0]):
+        if other is not None and other[0] > 0:
             blockers.append('another_lch_workflow_active')
         if not active:
             blockers.append('workflow_not_active')

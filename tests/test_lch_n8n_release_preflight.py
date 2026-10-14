@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
-from lch_n8n_release_preflight import audit, WORKFLOW_ID, CLEAN_WORKFLOW_ID, FIRESTORE_NODES, OUTLOOK_NODE
+from lch_n8n_release_preflight import audit, WORKFLOW_ID, CLEAN_WORKFLOW_ID, MAC_CLEAN_WORKFLOW_ID, FIRESTORE_NODES, OUTLOOK_NODE
 
 SOURCE = Path(__file__).resolve().parents[1] / 'workflows/n8n/lch-contact-mail-spark.workflow.json'
 CLEAN_SOURCE = Path(__file__).resolve().parents[1] / 'workflows/n8n/lch-contact-mail-clean.workflow.json'
@@ -78,6 +78,25 @@ class ReleasePreflightTests(unittest.TestCase):
                           (CLEAN_WORKFLOW_ID, json.dumps(clean['nodes']), 1))
         self.persist(enabled=True)
         result = audit(str(self.db), workflow_id=CLEAN_WORKFLOW_ID)
+        self.assertIn('another_lch_workflow_active', result['blockers'])
+
+    def test_actual_mac_ui_import_id_is_supported(self):
+        clean = json.loads(CLEAN_SOURCE.read_text())
+        self.conn.execute('INSERT INTO workflow_entity VALUES(?,?,?)',
+                          (MAC_CLEAN_WORKFLOW_ID, json.dumps(clean['nodes']), 0))
+        self.conn.commit()
+        result = audit(str(self.db), workflow_id=MAC_CLEAN_WORKFLOW_ID)
+        self.assertFalse(result['ready'])
+        self.assertIn('activation_time_not_configured', result['blockers'])
+
+    def test_concurrent_clean_imports_are_rejected(self):
+        clean = json.loads(CLEAN_SOURCE.read_text())
+        self.conn.execute('INSERT INTO workflow_entity VALUES(?,?,?)',
+                          (MAC_CLEAN_WORKFLOW_ID, json.dumps(clean['nodes']), 1))
+        self.conn.execute('INSERT INTO workflow_entity VALUES(?,?,?)',
+                          (CLEAN_WORKFLOW_ID, json.dumps(clean['nodes']), 1))
+        self.conn.commit()
+        result = audit(str(self.db), workflow_id=MAC_CLEAN_WORKFLOW_ID)
         self.assertIn('another_lch_workflow_active', result['blockers'])
 
     def test_unknown_workflow_id_is_refused(self):
