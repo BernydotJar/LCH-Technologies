@@ -137,7 +137,7 @@ export const LCH_KNOWLEDGE: readonly DonnaEntry[] = [
     links: [
       { label: 'Probar LUMA', url: 'https://luma.lch-app.cloud/onboarding' },
       { label: 'Explorar I-DO', url: 'https://ido.lch-app.cloud/w/colombia/inicio' },
-      { label: 'Ver Meridian', url: '#productos-reales' },
+      { label: 'Ver Meridian', url: 'https://meridian.lch-app.cloud/' },
       { label: 'Ver todos los productos', url: '#productos-reales' },
     ],
     followUp: '¿Te interesa aprendizaje, operaciones empresariales o talento y recruiting?',
@@ -181,7 +181,7 @@ export const LCH_KNOWLEDGE: readonly DonnaEntry[] = [
       'La IA se usa para extraer evidencia relacionada con criterios del rol y preparar preguntas; las decisiones de contratación permanecen bajo revisión humana.',
     ],
     interest: 'Software Empresarial',
-    links: [{ label: 'Ver Meridian', url: '#productos-reales' }, CONTACT_LINK],
+    links: [{ label: 'Ver Meridian', url: 'https://meridian.lch-app.cloud/' }, CONTACT_LINK],
     followUp: '¿Qué parte de recruiting o Talent Acquisition quieres hacer más consistente?',
   },
   {
