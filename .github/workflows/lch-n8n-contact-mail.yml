@@ -8,6 +8,12 @@ on:
       - 'scripts/lch_n8n_release_preflight.py'
       - 'scripts/lchGoogleIamAudit.cjs'
       - 'tests/lchGoogleIamAudit.test.cjs'
+      - 'scripts/lch-n8n-mac-bootstrap.sh'
+      - 'scripts/lch_n8n_workflow_guard.py'
+      - 'scripts/lch_entra_mail_audit.py'
+      - 'tests/test_lch_n8n_workflow_guard.py'
+      - 'tests/test_lch_entra_mail_audit.py'
+      - 'docs/lch-n8n-mac-cutover.md'
       - '.github/workflows/lch-n8n-contact-mail.yml'
   workflow_dispatch:
 jobs:
@@ -28,6 +34,10 @@ jobs:
           python-version: '3.12'
       - name: Verify read-only release preflight without credentials
         run: python3 -m unittest tests/test_lch_n8n_release_preflight.py -v
+      - name: Verify idempotent and owner-aware Mac n8n cutover
+        run: |
+          python3 -m unittest tests/test_lch_n8n_workflow_guard.py tests/test_lch_entra_mail_audit.py -v
+          bash -n scripts/lch-n8n-mac-bootstrap.sh
       - name: Verify JSON parse and fail-closed activation
         run: |
           node -e 'const p=require("./workflows/n8n/lch-contact-mail-spark.workflow.json");if(p.active!==false||!p.nodes.find(n=>n.name==="Activation UTC").parameters.jsCode.includes("__REPLACE_WITH_ACTIVATION_UTC__"))process.exit(1);'
