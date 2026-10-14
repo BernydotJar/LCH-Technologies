@@ -81,7 +81,7 @@ const CONTEXTUAL_PROMPTS: Partial<Record<InterestArea, readonly DonnaSuggestedPr
     { label: 'Conocer Evidence AI', message: '¿Cómo funciona Evidence AI para buscar en documentos?' },
   ],
   'Software Empresarial': [
-    { label: 'Conocer LUMA e I-DO', message: '¿Qué hacen LUMA e I-DO?' },
+    { label: 'Conocer productos LCH', message: '¿Qué hacen I-DO, LUMA y Meridian?' },
     { label: 'Explorar cloud', message: '¿Qué soluciones de Cloud ofrece LCH?' },
   ],
   'Cloud': [
