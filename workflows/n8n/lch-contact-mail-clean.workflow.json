@@ -1,0 +1,397 @@
+{
+  "id": "lchContactNotifyClean20261014",
+  "name": "LCH | Contact Notifications | CLEAN v1 (INACTIVE)",
+  "nodes": [
+    {
+      "id": "lch-clean-v1-01",
+      "name": "Every 5 Minutes",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -920,
+        180
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 5
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lch-clean-v1-02",
+      "name": "Activation UTC",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -700,
+        180
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Fail closed: replace the placeholder with an exact UTC timestamp immediately\n// before enabling this workflow. Prior leads are never mailed retroactively.\nconst ACTIVATION_UTC = '__REPLACE_WITH_ACTIVATION_UTC__';\nif (!/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$/.test(ACTIVATION_UTC) ||\n    !Number.isFinite(Date.parse(ACTIVATION_UTC)) || Date.parse(ACTIVATION_UTC) > Date.now()) return [];\nreturn [{json:{activationUtc:ACTIVATION_UTC}}];"
+      }
+    },
+    {
+      "id": "lch-clean-v1-03",
+      "name": "Read Consented Contacts",
+      "type": "n8n-nodes-base.googleFirebaseCloudFirestore",
+      "typeVersion": 1.1,
+      "position": [
+        -480,
+        180
+      ],
+      "parameters": {
+        "authentication": "serviceAccount",
+        "resource": "document",
+        "operation": "query",
+        "projectId": "rag-municipalidades",
+        "database": "ai-studio-8963e7a3-87ce-4ca9-938c-9490f698d4c7",
+        "query": "={{ JSON.stringify({structuredQuery:{from:[{collectionId:'demoRequests'}],where:{fieldFilter:{field:{fieldPath:'createdAt'},op:'GREATER_THAN_OR_EQUAL',value:{timestampValue:$json.activationUtc}}},orderBy:[{field:{fieldPath:'createdAt'},direction:'DESCENDING'},{field:{fieldPath:'__name__'},direction:'DESCENDING'}],limit:40}}) }}",
+        "simple": false
+      }
+    },
+    {
+      "id": "lch-clean-v1-04",
+      "name": "Prepare eligible leads",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -260,
+        180
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Code node: only approved contact fields and one fixed four-recipient list.\nconst LIMIT = 6;\nconst activation = Date.parse($('Activation UTC').first().json.activationUtc);\nconst rows = $input.all();\nconst recipients = [\n  'contacto@lch-technologies.com',\n  'eduardo.sacahui@lch-technologies.com',\n  'lina.saldarriaga@lchtechnologies.onmicrosoft.com',\n  'sara.saldarriaga@lchtechnologies.onmicrosoft.com',\n];\nconst interests = new Set(['Inteligencia Artificial','Automatización','Software Empresarial','Cloud','LCH Evidence AI','Otro']);\nfunction decode(v) {\n  if (v?.stringValue !== undefined) return v.stringValue;\n  if (v?.booleanValue !== undefined) return v.booleanValue;\n  if (v?.integerValue !== undefined) return Number(v.integerValue);\n  if (v?.timestampValue !== undefined) return v.timestampValue;\n  if (v?.nullValue !== undefined) return null;\n  if (v?.mapValue) return Object.fromEntries(Object.entries(v.mapValue.fields || {}).map(([k,w])=>[k,decode(w)]));\n  return undefined;\n}\nconst sanitize = (value,length=250) => typeof value === 'string' ? value.replace(/[\\u0000-\\u001f\\u007f]/g,' ').trim().slice(0,length) : '';\nconst esc = value => String(value??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;').replace(/'/g,'&#39;');\nconst out=[];\nfor (let i=0;i<rows.length && out.length<LIMIT;i++) {\n  const doc=rows[i].json.document;\n  if (!doc?.name || !doc?.updateTime || !doc.fields || !doc.name.includes('/demoRequests/')) continue;\n  const lead=Object.fromEntries(Object.entries(doc.fields).map(([k,v])=>[k,decode(v)]));\n  if (lead.source!=='website' || lead.consentimiento!==true || !interests.has(lead.interes)) continue;\n  if (!Number.isFinite(Date.parse(lead.createdAt)) || Date.parse(lead.createdAt)<activation) continue;\n  if (!['nombre','apellido','email','empresa','cargo'].every(k=>sanitize(lead[k],255))) continue;\n  const email=sanitize(lead.email,254);\n  if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) continue;\n  const previous=lead.notification||{};\n  if (['accepted','blocked','needs_review','invalid'].includes(previous.state)) continue;\n  if (previous.state==='sending' && Number(previous.leaseUntilMs||0)>Date.now()) continue;\n  const attempts=Number(previous.attempts||0)+1;\n  if (!Number.isSafeInteger(attempts) || attempts>7) continue;\n  const leadId=doc.name.split('/').at(-1);\n  if (!/^[a-zA-Z0-9_-]{5,180}$/.test(leadId)) continue;\n  const leaseId=String($execution.id)+'-'+leadId+'-'+attempts;\n  const pairs=[\n    ['Nombre',sanitize(lead.nombre,80)+' '+sanitize(lead.apellido,80)],\n    ['Correo',email], ['Organización',sanitize(lead.empresa,160)],\n    ['Cargo',sanitize(lead.cargo,160)], ['Interés',lead.interes],\n    ['Necesidad',sanitize(lead.mensaje,2000)||'(No proporcionada)'],['Referencia',leadId],\n  ];\n  const html='<!doctype html><html lang=\"es\"><body style=\"font-family:Arial,sans-serif;background:#f8fafc;padding:24px;color:#102a43\"><main style=\"margin:auto;max-width:680px;background:#fff;padding:24px;border-radius:12px\"><p style=\"letter-spacing:2px;font-size:12px;color:#0f766e\">LCH TECHNOLOGIES</p><h1>Nueva solicitud de contacto</h1><table style=\"border-collapse:collapse;width:100%\">'+pairs.map(([k,v])=>'<tr><th style=\"text-align:left;padding:9px;border-bottom:1px solid #e2e8f0\">'+esc(k)+'</th><td style=\"padding:9px;border-bottom:1px solid #e2e8f0\">'+esc(v)+'</td></tr>').join('')+'</table><p style=\"font-size:12px;color:#475569\">Solicitud de lch-app.cloud. Responder al prospecto cuando corresponda.</p></main></body></html>';\n  const now=Date.now();\n  const claimBody={name:doc.name,fields:{notification:{mapValue:{fields:{\n    provider:{stringValue:'n8n_outlook'},state:{stringValue:'sending'},\n    attempts:{integerValue:String(attempts)},leaseId:{stringValue:leaseId},\n    leaseUntilMs:{integerValue:String(now+120000)},updatedAt:{stringValue:new Date(now).toISOString()},\n  }}}}};\n  out.push({json:{leadId,documentName:doc.name,updateTime:doc.updateTime,leaseId,attempts,claimBody,\n    recipients:recipients.join(','),subject:'[LCH] Nuevo contacto: '+sanitize(lead.empresa,75)+' - '+lead.interes,\n    html,replyTo:email},pairedItem:{item:i}});\n}\nreturn out;"
+      }
+    },
+    {
+      "id": "lch-clean-v1-05",
+      "name": "Claim Firestore Lease",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -40,
+        180
+      ],
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ 'https://firestore.googleapis.com/v1/' + $json.documentName + '?updateMask.fieldPaths=notification&currentDocument.updateTime=' + encodeURIComponent($json.updateTime) }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "options": {
+          "timeout": 30000
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.claimBody) }}"
+      },
+      "continueOnFail": true
+    },
+    {
+      "id": "lch-clean-v1-06",
+      "name": "Confirm Firestore Lease",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        180,
+        180
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Only a successful Firestore CAS lease may proceed to Outlook.\n// With continueOnFail, conflicts/errors must never become mail candidates.\nconst out=[];\nfor(let i=0;i<$input.all().length;i++) {\n  const saved=$input.all()[i].json || {};\n  const expected=$('Prepare eligible leads').itemMatching(i).json;\n  const state=saved.fields?.notification?.mapValue?.fields || {};\n  if(saved.name!==expected.documentName || state.state?.stringValue!=='sending' || state.leaseId?.stringValue!==expected.leaseId) continue;\n  out.push({json:{claimConfirmed:true,leadId:expected.leadId},pairedItem:{item:i}});\n}\nreturn out;"
+      }
+    },
+    {
+      "id": "lch-clean-v1-07",
+      "name": "Outlook Send Four Recipients",
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        400,
+        180
+      ],
+      "parameters": {
+        "authentication": "microsoftOutlookOAuth2Api",
+        "resource": "message",
+        "operation": "send",
+        "toRecipients": "={{ $('Prepare eligible leads').item.json.recipients }}",
+        "subject": "={{ $('Prepare eligible leads').item.json.subject }}",
+        "bodyContent": "={{ $('Prepare eligible leads').item.json.html }}",
+        "additionalFields": {
+          "from": "contacto@lch-technologies.com",
+          "bodyContentType": "html",
+          "replyTo": "={{ $('Prepare eligible leads').item.json.replyTo }}",
+          "saveToSentItems": true,
+          "internetMessageHeaders": {
+            "headers": [
+              {
+                "name": "x-lch-lead-id",
+                "value": "={{ $('Prepare eligible leads').item.json.leadId }}"
+              }
+            ]
+          }
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "id": "lch-clean-v1-08",
+      "name": "Confirm Outlook Accepted",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        620,
+        180
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Outlook's installed v2 send operation emits {success:true} only after\n// provider acceptance. Failed deliveries may flow here with an error payload.\n// Never ACK Firestore unless the provider explicitly reported success.\nconst out=[];\nfor(let i=0;i<$input.all().length;i++) {\n  const result=$input.all()[i].json || {};\n  if(result.success!==true) continue;\n  const source=$('Prepare eligible leads').itemMatching(i).json;\n  out.push({json:{providerAccepted:true,leadId:source.leadId},pairedItem:{item:i}});\n}\nreturn out;"
+      }
+    },
+    {
+      "id": "lch-clean-v1-09",
+      "name": "Re-read Firestore Lease",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        840,
+        180
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "={{ 'https://firestore.googleapis.com/v1/' + $('Prepare eligible leads').item.json.documentName }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "options": {
+          "timeout": 30000
+        }
+      }
+    },
+    {
+      "id": "lch-clean-v1-10",
+      "name": "Verify Original Lease",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1060,
+        180
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// After Outlook send, verify the lease has not been taken over before ACK.\nconst out=[];\nfor (let i=0;i<$input.all().length;i++) {\n  const result=$input.all()[i].json;\n  const source=$('Prepare eligible leads').itemMatching(i).json;\n  const values=result.fields?.notification?.mapValue?.fields||{};\n  if (values.state?.stringValue!=='sending' || values.leaseId?.stringValue!==source.leaseId) continue;\n  if (!result.updateTime || result.name!==source.documentName) continue;\n  const acceptedAt=new Date().toISOString();\n  const ackBody={name:result.name,fields:{notification:{mapValue:{fields:{\n    provider:{stringValue:'n8n_outlook'},state:{stringValue:'accepted'},\n    attempts:{integerValue:String(source.attempts)},\n    leaseId:{stringValue:source.leaseId},leaseUntilMs:{integerValue:'0'},\n    acceptedAt:{stringValue:acceptedAt},updatedAt:{stringValue:acceptedAt},\n  }}}}};\n  out.push({json:{documentName:result.name,updateTime:result.updateTime,ackBody,leadId:source.leadId},pairedItem:{item:i}});\n}\nreturn out;"
+      }
+    },
+    {
+      "id": "lch-clean-v1-11",
+      "name": "Record Outlook Acceptance",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1280,
+        180
+      ],
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ 'https://firestore.googleapis.com/v1/' + $json.documentName + '?updateMask.fieldPaths=notification&currentDocument.updateTime=' + encodeURIComponent($json.updateTime) }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "options": {
+          "timeout": 30000
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.ackBody) }}"
+      }
+    },
+    {
+      "id": "lch-clean-v1-12",
+      "name": "Select Retry-Exhausted Leads",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -260,
+        450
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Dead-letter exhausted consented leads WITHOUT sending email.\n// This branch writes only notification.needs_review under Firestore CAS.\nconst activation=Date.parse($('Activation UTC').first().json.activationUtc);\nconst rows=$input.all();\nconst out=[];\nfunction decode(v){\n if(v?.stringValue!==undefined)return v.stringValue;\n if(v?.booleanValue!==undefined)return v.booleanValue;\n if(v?.integerValue!==undefined)return Number(v.integerValue);\n if(v?.timestampValue!==undefined)return v.timestampValue;\n if(v?.nullValue!==undefined)return null;\n if(v?.mapValue)return Object.fromEntries(Object.entries(v.mapValue.fields||{}).map(([k,w])=>[k,decode(w)]));\n return undefined;\n}\nfor(let i=0;i<rows.length && out.length<6;i++){\n const doc=rows[i].json.document;\n if(!doc?.name||!doc?.updateTime||!doc.fields||!doc.name.includes('/demoRequests/'))continue;\n const lead=Object.fromEntries(Object.entries(doc.fields).map(([k,v])=>[k,decode(v)]));\n if(lead.consentimiento!==true||lead.source!=='website')continue;\n if(!Number.isFinite(Date.parse(lead.createdAt))||Date.parse(lead.createdAt)<activation)continue;\n const prior=lead.notification||{};\n if(['accepted','needs_review','blocked','invalid'].includes(prior.state))continue;\n if(prior.state==='sending'&&Number(prior.leaseUntilMs||0)>Date.now())continue;\n const count=Number(prior.attempts||0);\n if(!Number.isSafeInteger(count)||count<7)continue;\n const now=new Date().toISOString();\n const reviewBody={name:doc.name,fields:{notification:{mapValue:{fields:{\n  provider:{stringValue:'n8n_outlook'},state:{stringValue:'needs_review'},\n  attempts:{integerValue:String(count)},errorCode:{stringValue:'retry_limit'},\n  leaseUntilMs:{integerValue:'0'},updatedAt:{stringValue:now}\n }}}}};\n out.push({json:{documentName:doc.name,updateTime:doc.updateTime,reviewBody},pairedItem:{item:i}});\n}\nreturn out;"
+      }
+    },
+    {
+      "id": "lch-clean-v1-13",
+      "name": "Record Needs Review",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -40,
+        450
+      ],
+      "continueOnFail": true,
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ 'https://firestore.googleapis.com/v1/' + $json.documentName + '?updateMask.fieldPaths=notification&currentDocument.updateTime=' + encodeURIComponent($json.updateTime) }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "options": {
+          "timeout": 30000
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.reviewBody) }}"
+      }
+    }
+  ],
+  "connections": {
+    "Every 5 Minutes": {
+      "main": [
+        [
+          {
+            "node": "Activation UTC",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Activation UTC": {
+      "main": [
+        [
+          {
+            "node": "Read Consented Contacts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Consented Contacts": {
+      "main": [
+        [
+          {
+            "node": "Prepare eligible leads",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Select Retry-Exhausted Leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare eligible leads": {
+      "main": [
+        [
+          {
+            "node": "Claim Firestore Lease",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Claim Firestore Lease": {
+      "main": [
+        [
+          {
+            "node": "Confirm Firestore Lease",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Outlook Send Four Recipients": {
+      "main": [
+        [
+          {
+            "node": "Confirm Outlook Accepted",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Re-read Firestore Lease": {
+      "main": [
+        [
+          {
+            "node": "Verify Original Lease",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verify Original Lease": {
+      "main": [
+        [
+          {
+            "node": "Record Outlook Acceptance",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Confirm Firestore Lease": {
+      "main": [
+        [
+          {
+            "node": "Outlook Send Four Recipients",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Confirm Outlook Accepted": {
+      "main": [
+        [
+          {
+            "node": "Re-read Firestore Lease",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Select Retry-Exhausted Leads": {
+      "main": [
+        [
+          {
+            "node": "Record Needs Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Guatemala",
+    "saveDataSuccessExecution": "none",
+    "saveDataErrorExecution": "none",
+    "saveManualExecutions": false,
+    "saveExecutionProgress": false
+  },
+  "pinData": {},
+  "meta": {
+    "lchProject": "LCH-Technologies",
+    "requiredFirebasePlan": "Spark",
+    "cutover": "clean-workflow-not-activated",
+    "sourceOfTruth": "Firestore demoRequests in named database",
+    "protectExisting": "do not modify or activate Lina; old LCH workflow stays inactive",
+    "activationPlaceholder": true,
+    "graphNode": "LCH-N8N-CLEAN-20261014"
+  },
+  "tags": []
+}

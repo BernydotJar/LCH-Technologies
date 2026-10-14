@@ -5,9 +5,10 @@ import unittest
 from pathlib import Path
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
-from lch_n8n_release_preflight import audit, WORKFLOW_ID, FIRESTORE_NODES, OUTLOOK_NODE
+from lch_n8n_release_preflight import audit, WORKFLOW_ID, CLEAN_WORKFLOW_ID, FIRESTORE_NODES, OUTLOOK_NODE
 
 SOURCE = Path(__file__).resolve().parents[1] / 'workflows/n8n/lch-contact-mail-spark.workflow.json'
+CLEAN_SOURCE = Path(__file__).resolve().parents[1] / 'workflows/n8n/lch-contact-mail-clean.workflow.json'
 
 
 class ReleasePreflightTests(unittest.TestCase):
@@ -58,6 +59,30 @@ class ReleasePreflightTests(unittest.TestCase):
         result = audit(str(self.db))
         self.assertTrue(result['ready'])
         self.assertFalse(result['live_receipts_verified'])
+
+    def test_clean_restart_id_is_audited_separately(self):
+        clean = json.loads(CLEAN_SOURCE.read_text())
+        self.conn.execute('INSERT INTO workflow_entity VALUES(?,?,?)',
+                          (CLEAN_WORKFLOW_ID, json.dumps(clean['nodes']), 0))
+        self.conn.commit()
+        result = audit(str(self.db), workflow_id=CLEAN_WORKFLOW_ID)
+        self.assertFalse(result['ready'])
+        self.assertIn('activation_time_not_configured', result['blockers'])
+        self.assertIn('google_firestore_credential_not_bound', result['blockers'])
+        self.assertIn('outlook_credential_not_bound', result['blockers'])
+        self.assertIn('workflow_not_active', result['blockers'])
+
+    def test_clean_restart_never_claims_go_if_old_lch_is_active(self):
+        clean = json.loads(CLEAN_SOURCE.read_text())
+        self.conn.execute('INSERT INTO workflow_entity VALUES(?,?,?)',
+                          (CLEAN_WORKFLOW_ID, json.dumps(clean['nodes']), 1))
+        self.persist(enabled=True)
+        result = audit(str(self.db), workflow_id=CLEAN_WORKFLOW_ID)
+        self.assertIn('another_lch_workflow_active', result['blockers'])
+
+    def test_unknown_workflow_id_is_refused(self):
+        result = audit(str(self.db), workflow_id='lina')
+        self.assertIn('workflow_id_not_allowed', result['blockers'])
 
     def test_wrong_revision_blocks_a_workflow_even_if_active(self):
         self.workflow['nodes'].pop()
