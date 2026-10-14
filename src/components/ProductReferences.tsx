@@ -11,12 +11,17 @@ import {
   Scale,
   ShieldCheck,
   Sparkles,
+  Users,
+  Briefcase,
+  FileText,
+  Search,
+  BarChart3,
 } from 'lucide-react';
 import { useLocale } from '../i18n/LocaleProvider';
 import { track } from '../analytics/client';
 
 type ProductReference = {
-  id: 'ido' | 'luma' | 'legal';
+  id: 'ido' | 'luma' | 'meridian';
   name: string;
   kicker: string;
   label: string;
@@ -79,25 +84,25 @@ const products: ProductReference[] = [
     icon: BookOpenCheck,
   },
   {
-    id: 'legal',
-    name: 'Evidencia Jurídica',
-    kicker: 'Evidence-first RAG',
-    label: 'Respuestas jurídicas con trazabilidad antes que confianza ciega.',
+    id: 'meridian',
+    name: 'Meridian',
+    kicker: 'Talent Intelligence',
+    label: 'Recruiting CRM con evidencia estructurada y decisión humana en el centro.',
     description:
-      'Consulta normativa y procedimientos con citas, clasificación de fuentes y límites explícitos de confianza.',
+      'Plataforma multi-organización para candidatos, vacantes, aplicaciones, analítica y trazabilidad del proceso de selección.',
     whatIsIt:
-      'Un asistente jurídico RAG que responde desde fuentes normativas verificables y muestra la evidencia, citas y límites de confianza detrás de cada respuesta.',
-    idealFor: ['Legal', 'Compliance', 'Gobierno', 'Knowledge operations'],
-    url: 'https://evidencia.lch-app.cloud/',
-    displayUrl: 'evidencia.lch-app.cloud / public demo',
-    tags: ['RAG', 'Legal AI', 'Citations'],
-    embed: true,
-    live: true,
-    publicAvailable: true,
-    availabilityLabel: 'Demo interactiva disponible',
-    stat: 'RAG',
-    statLabel: 'evidence-first',
-    icon: Scale,
+      'Un Recruiting CRM y sistema de Talent Intelligence que organiza candidatos, vacantes y aplicaciones, usa IA para extraer evidencia relacionada con criterios del rol y mantiene la decisión de contratación bajo revisión humana.',
+    idealFor: ['Talent Acquisition', 'HR Operations', 'Recruiting teams', 'Organizaciones multi-equipo'],
+    url: 'https://meridian.lch-app.cloud/',
+    displayUrl: 'meridian.lch-app.cloud / recruiting',
+    tags: ['Recruiting CRM', 'Human-in-the-loop', 'Evidence', 'Multi-org'],
+    embed: false,
+    live: false,
+    publicAvailable: false,
+    availabilityLabel: 'Preview disponible · dominio público en activación',
+    stat: 'TALENT',
+    statLabel: 'human-led intelligence',
+    icon: Users,
   },
 ];
 
@@ -191,6 +196,107 @@ const IdoPreview = () => {
       </div>
     </div>
   </div>
+  );
+};
+
+const MeridianPreview = () => {
+  const { t } = useLocale();
+  return (
+    <div className="relative h-full overflow-hidden bg-[#f7f8fb] text-slate-900">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_12%,rgba(99,102,241,0.16),transparent_30%)]" />
+      <div className="relative h-full grid grid-cols-[72px_1fr] sm:grid-cols-[86px_1fr]">
+        <aside className="border-r border-slate-200 bg-white/90 p-3 sm:p-4 flex flex-col items-center gap-5">
+          <div className="w-10 h-10 rounded-xl bg-[#2f2a72] text-white flex items-center justify-center font-bold">M</div>
+          {[Users, Briefcase, Search, BarChart3].map((Icon, index) => (
+            <div
+              key={index}
+              className={`w-9 h-9 rounded-lg flex items-center justify-center ${index === 0 ? 'bg-[#2f2a72] text-white' : 'text-slate-400'}`}
+            >
+              <Icon size={17} />
+            </div>
+          ))}
+        </aside>
+
+        <div className="min-w-0 p-4 sm:p-7 lg:p-9">
+          <div className="flex items-center justify-between gap-4 mb-7">
+            <div>
+              <div className="text-[10px] sm:text-xs uppercase tracking-[0.2em] text-slate-400 font-semibold">Talent workspace</div>
+              <h4 className="text-xl sm:text-2xl font-bold mt-1">Recruiting command center</h4>
+            </div>
+            <div className="hidden sm:flex items-center gap-2 text-xs font-semibold text-violet-700 bg-violet-50 border border-violet-100 px-3 py-2 rounded-full">
+              <span className="w-2 h-2 rounded-full bg-violet-500" />
+              {t('Human review required')}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+            {[
+              ['Candidatos', '248', 'pipeline activo'],
+              ['Vacantes', '12', '6 prioritarias'],
+              ['Evidencia', '94%', 'criterios trazables'],
+              ['Decisiones IA', '0', 'human-led'],
+            ].map(([name, value, detail]) => (
+              <div key={name} className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+                <div className="text-[10px] sm:text-xs text-slate-400 mb-2">{t(name)}</div>
+                <div className="text-lg sm:text-2xl font-bold">{value}</div>
+                <div className="text-[10px] sm:text-xs text-violet-600 mt-1">{t(detail)}</div>
+              </div>
+            ))}
+          </div>
+
+          <div className="grid lg:grid-cols-[1.15fr_0.85fr] gap-4">
+            <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm min-h-[250px]">
+              <div className="flex items-center justify-between mb-5">
+                <div>
+                  <div className="font-semibold">{t('Pipeline de talento')}</div>
+                  <div className="text-xs text-slate-400 mt-1">{t('Evidencia por etapa, sin decisiones automáticas')}</div>
+                </div>
+                <Briefcase size={18} className="text-violet-500" />
+              </div>
+              <div className="space-y-3">
+                {[
+                  ['Senior AI Engineer', '18 candidatos', '6 con evidencia completa'],
+                  ['Finance Automation Lead', '12 candidatos', '4 para revisión'],
+                  ['Solutions Architect', '21 candidatos', '8 con criterios verificados'],
+                ].map(([role, candidates, evidence]) => (
+                  <div key={role} className="rounded-xl border border-slate-100 bg-slate-50 px-4 py-3">
+                    <div className="flex items-center justify-between gap-4">
+                      <span className="text-sm font-semibold">{role}</span>
+                      <span className="text-[10px] rounded-full bg-violet-100 text-violet-700 px-2 py-1">{candidates}</span>
+                    </div>
+                    <div className="mt-2 flex items-center gap-2 text-[11px] text-slate-500">
+                      <FileText size={13} className="text-violet-500" />
+                      {evidence}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="bg-[#211d52] text-white rounded-xl p-5 shadow-sm min-h-[250px] flex flex-col justify-between">
+              <div>
+                <div className="flex items-center gap-2 text-xs text-violet-200 mb-4">
+                  <Sparkles size={14} />
+                  Talent intelligence
+                </div>
+                <div className="text-lg font-bold leading-tight">{t('La IA aporta evidencia. La persona decide.')}</div>
+                <p className="text-sm text-white/55 mt-3 leading-relaxed">
+                  {t('Meridian relaciona evidencia del CV con criterios del rol y prepara preguntas para revisión humana.')}
+                </p>
+              </div>
+              <div className="space-y-2 mt-6">
+                {[t('Evidencia del criterio'), t('Pregunta sugerida'), t('Revisión del recruiter')].map((item) => (
+                  <div key={item} className="flex items-center justify-between text-xs bg-white/5 border border-white/10 rounded-lg px-3 py-2.5">
+                    <span>{item}</span>
+                    <CircleCheck size={13} className="text-violet-200" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
@@ -374,6 +480,8 @@ export const ProductReferences = () => {
                     sandbox="allow-forms allow-modals allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"
                     className="absolute inset-0 w-full h-full border-0 bg-white"
                   />
+                ) : active.id === 'meridian' ? (
+                  <MeridianPreview />
                 ) : (
                   <IdoPreview />
                 )}
@@ -425,6 +533,33 @@ export const ProductReferences = () => {
             )}
           </motion.div>
         </AnimatePresence>
+
+        <div className="max-w-[1240px] mx-auto mt-10">
+          <a
+            href="https://evidencia.lch-app.cloud/"
+            target="_blank"
+            rel="noreferrer"
+            onClick={() => track('cta_click', { section: 'product' })}
+            className="group flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 rounded-2xl border border-white/10 bg-white/[0.035] px-5 sm:px-6 py-5 hover:bg-white/[0.06] hover:border-sky-300/20 transition-colors"
+          >
+            <div className="flex items-start gap-4">
+              <span className="mt-0.5 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.05] text-sky-200">
+                <Scale size={18} />
+              </span>
+              <div>
+                <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-sky-300">{t('Academia / Knowledge Lab')}</div>
+                <div className="mt-1 font-bold text-white">Evidencia Jurídica</div>
+                <p className="mt-1 text-xs sm:text-sm text-white/45 leading-relaxed">
+                  {t('Una referencia académica de RAG jurídico con fuentes, citas y trazabilidad. No forma parte del portafolio principal de productos.')}
+                </p>
+              </div>
+            </div>
+            <div className="inline-flex items-center gap-2 text-sm font-semibold text-white/70 group-hover:text-white transition-colors">
+              {t('Explorar Knowledge Lab')}
+              <ArrowUpRight size={16} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+            </div>
+          </a>
+        </div>
 
         <div className="max-w-[1240px] mx-auto mt-12 pt-6 border-t border-white/10 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between text-[10px] sm:text-xs text-white/30 font-mono tracking-wide uppercase">
           <span>{t('Built by LCH Technologies · systems, not slides')}</span>
