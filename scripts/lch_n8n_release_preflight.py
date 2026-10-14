@@ -6,23 +6,35 @@ import sqlite3
 from pathlib import Path
 
 WORKFLOW_ID = 'lchContactNotifyN8nGH26'
+CLEAN_WORKFLOW_ID = 'lchContactNotifyClean20261014'
+# n8n 2.x assigns an instance-local ID when importing the clean JSON via its UI.
+# Verified on the Mac Personal project on 2026-10-14.
+MAC_CLEAN_WORKFLOW_ID = 'iPYnXzUIq9Vog1PM'
+ALLOWED_LCH_WORKFLOW_IDS = frozenset((WORKFLOW_ID, CLEAN_WORKFLOW_ID, MAC_CLEAN_WORKFLOW_ID))
 FIRESTORE_NODES = ('Read Consented Contacts', 'Claim Firestore Lease',
                    'Record Needs Review', 'Re-read Firestore Lease',
                    'Record Outlook Acceptance')
 OUTLOOK_NODE = 'Outlook Send Four Recipients'
 
 
-def audit(database: str) -> dict:
+def audit(database: str, workflow_id: str = WORKFLOW_ID) -> dict:
+    if workflow_id not in ALLOWED_LCH_WORKFLOW_IDS:
+        return {'ready': False, 'blockers': ['workflow_id_not_allowed'], 'workflow_active': False, 'live_receipts_verified': False}
     conn = sqlite3.connect(f'file:{Path(database).resolve()}?mode=ro', uri=True, timeout=5)
     try:
         row = conn.execute('SELECT nodes, active FROM workflow_entity WHERE id=?',
-                           (WORKFLOW_ID,)).fetchone()
+                           (workflow_id,)).fetchone()
         types = {str(r[0]): set() for r in conn.execute('SELECT DISTINCT type FROM credentials_entity')}
         for cred_id, cred_type in conn.execute('SELECT id, type FROM credentials_entity'):
             types[cred_type].add(cred_id)
         if row is None:
             return {'ready': False, 'blockers': ['lch_workflow_missing'], 'workflow_active': False}
         nodes, active = json.loads(row[0]), bool(row[1])
+        other_workflow_ids = tuple(sorted(ALLOWED_LCH_WORKFLOW_IDS - {workflow_id}))
+        other = conn.execute(
+            'SELECT COUNT(*) FROM workflow_entity WHERE active=1 AND id IN (' +
+            ','.join('?' for _ in other_workflow_ids) + ')', other_workflow_ids
+        ).fetchone()
         by_name = {n['name']: n for n in nodes}
         blockers = []
         if len(nodes) != 13:
@@ -38,6 +50,8 @@ def audit(database: str) -> dict:
         code = by_name.get('Activation UTC', {}).get('parameters', {}).get('jsCode', '')
         if '__REPLACE_WITH_ACTIVATION_UTC__' in code or 'const ACTIVATION_UTC' not in code:
             blockers.append('activation_time_not_configured')
+        if other is not None and other[0] > 0:
+            blockers.append('another_lch_workflow_active')
         if not active:
             blockers.append('workflow_not_active')
         # Credentials present/bound and active do not prove OAuth validity, Microsoft sender
@@ -51,9 +65,10 @@ def audit(database: str) -> dict:
 def main() -> int:
     parser = argparse.ArgumentParser(description='Read-only LCH n8n release prerequisite audit')
     parser.add_argument('--database', default='/workspace/_shared/lina-n8n-runtime/data/database.sqlite')
+    parser.add_argument('--workflow-id', choices=sorted(ALLOWED_LCH_WORKFLOW_IDS), default=WORKFLOW_ID)
     args = parser.parse_args()
     try:
-        result = audit(args.database)
+        result = audit(args.database, workflow_id=args.workflow_id)
     except (OSError, sqlite3.Error, ValueError, KeyError) as exc:
         result = {'ready': False, 'blockers': ['prerequisite_audit_failed'], 'workflow_active': False,
                   'live_receipts_verified': False}
