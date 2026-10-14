@@ -68,3 +68,23 @@ It rejects two simultaneously active LCH workflows; this is a **configuration ch
 - No workflow was published and no email was sent. Historical inactive LCH in SQLite was not deleted or modified.
 
 **Remaining NO-GO:** bind Google and Microsoft credentials, test authorized Firestore read, send a new consented synthetic lead, verify four recipient inboxes and replay idempotency before publishing.
+
+**n8n query parser fix (14 October):** The Firestore Query JSON expression displayed `invalid syntax` because it embedded adjacent object braces within `{{ ... }}`. The clean workflow now constructs the exact Firestore structured query in the fail-closed Activation UTC Code node and passes it as `={{ $json.firestoreQuery }}`. This avoids ambiguous template parsing and is independently VM-tested.
+
+## Live n8n review: 14 October 2026
+
+Playwright attached to the already-open Chrome 155 via the existing local CDP endpoint. The exact Mac n8n editor workflow is `/workflow/iPYnXzUIq9Vog1PM`, with 13 nodes and 6 validation badges.
+
+The six flagged nodes are **Read Consented Contacts**, **Claim Firestore Lease**, **Re-read Firestore Lease**, **Record Outlook Acceptance**, **Record Needs Review** (Google Service Account credential), and **Outlook Send Four Recipients** (Microsoft Outlook OAuth2 credential). The n8n Credential overview initially displayed *Create your first credential*. The read node also showed `[ERROR: invalid syntax]` for the previous inline Firestore JSON expression. The n8n UI was updated to build its query in the fail-closed Activation UTC Code node, with `Query JSON` referencing `{{ $json.firestoreQuery }}`; the repository source and VM tests reflect this fix. The editor stayed at 13 nodes; a UI import once appended duplicates, and a single verified Undo restored the original 13 nodes before editing only the two affected parameters.
+
+Clicking the **Publish** button was **blocked directly by n8n**: its element was `disabled` while 6 validation badges remained. Thus **not published**, no real Outlook messages, no secret credentials added, no Firestore writes from n8n.
+
+Additional read-only cloud checks: the exact Google service account still has **zero user-managed keys** and a conditioned `roles/datastore.user` binding; the Entra application still has **zero client secrets**, requires assignment and only authorizes the dedicated `contacto` identity with delegated `Mail.Send`. The Google organization policy could not be read by the current admin (HTTP 403); do not infer that a long-lived key is permitted. The attempt to provision/import the private key through Cloud Sandbox was blocked by runtime safety controls before execution; do not route around this restriction or store credentials in Git, logs or chat. Use an authorized secure credential administration procedure.
+
+**Release status: NO-GO pending securely connected GCP credential + Outlook OAuth + effective Firestore read + controlled synthetic E2E to four inboxes.** Lina remains outside the release scope, and historical LCH remains inactive.
+
+### Operator next action
+
+In the existing Mac n8n UI, create the `Google Service Account API` credential for `lch-lead-mail-n8n@rag-municipalidades.iam.gserviceaccount.com` only after confirming the organization's key policy, and set the HTTP Request scope to `https://www.googleapis.com/auth/datastore`; apply one credential to the five Firestore nodes. If long-lived keys are forbidden, provide a supported keyless broker rather than bypassing policy. Separately provision a short-lived Entra client secret through the approved administrator workflow, connect the Outlook credential as `contacto@lch-technologies.com`, and grant only the already-approved scopes. Do not paste any secret into ChatGPT.
+
+Once connected, rerun the independent preflight, verify one synthetic read and one synthetic notification with the new UTC cutoff, no replay, four independent mailbox receipts and no other LCH poller. Then publish using the existing n8n Publish button.

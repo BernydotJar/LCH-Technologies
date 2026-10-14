@@ -33,7 +33,7 @@
       ],
       "parameters": {
         "mode": "runOnceForAllItems",
-        "jsCode": "// Fail closed: replace the placeholder with an exact UTC timestamp immediately\n// before enabling this workflow. Prior leads are never mailed retroactively.\nconst ACTIVATION_UTC = '__REPLACE_WITH_ACTIVATION_UTC__';\nif (!/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$/.test(ACTIVATION_UTC) ||\n    !Number.isFinite(Date.parse(ACTIVATION_UTC)) || Date.parse(ACTIVATION_UTC) > Date.now()) return [];\nreturn [{json:{activationUtc:ACTIVATION_UTC}}];"
+        "jsCode": "// Fail closed: replace the placeholder with an exact UTC timestamp immediately\n// before enabling this workflow. Prior leads are never mailed retroactively.\nconst ACTIVATION_UTC = '__REPLACE_WITH_ACTIVATION_UTC__';\nif (!/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$/.test(ACTIVATION_UTC) ||\n    !Number.isFinite(Date.parse(ACTIVATION_UTC)) || Date.parse(ACTIVATION_UTC) > Date.now()) return [];\n// Build the JSON using the trusted Code node instead of nesting brace pairs\n// inside the n8n expression parser (which otherwise reports invalid syntax).\nconst firestoreQuery = JSON.stringify({\n  structuredQuery: {\n    from: [{ collectionId: 'demoRequests' }],\n    where: { fieldFilter: {\n      field: { fieldPath: 'createdAt' },\n      op: 'GREATER_THAN_OR_EQUAL',\n      value: { timestampValue: ACTIVATION_UTC },\n    } },\n    orderBy: [\n      { field: { fieldPath: 'createdAt' }, direction: 'DESCENDING' },\n      { field: { fieldPath: '__name__' }, direction: 'DESCENDING' },\n    ],\n    limit: 40,\n  },\n});\nreturn [{ json: { activationUtc: ACTIVATION_UTC, firestoreQuery } }];"
       }
     },
     {
@@ -51,7 +51,7 @@
         "operation": "query",
         "projectId": "rag-municipalidades",
         "database": "ai-studio-8963e7a3-87ce-4ca9-938c-9490f698d4c7",
-        "query": "={{ JSON.stringify({structuredQuery:{from:[{collectionId:'demoRequests'}],where:{fieldFilter:{field:{fieldPath:'createdAt'},op:'GREATER_THAN_OR_EQUAL',value:{timestampValue:$json.activationUtc}}},orderBy:[{field:{fieldPath:'createdAt'},direction:'DESCENDING'},{field:{fieldPath:'__name__'},direction:'DESCENDING'}],limit:40}}) }}",
+        "query": "={{ $json.firestoreQuery }}",
         "simple": false
       }
     },

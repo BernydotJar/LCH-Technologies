@@ -45,6 +45,7 @@ test('fresh workflow maintains Firestore CAS before Outlook and ACK after provid
   assert.ok(idx.every((i:number)=>i >= 0));
   assert.ok(idx.every((i:number,pos:number)=>pos===0||i>idx[pos-1]));
   const query = getNode('Read Consented Contacts').parameters;
+  assert.equal(query.query, '={{ $json.firestoreQuery }}');
   assert.equal(query.projectId,'rag-municipalidades');
   assert.equal(query.database,'ai-studio-8963e7a3-87ce-4ca9-938c-9490f698d4c7');
   for(const n of ['Claim Firestore Lease','Record Outlook Acceptance']) {
@@ -55,6 +56,20 @@ test('fresh workflow maintains Firestore CAS before Outlook and ACK after provid
   }
   assert.equal(getNode('Outlook Send Four Recipients').parameters.additionalFields.from,'contacto@lch-technologies.com');
   assert.equal(getNode('Outlook Send Four Recipients').continueOnFail,true);
+});
+
+test('Firestore query is pre-built in Code node and remains fail-closed until activation', () => {
+  const source=getNode('Activation UTC').parameters.jsCode;
+  assert.match(source, /const firestoreQuery = JSON\.stringify/);
+  assert.match(source, /GREATER_THAN_OR_EQUAL/);
+  const date='2026-10-13T06:30:00Z';
+  const runnable=source.replace('__REPLACE_WITH_ACTIVATION_UTC__', date);
+  const res=vm.runInNewContext('(function(){ ' + runnable + '\n })()', {Date,Number,JSON},{timeout:1000});
+  assert.equal(res.length,1);
+  const query=JSON.parse(res[0].json.firestoreQuery);
+  assert.equal(query.structuredQuery.from[0].collectionId,'demoRequests');
+  assert.equal(query.structuredQuery.where.fieldFilter.value.timestampValue,date);
+  assert.equal(query.structuredQuery.limit,40);
 });
 
 test('fresh workflow locks four fixed recipients and excludes arbitrary prospect recipients', () => {
