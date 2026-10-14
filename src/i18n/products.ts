@@ -55,6 +55,7 @@ export const productCopy: Record<string, readonly [string, string]> = {
   'Recruiting teams': ['Recruiting teams', 'Equipes de recrutamento'],
   'Organizaciones multi-equipo': ['Multi-team organizations', 'Organizações com múltiplas equipes'],
   'Preview disponible · dominio público en activación': ['Preview available · public domain being activated', 'Prévia disponível · domínio público em ativação'],
+  'Demo pública disponible': ['Public demo available', 'Demonstração pública disponível'],
   'human-led intelligence': ['human-led intelligence', 'inteligência conduzida por pessoas'],
   'Human review required': ['Human review required', 'Revisão humana obrigatória'],
   'Candidatos': ['Candidates', 'Candidatos'],
