@@ -19,9 +19,9 @@ export const Hero = () => {
   }, [prefersReducedMotion]);
 
   return (
-    <section id="inicio" className="relative w-full min-h-[85svh] sm:min-h-[90svh] lg:min-h-[94vh] flex flex-col justify-between bg-primary overflow-hidden selection:bg-accent selection:text-white">
+    <section id="inicio" className="site-hero relative w-full min-h-[85svh] sm:min-h-[90svh] lg:min-h-[94vh] flex flex-col justify-between bg-primary overflow-hidden selection:bg-accent selection:text-white">
       {/* Environmental Tonal Texture (Architectural Grid & Depth) */}
-      <div className="absolute inset-0 z-0 bg-primary pointer-events-none">
+      <div className="site-hero-underlay absolute inset-0 z-0 bg-primary pointer-events-none">
         <div
           className={`absolute inset-0 opacity-15 transition-transform duration-[20000ms] ${isPlaying ? 'scale-105' : 'scale-100'}`}
           style={{
@@ -31,8 +31,8 @@ export const Hero = () => {
           }}
         ></div>
         {/* Soft Depth Gradients */}
-        <div className="absolute inset-0 bg-gradient-to-t from-primary via-primary/75 to-transparent"></div>
-        <div className="absolute inset-0 bg-gradient-to-r from-primary via-primary/50 to-transparent"></div>
+        <div className="site-hero-gradient-t absolute inset-0 bg-gradient-to-t from-primary via-primary/75 to-transparent"></div>
+        <div className="site-hero-gradient-r absolute inset-0 bg-gradient-to-r from-primary via-primary/50 to-transparent"></div>
       </div>
 
       {/* Main Asymmetric Hero Content Container */}

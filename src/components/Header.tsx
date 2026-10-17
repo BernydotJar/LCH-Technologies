@@ -47,7 +47,7 @@ export const Header = () => {
   );
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-primary text-white shadow-md">
+    <header className="site-brand-surface sticky top-0 z-50 w-full bg-primary text-white shadow-md">
       <div className="mx-auto flex h-20 w-full max-w-7xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
         <a href="#inicio" onClick={() => track('cta_click', { section: 'hero' })} aria-label={t('LCH Technologies — Inicio')} className="inline-flex shrink-0 items-center rounded-md bg-white px-2 py-1.5">
           <img src="/assets/brand/lch-technologies-logo.svg" alt="LCH Technologies" className="h-10 w-auto sm:h-11" />

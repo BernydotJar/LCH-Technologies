@@ -14,7 +14,7 @@ const reasons = [
 export const WhyLCH = () => {
   const { t } = useLocale();
   return (
-    <section className="py-24 bg-primary text-white">
+    <section className="site-brand-surface py-24 bg-primary text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           <div>

@@ -310,7 +310,7 @@ export const ProductReferences = () => {
   );
 
   return (
-    <section id="productos-reales" className="relative overflow-hidden bg-[#080720] text-white py-24 sm:py-32 border-y border-white/10">
+    <section id="productos-reales" className="site-product-lab relative overflow-hidden bg-[#080720] text-white py-24 sm:py-32 border-y border-white/10">
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[900px] h-[520px] rounded-full bg-accent/20 blur-[140px]" />
         <div className="absolute bottom-[-220px] right-[-120px] w-[620px] h-[620px] rounded-full bg-[#4138b8]/20 blur-[150px]" />

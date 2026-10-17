@@ -16,7 +16,7 @@ export const EvidenceAI = () => {
   }, []);
 
   return (
-    <section id="productos" className="bg-primary text-white py-32 overflow-hidden border-b border-white/10">
+    <section id="productos" className="site-brand-surface bg-primary text-white py-32 overflow-hidden border-b border-white/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-8 items-center">
 

@@ -142,7 +142,7 @@ export const Contact = ({ handoff, preparedDraft, onStartDonna }: Props) => {
   };
 
   return (
-    <section id="contacto" className="border-t border-white/10 bg-primary">
+    <section id="contacto" className="site-brand-surface border-t border-white/10 bg-primary">
       <div className="mx-auto flex min-h-[80vh] max-w-7xl flex-col px-4 sm:px-6 lg:flex-row lg:px-8">
         <div className="flex flex-col justify-center py-20 lg:w-1/2 lg:py-28 lg:pr-16">
           <p className="mb-5 text-xs font-bold uppercase tracking-[0.2em] text-teal-300">{t('Hablemos de resultados')}</p>
