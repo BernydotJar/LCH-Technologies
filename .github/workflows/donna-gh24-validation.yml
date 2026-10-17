@@ -53,3 +53,7 @@ jobs:
         env:
           LCH_SMOKE_URL: http://127.0.0.1:4254/
         run: node scripts/donna-live-form-smoke.cjs
+      - name: Verify global night theme and unobtrusive Donna dock across viewports
+        env:
+          LCH_SMOKE_URL: http://127.0.0.1:4254/
+        run: node scripts/lch-ux-smoke.cjs

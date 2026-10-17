@@ -132,3 +132,57 @@ body {
 .app-shell {
   overflow-x: clip;
 }
+/* A site-wide night palette: brand sections visibly change along with editorial surfaces.
+   The logo and the framed product demos retain their authored colors. */
+:root[data-theme="dark"] .site-brand-surface,
+:root[data-theme="dark"] .site-hero,
+:root[data-theme="dark"] .site-hero-underlay {
+  background-color: #080f27 !important;
+}
+:root[data-theme="dark"] .site-hero-gradient-t {
+  background-image: linear-gradient(to top, #080f27, rgba(8, 15, 39, .80), transparent) !important;
+}
+:root[data-theme="dark"] .site-hero-gradient-r {
+  background-image: linear-gradient(to right, #080f27, rgba(8, 15, 39, .52), transparent) !important;
+}
+:root[data-theme="dark"] .site-product-lab {
+  background-color: #060b1a !important;
+}
+:root[data-theme="dark"] .theme-light-surface [class*="bg-white/"],
+:root[data-theme="dark"] .theme-light-surface [class*="bg-neutral-"],
+:root[data-theme="dark"] .theme-contact-surface [class*="bg-white/"] {
+  background-color: #17243a !important;
+}
+:root[data-theme="dark"] .theme-light-surface [class*="text-secondary/"],
+:root[data-theme="dark"] .theme-contact-surface [class*="text-secondary/"] {
+  color: #c4d3e6 !important;
+}
+:root[data-theme="dark"] .theme-light-surface [class*="bg-primary/"] {
+  background-color: #25374d !important;
+}
+/* Compact, accessible Donna dock. No unsolicited message card. */
+.donna-dock {
+  right: max(1rem, env(safe-area-inset-right, 0px));
+  bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+}
+:root[data-theme="dark"] .donna-launcher {
+  background-color: #102340 !important;
+  border-color: #3e697c !important;
+}
+:root[data-theme="dark"] .donna-transcript {
+  background: linear-gradient(180deg, #111d31, #10192b) !important;
+}
+:root[data-theme="dark"] .donna-composer {
+  background-color: #10192b !important;
+  border-color: #344862 !important;
+}
+@media (max-width: 639px) {
+  .donna-panel {
+    border-radius: 1rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .donna-dock *, .site-hero-gradient-t, .site-hero-gradient-r {
+    transition-duration: 0.01ms !important;
+  }
+}

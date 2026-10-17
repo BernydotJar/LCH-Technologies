@@ -75,6 +75,8 @@ Google Analytics 4 es opcional y requiere consentimiento previo. Para activarlo,
 
 Guía técnica, medidas de privacidad, eventos permitidos, activación y verificación: [i18n, tema nocturno y analítica](docs/i18n-dark-analytics.md).
 
+La presentación nocturna afecta a **toda la web**, incluido el hero. Donna permanece oculta hasta que el visitante abre el botón compacto anclado a la esquina inferior derecha. Detalles y E2E: [UX de tema y Donna](docs/night-mode-donna-ux.md).
+
 ## Identidad visual
 
 Los recursos oficiales de marca se encuentran en `public/assets/brand/` y deben tratarse como fuente canónica para cualquier uso dentro del sitio:
