@@ -887,7 +887,8 @@
         "docs/lch-custom-domain-cutover.md",
         "specs/GH-31/**",
         "graph/**",
-        "progress/GH-31/**"
+        "progress/GH-31/**",
+            ".github/workflows/gh31-domain-preflight.yml"
       ],
       "metadata": {
         "priority": 105,
