@@ -888,7 +888,8 @@
         "specs/GH-31/**",
         "graph/**",
         "progress/GH-31/**",
-            ".github/workflows/gh31-domain-preflight.yml"
+            ".github/workflows/gh31-domain-preflight.yml",
+            ".github/workflows/gh31-graph-validation.yml"
       ],
       "metadata": {
         "priority": 105,
