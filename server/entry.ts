@@ -12,6 +12,7 @@ const handler = createSiteHandler({
   distDir,
   releaseSha,
   allowedOrigin: process.env.LCH_PUBLIC_ORIGIN ?? 'https://lch-app.cloud',
+  canonicalOrigin: process.env.LCH_CANONICAL_ORIGIN ?? 'https://lch-app.cloud',
   trustedProxyHeader: process.env.DONNA_TRUSTED_PROXY_IP_HEADER,
 });
 createServer((req, res) => { void handler(req, res); })
