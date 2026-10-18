@@ -46,6 +46,11 @@ jobs:
               redirect: 'manual', signal: AbortSignal.timeout(8000),
             });
             lines.push('- Existing lch-app.cloud control: HTTP ' + control.status + ' (informational)');
+            if (control.status >= 500) {
+              const errorHtml = (await control.text()).slice(0, 10000);
+              const marker = errorHtml.match(/(?:Error|error code|Cloudflare)\\s*(?:code)?\\s*[:#-]?\\s*(10[0-9]{2})/i);
+              lines.push('- Existing ingress diagnostic: ' + (marker?.[1] || 'HTTP 5xx without public error code'));
+            }
           } catch (error) {
             lines.push('- Existing lch-app.cloud control: ' + (error.cause?.code || error.message) + ' (informational)');
           }
