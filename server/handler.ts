@@ -9,7 +9,7 @@ import { extname, resolve, sep } from 'node:path';
 import { isIP } from 'node:net';
 import { DONNA_LIMITS, parseDonnaRequest } from '../src/donna/engine.ts';
 import { respondToDonnaLocalized } from '../src/donna/localized.ts';
-import { renderLocalizedHead } from './localizedHead.ts';
+import { renderLocalizedHead, validateCanonicalOrigin } from './localizedHead.ts';
 
 const CONTENT_TYPES: Readonly<Record<string, string>> = {
   '.html': 'text/html; charset=utf-8',
@@ -100,6 +100,7 @@ export type SiteHandlerOptions = {
   distDir: string;
   releaseSha: string;
   allowedOrigin?: string;
+  canonicalOrigin?: string;
   trustedProxyHeader?: string;
   limiter?: DonnaRateLimiter;
 };
@@ -108,6 +109,7 @@ export function createSiteHandler(options: SiteHandlerOptions) {
   const dist = resolve(options.distDir);
   const limiter = options.limiter ?? new DonnaRateLimiter();
   const officialOrigin = options.allowedOrigin ?? 'https://lch-app.cloud';
+  const canonicalOrigin = validateCanonicalOrigin(options.canonicalOrigin ?? 'https://lch-app.cloud');
 
   return async (req: IncomingMessage, res: ServerResponse): Promise<void> => {
     try {
@@ -202,7 +204,7 @@ export function createSiteHandler(options: SiteHandlerOptions) {
         return;
       }
       const rawBody = await readFile(finalFile);
-      const body = ext === '.html' ? Buffer.from(renderLocalizedHead(rawBody.toString('utf8'), url.searchParams.get('lang'))) : rawBody;
+      const body = ext === '.html' ? Buffer.from(renderLocalizedHead(rawBody.toString('utf8'), url.searchParams.get('lang'), canonicalOrigin)) : rawBody;
       res.writeHead(200, {
         'content-type': type,
         'x-content-type-options': 'nosniff',
