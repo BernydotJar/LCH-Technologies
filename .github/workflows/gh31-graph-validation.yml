@@ -1,0 +1,39 @@
+name: GH-31 Graph Harness invariant validation
+on:
+  pull_request:
+    paths:
+      - 'graph/**'
+      - 'specs/GH-31/**'
+      - '.github/workflows/gh31-graph-validation.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned official Graph Harness SDLC
+        run: python -m pip install 'git+https://github.com/BernydotJar/Graph-harness-sdlc.git@168b740045293089720964bdc0d2bda79828b5c8'
+      - name: Validate append-only event chain and graph schema
+        run: |
+          python -m graph_harness --project graph/graph-harness.project.json --events graph/graph-harness.events.jsonl validate
+          python -m graph_harness --project graph/graph-harness.project.json --events graph/graph-harness.events.jsonl status --pretty
+      - name: Assert release node remains gated without external transport proof
+        run: |
+          python - <<'PY'
+          import json
+          with open('graph/graph-harness.project.json', encoding='utf8') as fh:
+              project = json.load(fh)
+          nodes = {node['id']: node for node in project['nodes']}
+          assert project['project_id'] == 'lch-technologies-corporate-website'
+          node = nodes['GH-31']
+          assert node['status'] == 'pending'
+          assert node['gates']['done'] == ['production_transport']
+          assert set(node['depends_on']) == {'GH-23', 'GH-17'}
+          print('GH-31 identity, dependency and release invariants: PASS; live release remains gated')
+          PY
