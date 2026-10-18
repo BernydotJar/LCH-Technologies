@@ -865,6 +865,39 @@
         "four_mailboxes_received": false,
         "no_mail_sent": true
       }
+    },
+    {
+      "id": "GH-31",
+      "kind": "infrastructure",
+      "title": "LCH branded-domain DNS, TLS and immutable production cutover",
+      "status": "pending",
+      "depends_on": [
+        "GH-23",
+        "GH-17"
+      ],
+      "capability": "release",
+      "gates": {
+        "done": [
+          "production_transport"
+        ]
+      },
+      "allowed_paths": [
+        "server/**",
+        "tests/domainCutover.test.ts",
+        "docs/lch-custom-domain-cutover.md",
+        "specs/GH-31/**",
+        "graph/**",
+        "progress/GH-31/**"
+      ],
+      "metadata": {
+        "priority": 105,
+        "canonical_domain": "lch-technologies.com",
+        "previous_public_domain": "lch-app.cloud",
+        "execution_mode": "graph",
+        "reasoning_mode": "engineering",
+        "human_eval_frequency": "gated",
+        "fail_closed_until_live_dns_tls": true
+      }
     }
   ]
 }
