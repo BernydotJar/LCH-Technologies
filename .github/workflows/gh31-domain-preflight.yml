@@ -1,0 +1,88 @@
+name: GH-31 branded-domain DNS and HTTPS release gate
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/gh31-domain-preflight.yml'
+      - 'server/**'
+      - 'tests/domainCutover.test.ts'
+      - 'graph/graph-harness.project.json'
+      - 'docs/lch-custom-domain-cutover.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  domain-canary:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Read-only authoritative DNS + HTTPS check
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          import dns from 'node:dns/promises';
+          import fs from 'node:fs';
+          const domain = 'lch-technologies.com';
+          const failures = [];
+          const lines = ['# GH-31 public-domain preflight', '', 'Read-only probe from GitHub Actions. No DNS or hosting writes.', ''];
+          async function records(label, fn, required = true) {
+            try {
+              const result = await fn();
+              lines.push('- ' + label + ': ' + (result.length || 0) + ' record(s) found');
+              if (required && result.length === 0) failures.push(label + ' records absent');
+            } catch (error) {
+              lines.push('- ' + label + ': NOT VERIFIED (' + (error.code || error.message) + ')');
+              if (required) failures.push(label + ' unresolved');
+            }
+          }
+          await records('NS', () => dns.resolveNs(domain));
+          await records('A', () => dns.resolve4(domain));
+          await records('MX', () => dns.resolveMx(domain));
+          let health;
+          try {
+            const response = await fetch('https://' + domain + '/health', {
+              redirect: 'manual', signal: AbortSignal.timeout(12000),
+            });
+            health = await response.json();
+            const ok = response.status === 200 && health.ok === true && health.product === 'lch-site';
+            lines.push('- HTTPS /health: HTTP ' + response.status + (ok ? ' PASS' : ' FAIL'));
+            if (!ok) failures.push('origin health invalid');
+          } catch (error) {
+            lines.push('- HTTPS /health: NOT VERIFIED (' + error.message + ')');
+            failures.push('public HTTPS origin unavailable');
+          }
+          try {
+            const response = await fetch('https://' + domain + '/', {
+              redirect: 'manual', signal: AbortSignal.timeout(12000),
+            });
+            const html = await response.text();
+            const ok = response.status === 200 &&
+              html.includes('rel="canonical" href="https://lch-technologies.com/"') &&
+              html.includes('property="og:url" content="https://lch-technologies.com/"');
+            lines.push('- HTML canonical and OG URL: HTTP ' + response.status + (ok ? ' PASS' : ' FAIL'));
+            if (!ok) failures.push('canonical metadata absent');
+          } catch (error) {
+            lines.push('- HTML: NOT VERIFIED (' + error.message + ')');
+            failures.push('homepage HTTPS unavailable');
+          }
+          try {
+            const response = await fetch('https://www.' + domain + '/', {
+              redirect: 'manual', signal: AbortSignal.timeout(12000),
+            });
+            const location = response.headers.get('location') || '';
+            const ok = [301, 302, 307, 308].includes(response.status) &&
+              location.startsWith('https://' + domain + '/');
+            lines.push('- www to apex redirect: HTTP ' + response.status + (ok ? ' PASS' : ' FAIL'));
+            if (!ok) failures.push('www redirect missing');
+          } catch (error) {
+            lines.push('- www redirect: NOT VERIFIED (' + error.message + ')');
+            failures.push('www hostname or TLS unavailable');
+          }
+          lines.push('', '**Gate: ' + (failures.length ? 'BLOCKED' : 'PASS') + '**');
+          if (failures.length) lines.push('Reasons: ' + failures.join('; '));
+          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, lines.join('\n') + '\n');
+          console.log(lines.join('\n'));
+          if (failures.length) process.exitCode = 1;
+          NODE
