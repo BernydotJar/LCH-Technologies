@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import {
   ArrowRight,
@@ -21,7 +21,7 @@ import { useLocale } from '../i18n/LocaleProvider';
 import { track } from '../analytics/client';
 
 type ProductReference = {
-  id: 'ido' | 'luma' | 'meridian';
+  id: 'ido' | 'luma' | 'meridian' | 'legal';
   name: string;
   kicker: string;
   label: string;
@@ -51,8 +51,8 @@ const products: ProductReference[] = [
     whatIsIt:
       'Un SaaS empresarial multi-tenant que reúne finanzas, compras, ventas, inventario, personas y automatizaciones en una misma capa operativa, con IA aplicada donde aporta contexto y decisión.',
     idealFor: ['Operaciones', 'Finanzas', 'Back office', 'Procesos multi-sistema'],
-    url: 'https://ido.lch-app.cloud/w/colombia/inicio',
-    displayUrl: 'ido.lch-app.cloud / colombia',
+    url: 'https://ido.textilesdemedellin.com/w/colombia/inicio',
+    displayUrl: 'ido.textilesdemedellin.com / colombia',
     tags: ['ERP', 'Multi-tenant', 'AI-native'],
     embed: false,
     live: false,
@@ -104,7 +104,30 @@ const products: ProductReference[] = [
     statLabel: 'human-led intelligence',
     icon: Users,
   },
+  {
+    id: 'legal',
+    name: 'Evidencia Jurídica',
+    kicker: 'Evidence-first Legal RAG',
+    label: 'Conocimiento jurídico con fuentes, citas y trazabilidad verificable.',
+    description:
+      'Knowledge Lab para consultar normativa y procedimientos con recuperación de evidencia, citas y límites explícitos de confianza.',
+    whatIsIt:
+      'Un sistema RAG jurídico orientado a evidencia que recupera fuentes, conserva trazabilidad y presenta respuestas con citas para que una persona pueda verificar el sustento de cada conclusión.',
+    idealFor: ['Legal operations', 'Investigación normativa', 'Municipalidades', 'Knowledge teams'],
+    url: 'https://evidencia.lch-app.cloud/',
+    displayUrl: 'evidencia.lch-app.cloud / knowledge lab',
+    tags: ['RAG', 'Legal AI', 'Citations', 'Traceability'],
+    embed: true,
+    live: true,
+    publicAvailable: true,
+    availabilityLabel: 'Knowledge Lab interactivo disponible',
+    stat: 'EVIDENCE',
+    statLabel: 'verifiable knowledge',
+    icon: Scale,
+  },
 ];
+
+const AUTO_ROTATE_MS = 9000;
 
 const IdoPreview = () => {
   const { t } = useLocale();
@@ -303,11 +326,24 @@ const MeridianPreview = () => {
 export const ProductReferences = () => {
   const { t } = useLocale();
   const [activeId, setActiveId] = useState<ProductReference['id']>('ido');
+  const [autoPlay, setAutoPlay] = useState(true);
+  const [isPaused, setIsPaused] = useState(false);
   const reduceMotion = useReducedMotion();
   const active = useMemo(
     () => products.find((product) => product.id === activeId) ?? products[0],
     [activeId],
   );
+
+  useEffect(() => {
+    if (!autoPlay || isPaused || reduceMotion) return;
+    const timer = window.setTimeout(() => {
+      const currentIndex = products.findIndex((product) => product.id === activeId);
+      const next = products[(currentIndex + 1) % products.length];
+      setActiveId(next.id);
+      track('product_demo_auto_advance', { product: next.id });
+    }, AUTO_ROTATE_MS);
+    return () => window.clearTimeout(timer);
+  }, [activeId, autoPlay, isPaused, reduceMotion]);
 
   return (
     <section id="productos-reales" className="relative overflow-hidden bg-[#080720] text-white py-24 sm:py-32 border-y border-white/10">
@@ -352,7 +388,7 @@ export const ProductReferences = () => {
         </div>
 
         <div className="max-w-5xl mx-auto mb-7" role="tablist" aria-label={t('Demos de productos LCH')}>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 p-2 rounded-2xl bg-white/[0.045] border border-white/10 backdrop-blur-xl">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 p-2 rounded-2xl bg-white/[0.045] border border-white/10 backdrop-blur-xl">
             {products.map((product) => {
               const Icon = product.icon;
               const selected = product.id === active.id;
@@ -388,6 +424,19 @@ export const ProductReferences = () => {
                 </button>
               );
             })}
+          </div>
+          <div className="mt-3 flex items-center justify-between gap-3 px-1 text-[10px] sm:text-xs text-white/35 font-mono uppercase tracking-wide">
+            <span>{autoPlay && !reduceMotion ? t('Recorrido automático · 9 s por producto') : t('Recorrido manual')}</span>
+            {!reduceMotion && (
+              <button
+                type="button"
+                onClick={() => setAutoPlay((value) => !value)}
+                className="rounded-full border border-white/10 bg-white/[0.035] px-3 py-1.5 text-white/55 transition-colors hover:bg-white/[0.07] hover:text-white"
+                aria-pressed={!autoPlay}
+              >
+                {t(autoPlay ? 'Pausar recorrido' : 'Reanudar recorrido')}
+              </button>
+            )}
           </div>
         </div>
 
@@ -428,6 +477,10 @@ export const ProductReferences = () => {
           layout
           id="product-demo-stage"
           role="tabpanel"
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+          onFocusCapture={() => setIsPaused(true)}
+          onBlurCapture={() => setIsPaused(false)}
           className="relative max-w-[1240px] mx-auto"
         >
           <div className="absolute -inset-5 sm:-inset-8 bg-gradient-to-b from-accent/10 to-transparent blur-3xl rounded-[40px] pointer-events-none" />
@@ -534,36 +587,9 @@ export const ProductReferences = () => {
           </motion.div>
         </AnimatePresence>
 
-        <div className="max-w-[1240px] mx-auto mt-10">
-          <a
-            href="https://evidencia.lch-app.cloud/"
-            target="_blank"
-            rel="noreferrer"
-            onClick={() => track('cta_click', { section: 'product' })}
-            className="group flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 rounded-2xl border border-white/10 bg-white/[0.035] px-5 sm:px-6 py-5 hover:bg-white/[0.06] hover:border-sky-300/20 transition-colors"
-          >
-            <div className="flex items-start gap-4">
-              <span className="mt-0.5 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.05] text-sky-200">
-                <Scale size={18} />
-              </span>
-              <div>
-                <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-sky-300">{t('Academia / Knowledge Lab')}</div>
-                <div className="mt-1 font-bold text-white">Evidencia Jurídica</div>
-                <p className="mt-1 text-xs sm:text-sm text-white/45 leading-relaxed">
-                  {t('Una referencia académica de RAG jurídico con fuentes, citas y trazabilidad. No forma parte del portafolio principal de productos.')}
-                </p>
-              </div>
-            </div>
-            <div className="inline-flex items-center gap-2 text-sm font-semibold text-white/70 group-hover:text-white transition-colors">
-              {t('Explorar Knowledge Lab')}
-              <ArrowUpRight size={16} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-            </div>
-          </a>
-        </div>
-
         <div className="max-w-[1240px] mx-auto mt-12 pt-6 border-t border-white/10 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between text-[10px] sm:text-xs text-white/30 font-mono tracking-wide uppercase">
           <span>{t('Built by LCH Technologies · systems, not slides')}</span>
-          <span>{t('Product Lab / 03 product references')}</span>
+          <span>{t('Product Lab / 04 product references')}</span>
         </div>
       </div>
     </section>

@@ -4,7 +4,7 @@
  */
 export type AnalyticsEvent =
   | 'page_view' | 'language_change' | 'theme_change'
-  | 'product_demo_select' | 'contact_submit_success' | 'contact_submit_error'
+  | 'product_demo_select' | 'product_demo_auto_advance' | 'contact_submit_success' | 'contact_submit_error'
   | 'donna_open' | 'cta_click';
 export type SafeDimensions = {
   language?: 'es' | 'en' | 'pt';
