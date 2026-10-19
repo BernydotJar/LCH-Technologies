@@ -72,7 +72,7 @@ const products: ProductReference[] = [
     whatIsIt:
       'Una plataforma de learning intelligence que construye un Learning Twin de cada participante para adaptar práctica, contenido y acompañamiento según evidencia real de progreso.',
     idealFor: ['Academias', 'Educación premium', 'L&D', 'Programas high-ticket'],
-    url: 'https://luma.lch-app.cloud/onboarding',
+    url: 'https://luma.lch-app.cloud/onboarding?theme=light',
     displayUrl: 'luma.lch-app.cloud / onboarding',
     tags: ['Learning Twin', 'Evidence', 'Adaptive learning'],
     embed: true,
