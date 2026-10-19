@@ -865,6 +865,42 @@
         "four_mailboxes_received": false,
         "no_mail_sent": true
       }
+    },
+    {
+      "id": "GH-32",
+      "kind": "feature",
+      "title": "Problem-first interactive LCH landing and consent-safe Donna handoff",
+      "status": "pending",
+      "depends_on": [
+        "GH-23",
+        "GH-17"
+      ],
+      "capability": "frontend",
+      "gates": {
+        "done": [
+          "implementation_quality",
+          "production_transport"
+        ]
+      },
+      "allowed_paths": [
+        ".github/workflows/donna-gh24-validation.yml",
+        "docs/GH-32/**",
+        "graph/**",
+        "progress/GH-32/**",
+        "scripts/opportunity-smoke.cjs",
+        "src/App.tsx",
+        "src/components/Hero.tsx",
+        "src/components/OpportunityNavigator.tsx",
+        "src/components/DonnaChat.tsx",
+        "src/i18n/marketing.ts",
+        "src/analytics/client.ts"
+      ],
+      "metadata": {
+        "scope": "Business-problem navigator, localized hero, Donna exploration, explicit contact interest without consent",
+        "production_origin": "https://lch-app.cloud",
+        "no_domain_dns_mutation": true,
+        "human_eval_frequency": "gated"
+      }
     }
   ]
 }
