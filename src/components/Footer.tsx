@@ -6,7 +6,7 @@ export const Footer = () => {
   const { available, openPreferences } = useAnalyticsPreferences();
 
   return (
-    <footer className="border-t border-white/10 bg-primary pb-8 pt-16 text-white">
+    <footer className="site-brand-surface border-t border-white/10 bg-primary pb-8 pt-16 text-white">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-16 grid grid-cols-1 gap-12 md:grid-cols-4">
           <div className="md:col-span-1">
