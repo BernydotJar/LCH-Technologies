@@ -19,7 +19,7 @@ import { containsOutOfSchemaPrivateData, containsPersonalContactData, extractFro
 
 type DonnaUiMessage = HistoryTurn & { id: number; links?: DonnaReply['links']; kind?: DonnaReply['kind']; interest?: InterestArea };
 export type DonnaHandoff = { interest: InterestArea; message: string; draft: ContactDraft };
-type Props = { onHandoff: (data: DonnaHandoff) => void; onDraft: (draft: ContactDraft) => void; startContactRequest: DonnaPreparedDraft | null };
+type Props = { onHandoff: (data: DonnaHandoff) => void; onDraft: (draft: ContactDraft) => void; startContactRequest: DonnaPreparedDraft | null; openExplorationRequest?: number };
 
 const PUBLIC_LINKS = new Set([
   '#contacto',
@@ -51,7 +51,7 @@ function PersonaOrb({ size = 'launcher', state = 'idle' }: { size?: 'compact' | 
   );
 }
 
-export function DonnaChat({ onHandoff, onDraft, startContactRequest }: Props) {
+export function DonnaChat({ onHandoff, onDraft, startContactRequest, openExplorationRequest = 0 }: Props) {
   const { t, locale } = useLocale();
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<DonnaUiMessage[]>([]);
@@ -341,6 +341,15 @@ export function DonnaChat({ onHandoff, onDraft, startContactRequest }: Props) {
     setContactMode(false);
     setOpen(false);
   }
+
+  // A user-initiated hero action opens the existing bounded assistant, with no
+  // submitted question, automatically generated lead, or contact consent.
+  useEffect(() => {
+    if (openExplorationRequest > 0) {
+      setOpen(true);
+      track('donna_open');
+    }
+  }, [openExplorationRequest]);
 
   // Starting from Contact uses its already-entered values only to ask for missing fields.
   useEffect(() => {

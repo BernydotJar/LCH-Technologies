@@ -1,152 +1,92 @@
-import React, { useState, useEffect } from 'react';
-import { ArrowRight, Play, Pause, ChevronDown, CheckCircle2, Zap } from 'lucide-react';
+import { ArrowRight, ArrowDownRight, CheckCircle2, ShieldCheck, Sparkles } from 'lucide-react';
 import { motion, useReducedMotion } from 'motion/react';
-import { HeroSystemAnimation } from './HeroSystemAnimation';
 import { useLocale } from '../i18n/LocaleProvider';
+import type { InterestArea } from '../integrations/leadContract';
 import { track } from '../analytics/client';
+import { OpportunityNavigator } from './OpportunityNavigator';
 
-export const Hero = () => {
+export function Hero({
+  onContact,
+  onOpenDonna,
+}: {
+  onContact: (interest: InterestArea) => void;
+  onOpenDonna: () => void;
+}) {
   const { t } = useLocale();
-  const prefersReducedMotion = useReducedMotion();
-  const [isPlaying, setIsPlaying] = useState(!prefersReducedMotion);
-
-  // Allow users to pause/play background motion for accessibility
-  const togglePlay = () => setIsPlaying(!isPlaying);
-
-  // Sync state if user changes OS preferences
-  useEffect(() => {
-    setIsPlaying(!prefersReducedMotion);
-  }, [prefersReducedMotion]);
+  const reducedMotion = useReducedMotion();
 
   return (
-    <section id="inicio" className="site-hero relative w-full min-h-[85svh] sm:min-h-[90svh] lg:min-h-[94vh] flex flex-col justify-between bg-primary overflow-hidden selection:bg-accent selection:text-white">
-      {/* Environmental Tonal Texture (Architectural Grid & Depth) */}
-      <div className="site-hero-underlay absolute inset-0 z-0 bg-primary pointer-events-none">
-        <div
-          className={`absolute inset-0 opacity-15 transition-transform duration-[20000ms] ${isPlaying ? 'scale-105' : 'scale-100'}`}
-          style={{
-            backgroundImage: 'linear-gradient(60deg, #155E75 1px, transparent 1px), linear-gradient(120deg, #155E75 1px, transparent 1px)',
-            backgroundSize: '100px 173.2px',
-            backgroundPosition: 'center center'
-          }}
-        ></div>
-        {/* Soft Depth Gradients */}
-        <div className="site-hero-gradient-t absolute inset-0 bg-gradient-to-t from-primary via-primary/75 to-transparent"></div>
-        <div className="site-hero-gradient-r absolute inset-0 bg-gradient-to-r from-primary via-primary/50 to-transparent"></div>
+    <section id="inicio" className="site-hero relative isolate overflow-hidden bg-[#0C0A50] text-white">
+      <div className="site-hero-underlay pointer-events-none absolute inset-0 z-[-1] overflow-hidden bg-[#0C0A50]">
+        <div className="absolute -right-36 -top-56 h-[580px] w-[580px] rounded-full bg-teal-500/20 blur-[110px]" />
+        <div className="absolute -bottom-64 -left-32 h-[540px] w-[540px] rounded-full bg-blue-500/15 blur-[100px]" />
+        <div className="absolute inset-0 opacity-[.12]" style={{ backgroundImage: 'linear-gradient(rgba(148,210,224,.45) 1px,transparent 1px),linear-gradient(90deg,rgba(148,210,224,.45) 1px,transparent 1px)', backgroundSize: '64px 64px', maskImage: 'linear-gradient(to right,transparent,black 45%,black)' }} />
+        <div className="site-hero-gradient-t absolute inset-0 bg-gradient-to-t from-[#0C0A50]/90 via-transparent to-[#0C0A50]/40" />
+        <div className="site-hero-gradient-r absolute inset-0 bg-gradient-to-r from-[#0C0A50]/70 via-transparent to-transparent" />
       </div>
-
-      {/* Main Asymmetric Hero Content Container */}
-      <div className="relative z-10 w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-10 sm:pt-14 sm:pb-16 lg:py-16 flex-1 flex flex-col justify-center">
-
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 items-center">
-
-          {/* LEFT COLUMN: Dominant Typography & Concrete Value Proposition */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: "easeOut" }}
-            className="lg:col-span-7 xl:col-span-6 flex flex-col items-start"
-          >
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded bg-accent/20 border border-accent/40 text-sky-200 text-xs font-mono font-semibold tracking-wider uppercase mb-5">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              {t('Aceleradores de Transformación Operacional')}
-            </div>
-
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-[64px] font-extrabold text-white leading-[1.08] tracking-tight mb-6">
-              {t('Convertimos operaciones manuales y fragmentadas en')}{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-200 via-teal-200 to-emerald-300">
-                {t('sistemas automatizados y trazables.')}
-              </span>
-            </h1>
-
-            <p className="text-base sm:text-lg lg:text-xl text-neutral-200 max-w-xl leading-relaxed mb-8">
-              {t('Diseñamos software, automatizaciones e IA para procesos empresariales que hoy dependen de emails, hojas de cálculo, documentos y seguimiento manual.')}
-            </p>
-
-            {/* REAL PROOF ANCHOR / BEFORE-AFTER CALLOUT */}
-            <div className="w-full max-w-xl p-3.5 sm:p-4 rounded-sm bg-[#080730]/90 border border-teal-500/30 mb-8 flex items-start gap-3 text-xs sm:text-sm text-neutral-200">
-              <Zap size={18} className="text-emerald-400 shrink-0 mt-0.5" />
-              <div>
-                <span className="font-semibold text-white">{t('Impacto medible típico:')}</span>{' '}
-                {t('Un flujo de aprobación documental de 5 días convertido en un proceso automatizado de 20 minutos con auditoría completa.')}
-              </div>
-            </div>
-
-            {/* CTA BUTTONS */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto">
-              <a
-                href="#contacto"
-                onClick={() => track('cta_click', { section: 'hero' })}
-                className="group inline-flex items-center justify-center gap-3 bg-accent text-white px-7 py-3.5 font-bold text-sm tracking-wide rounded-sm hover:bg-white hover:text-primary transition-all duration-300 shadow-[0_4px_20px_rgba(21,94,117,0.4)]"
-              >
-                {t('Hablemos de tu proyecto')}
-                <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-              </a>
-
-              <a
-                href="#soluciones"
-                className="inline-flex items-center justify-center gap-2 text-neutral-200 hover:text-white font-semibold text-sm tracking-wide transition-colors duration-200 py-2 sm:py-0"
-              >
-                <span className="border-b border-white/40 hover:border-white transition-colors pb-1 flex items-center gap-1.5">
-                  {t('Descubre cómo funciona')} <ChevronDown size={14} className="mt-0.5" />
-                </span>
-              </a>
-            </div>
-          </motion.div>
-
-          {/* RIGHT COLUMN: Custom Interactive Operational System SVG */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.97 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.1, ease: "easeOut" }}
-            className="lg:col-span-5 xl:col-span-6 w-full flex items-center justify-center lg:justify-end"
-          >
-            <HeroSystemAnimation isPlaying={isPlaying} />
-          </motion.div>
-
-        </div>
-      </div>
-
-      {/* BOTTOM ANCHOR BAR: Brand Capability Badges & Motion Controls */}
-      <div className="relative z-10 w-full border-t border-white/15 bg-[#0A093D]/95 backdrop-blur-md">
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-mono text-neutral-200">
-
-          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-5 gap-y-2 uppercase tracking-widest text-[11px] sm:text-xs font-semibold">
-            <span className="text-teal-300">{t('IA EMPRESARIAL')}</span>
-            <span className="text-white/30">•</span>
-            <span className="text-white">{t('AUTOMATIZACIÓN')}</span>
-            <span className="text-white/30">•</span>
-            <span className="text-white">SOFTWARE</span>
-            <span className="text-white/30">•</span>
-            <span className="text-white">CLOUD</span>
+      <div className="relative mx-auto grid w-full max-w-[1440px] grid-cols-1 items-center gap-10 px-4 pb-12 pt-12 sm:px-6 sm:pb-16 sm:pt-16 lg:min-h-[790px] lg:grid-cols-[minmax(0,1fr)_minmax(0,0.95fr)] lg:gap-14 lg:px-10 lg:py-20">
+        <motion.div
+          initial={reducedMotion ? false : { opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: .65, ease: 'easeOut' }}
+          className="flex min-w-0 flex-col items-start"
+        >
+          <div className="mb-7 inline-flex flex-wrap items-center gap-2 rounded-full border border-[#85DEDA]/25 bg-[#7AE6D8]/10 px-3 py-2 font-mono text-[11px] font-semibold uppercase tracking-[.14em] text-[#9BEFE5]">
+            <Sparkles size={14} aria-hidden="true" />
+            {t('AI · Automation · Engineering')}
           </div>
-
-          <div className="flex items-center gap-5">
-            <a href="#soluciones" className="hidden md:inline-flex items-center gap-1.5 text-neutral-200 hover:text-white transition-colors text-[11px] uppercase tracking-wider font-semibold">
-              <span>{t('Explorar soluciones')}</span>
-              <ChevronDown size={12} />
+          <h1 className="max-w-[720px] text-4xl font-bold leading-[1.07] tracking-[-.038em] text-white sm:text-5xl lg:text-[clamp(3rem,4.1vw,4.6rem)]">
+            {t('Tu operación puede funcionar mejor.')}{' '}
+            <span className="mt-2 block bg-gradient-to-r from-[#A9EDF2] via-[#8DE9DB] to-[#D1F9C2] bg-clip-text text-transparent">
+              {t('Hagámoslo posible.')}
+            </span>
+          </h1>
+          <p className="mt-6 max-w-[560px] text-base leading-relaxed text-slate-200 sm:text-lg lg:text-[20px]">
+            {t('Conectamos personas, procesos y tecnología para que tu empresa avance con claridad, automatización y control. Empezamos por tu reto, no por una herramienta.')}
+          </p>
+          <div className="mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
+            <a href="#retos" onClick={() => track('cta_click', { section: 'hero' })}
+              className="inline-flex min-h-12 items-center justify-center gap-2.5 rounded-lg bg-[#7DE3D3] px-6 py-3 font-bold text-[#072A40] shadow-[0_12px_35px_rgba(10,189,165,.16)] transition-colors hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#A8F8E8]">
+              {t('Explorar mi reto')}
+              <ArrowDownRight size={19} aria-hidden="true" />
             </a>
-
-            {/* Accessibility Motion Toggle */}
-            <button
-              onClick={togglePlay}
-              className="text-neutral-200 hover:text-white transition-colors flex items-center gap-2 text-[11px] uppercase tracking-widest px-2.5 py-1 border border-white/20 rounded hover:bg-white/10 font-semibold"
-              aria-label={t(isPlaying ? 'Pausar animación del hero' : 'Reproducir animación del hero')}
-            >
-              {isPlaying ? (
-                <>
-                  <Pause size={12} className="text-emerald-400" /> {t('Animación: Activa')}
-                </>
-              ) : (
-                <>
-                  <Play size={12} className="text-neutral-400" /> {t('Animación: Pausada')}
-                </>
-              )}
-            </button>
+            <a href="#contacto" onClick={() => track('cta_click', { section: 'hero' })}
+              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg border border-white/30 px-6 py-3 font-semibold text-white transition-colors hover:border-[#9BEFE5] hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
+              {t('Hablar con el equipo')} <ArrowRight size={17} aria-hidden="true" />
+            </a>
           </div>
+          <div className="mt-10 grid w-full max-w-[580px] grid-cols-1 gap-3 border-t border-white/15 pt-6 sm:grid-cols-3">
+            {[
+              { icon: CheckCircle2, label: 'Entender el proceso' },
+              { icon: ShieldCheck, label: 'Diseñar con control' },
+              { icon: ArrowRight, label: 'Entregar algo operable' },
+            ].map(({ icon: Icon, label }) => (
+              <div key={label} className="flex items-center gap-2 text-[13px] font-medium leading-tight text-slate-200">
+                <Icon size={16} strokeWidth={1.8} className="shrink-0 text-[#8DE7DA]" aria-hidden="true" />
+                {t(label)}
+              </div>
+            ))}
+          </div>
+        </motion.div>
 
+        <motion.div
+          initial={reducedMotion ? false : { opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: .7, ease: 'easeOut', delay: .12 }}
+          className="relative min-w-0 lg:max-w-[625px]"
+        >
+          <div className="pointer-events-none absolute -inset-6 rounded-[40px] border border-white/5" aria-hidden="true" />
+          <OpportunityNavigator onContact={onContact} onOpenDonna={onOpenDonna} />
+        </motion.div>
+      </div>
+      <div className="relative border-t border-white/10 bg-[#071334]/70">
+        <div className="mx-auto flex w-full max-w-[1440px] flex-wrap items-center justify-between gap-2 px-4 py-4 text-[11px] font-semibold uppercase tracking-[.14em] text-slate-300 sm:px-6 lg:px-10">
+          <span>{t('Diseño responsable. Ejecución verificable.')}</span>
+          <span className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[#94F3E1]">
+            <span>{t('IA empresarial')}</span><span className="text-white/35">·</span><span>{t('Automatización')}</span><span className="text-white/35">·</span><span>Software</span><span className="text-white/35">·</span><span>Cloud</span>
+          </span>
         </div>
       </div>
     </section>
   );
-};
+}

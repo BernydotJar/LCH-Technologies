@@ -5,13 +5,14 @@
 export type AnalyticsEvent =
   | 'page_view' | 'language_change' | 'theme_change'
   | 'product_demo_select' | 'product_demo_auto_advance' | 'contact_submit_success' | 'contact_submit_error'
-  | 'donna_open' | 'cta_click';
+  | 'donna_open' | 'cta_click' | 'opportunity_select';
 export type SafeDimensions = {
   language?: 'es' | 'en' | 'pt';
   theme?: 'dark' | 'light';
   product?: 'ido' | 'luma' | 'legal' | 'meridian';
   section?: 'hero' | 'capabilities' | 'product' | 'contact' | 'cases';
   page_path?: '/';
+  challenge?: 'automation' | 'ai' | 'platform' | 'cloud';
 };
 export type Consent = 'granted' | 'denied' | null;
 const STORAGE_KEY = 'lch.analytics.consent';
@@ -108,5 +109,6 @@ export function track(event: AnalyticsEvent, values: SafeDimensions = {}): void 
   if (values.product && ['ido', 'luma', 'legal', 'meridian'].includes(values.product)) dimensions.product = values.product;
   if (values.section && ['hero', 'capabilities', 'product', 'contact', 'cases'].includes(values.section)) dimensions.section = values.section;
   if (values.page_path === '/') dimensions.page_path = '/';
+  if (values.challenge && ['automation', 'ai', 'platform', 'cloud'].includes(values.challenge)) dimensions.challenge = values.challenge;
   window.gtag?.('event', event, dimensions);
 }
