@@ -3,6 +3,7 @@
 import hashlib
 import json
 import pathlib
+import sqlite3
 import sys
 
 LCH_ID = 'lchContactNotifyN8nGH26'
@@ -67,7 +68,88 @@ def find_lina(export):
     return matches[0]
 
 
+def inspect_existing(source, export):
+    """Recognize an existing exact, inactive workflow without reimporting it."""
+    validate_source(source)
+    find_lina(export)
+    candidates = [w for w in export if w.get('id') == LCH_ID or
+                  'LCH | Contact Notifications' in w.get('name', '')]
+    if not candidates:
+        return {'state': 'absent', 'workflowCount': len(export)}
+    if len(candidates) != 1:
+        raise ValueError('Multiple LCH workflow records; refuse any import')
+    current = candidates[0]
+    if current.get('id') != LCH_ID or current.get('name') != source.get('name'):
+        raise ValueError('Existing LCH workflow has unexpected ID or name')
+    if current.get('active') is not False:
+        raise ValueError('Existing LCH workflow is active; refuse to modify it')
+    if len(current.get('nodes', [])) != len(source['nodes']):
+        raise ValueError('Existing LCH workflow node count differs')
+    expected_nodes = {n.get('name'): n for n in source['nodes']}
+    current_nodes = {n.get('name'): n for n in current['nodes']}
+    if set(expected_nodes) != set(current_nodes):
+        raise ValueError('Existing LCH workflow nodes differ from canonical source')
+    for name, template in expected_nodes.items():
+        existing_node = current_nodes[name]
+        # Ignore stable IDs, positions, UI metadata and credential references.
+        # Critical executable code, parameters, node type and routing must match.
+        for key in ('type', 'typeVersion', 'parameters', 'disabled', 'continueOnFail'):
+            if key in template and existing_node.get(key) != template[key]:
+                raise ValueError('Existing LCH executable node differs: ' + name + ' (' + key + ')')
+        if 'disabled' not in template and existing_node.get('disabled') is True:
+            raise ValueError('Existing LCH node disabled: ' + name)
+    if current.get('connections') != source.get('connections'):
+        raise ValueError('Existing LCH workflow connections differ')
+    expected_settings = source.get('settings') or {}
+    actual_settings = current.get('settings') or {}
+    if any(actual_settings.get(key) != value for key, value in expected_settings.items()):
+        raise ValueError('Existing LCH execution settings differ')
+    return {
+        'state': 'present_matching_inactive',
+        'workflowCount': len(export),
+        'lchNodes': len(current['nodes']),
+        'credentialBoundNodes': sum(bool(n.get('credentials')) for n in current['nodes']),
+        'activationCutoffUnset': '__REPLACE_WITH_ACTIVATION_UTC__' in current_nodes['Activation UTC']['parameters']['jsCode'],
+    }
+
+
+
+def inspect_ownership(source, export, database_path):
+    """Read only a project-membership count; never read credentials or leads."""
+    status = inspect_existing(source, export)
+    uri = pathlib.Path(database_path).resolve().as_uri() + '?mode=ro'
+    con = sqlite3.connect(uri, uri=True, timeout=5)
+    try:
+        def memberships(identifier):
+            return {row[0] for row in con.execute(
+                'SELECT projectId FROM shared_workflow WHERE workflowId=?',
+                (identifier,),
+            )}
+        lina = find_lina(export)
+        lina_projects = memberships(lina['id'])
+        if len(lina_projects) != 1:
+            raise ValueError('Existing Lina has no unique owning project')
+        # Database must match the export: check actual workflow inventory by IDs.
+        ids = [row[0] for row in con.execute('SELECT id FROM workflow_entity')]
+        if set(ids) != {w['id'] for w in export}:
+            raise ValueError('Mac SQLite inventory changed since export; retry dry-run')
+        if status['state'] == 'absent':
+            status.update({'ownerState': 'not_applicable', 'cutover': 'ready_for_inactive_import'})
+        else:
+            owners = memberships(LCH_ID)
+            if not owners:
+                status.update({'ownerState': 'orphan', 'cutover': 'blocked_orphan_existing'})
+            elif owners == lina_projects:
+                status.update({'ownerState': 'same_project_as_lina', 'cutover': 'already_present_skip_import'})
+            else:
+                status.update({'ownerState': 'other_project', 'cutover': 'blocked_other_project'})
+        return status
+    finally:
+        con.close()
+
+
 def verify_before(export):
+    """Legacy strict import gate. Never imports when LCH exists."""
     find_lina(export)
     if any(w.get('id') == LCH_ID or 'LCH | Contact Notifications' in w.get('name', '') for w in export):
         raise ValueError('LCH workflow already exists; import would duplicate it')
@@ -92,17 +174,21 @@ def verify_after(before, after):
 def main(argv):
     if len(argv) == 3 and argv[1] == 'source':
         print(json.dumps({'guard': 'pass', 'sha256': validate_source(parse(argv[2])[0])}))
+    elif len(argv) == 4 and argv[1] == 'inspect':
+        print(json.dumps(inspect_existing(parse(argv[2])[0], parse(argv[3]))))
+    elif len(argv) == 5 and argv[1] == 'ownership':
+        print(json.dumps(inspect_ownership(parse(argv[2])[0], parse(argv[3]), argv[4])))
     elif len(argv) == 3 and argv[1] == 'before':
         print(json.dumps({'existingWorkflows': verify_before(parse(argv[2])), 'duplicate': False}))
     elif len(argv) == 4 and argv[1] == 'after':
         print(json.dumps(verify_after(parse(argv[2]), parse(argv[3]))))
     else:
-        raise ValueError('Usage: guard.py source FILE | before EXPORT | after BEFORE AFTER')
+        raise ValueError('Usage: guard.py source FILE | inspect SOURCE EXPORT | ownership SOURCE EXPORT SQLITE_DB | before EXPORT | after BEFORE AFTER')
 
 
 if __name__ == '__main__':
     try:
         main(sys.argv)
-    except (ValueError, OSError, json.JSONDecodeError, KeyError) as exc:
+    except (ValueError, OSError, sqlite3.DatabaseError, json.JSONDecodeError, KeyError) as exc:
         print('LCH_N8N_GUARD_BLOCKED: ' + str(exc), file=sys.stderr)
         sys.exit(2)
