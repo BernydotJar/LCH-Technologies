@@ -34,17 +34,29 @@ const en: LanguageDictionary = {
     'The right architecture depends on workloads, integrations and requirements; we do not select a provider before reviewing the use case.',
   ], followUp: 'Is your priority modernization, integration or deploying a new application?' },
   products: { facts: [
-    'LCH presents distinct products: LUMA focuses on learning intelligence and evidence of progress through a Learning Twin, while I-DO brings operations, finance and business processes into a multi-tenant Business OS.',
-    'We also showcase Legal Evidence, a regulations assistant supported by verifiable sources. You can explore the products on this website.',
-  ], followUp: 'Are you interested in learning, enterprise operations or document search?' },
+    'LCH showcases I-DO for business operations, LUMA for learning intelligence, Meridian for recruiting, Coded Automation/BPCA for Blue Prism engineering, and OS Electoral/CampaignOS for governed campaign operations.',
+    'Legal Evidence is a separate RAG knowledge lab. LUMA and Legal Evidence have public experiences; BPCA is in developer preview; OS Electoral offers a non-production static demo; the I-DO and Meridian live demos are under review.',
+  ], followUp: 'Which product would you like to explore?' },
   luma: { facts: [
     'LUMA is an intelligent learning experience using a Learning Twin to connect objectives, progress and evidence of capabilities.',
     'You can try its onboarding demo. Adapting it to an educational program requires reviewing the institution’s teaching model and operations.',
   ], followUp: 'Would you explore LUMA as an education provider, coach or business?' },
   ido: { facts: [
     'I-DO is a governed multi-tenant enterprise platform for operations, finance and business processes.',
-    'LCH offers a public preview of the experience. Integrations and scope are agreed with each organization.',
+    'LCH offers a conceptual preview while the public demo is under maintenance. Integrations and scope are agreed with each organization.',
   ], followUp: 'Which part of your operation would you like to bring together?' },
+  meridian: { facts: [
+    'Meridian is a multi-organization Recruiting CRM with candidate profiles, jobs, applications, analytics, and human-led recruiting workflows.',
+    'Its AI supports evidence review and suggested interview questions; hiring decisions remain with people. The public demo is temporarily unavailable, so the LCH product profile shows a conceptual preview.',
+  ], followUp: 'Which recruiting or Talent Acquisition process would you like to improve?' },
+  bpca: { facts: [
+    'Coded Automation (BPCA) is a developer-preview SDK and CLI to generate and verify Blue Prism Processes and Business Objects from explicit specifications, quality checks, and delivery evidence.',
+    'This is not a certified Blue Prism runtime. Native Studio import and execution remain separate validation gates.',
+  ], followUp: 'Are you interested in automation engineering or governed delivery?' },
+  electoral: { facts: [
+    'OS Electoral / CampaignOS is an in-development concept for internal campaign coordination with human authority and auditable operational evidence.',
+    'Its public Team Command Center, Daily War Room, and Evidence Control Room are a read-only static demo, not a production SaaS or autonomous electoral decision system.',
+  ], followUp: 'Would you like to review operational architecture, access control, or decision traceability?' },
   contact: { facts: [
     'You can submit an inquiry through LCH’s contact form, including your organization, area of interest and the outcome you are seeking.',
     'Submitting a request does not automatically book a meeting or guarantee a response date.',
@@ -84,17 +96,29 @@ const pt: LanguageDictionary = {
     'A arquitetura depende das cargas, integrações e requisitos específicos; não escolhemos um provedor antes de analisar o caso.',
   ], followUp: 'A prioridade é modernizar, integrar ou implantar uma nova aplicação?' },
   products: { facts: [
-    'A LCH apresenta produtos com objetivos diferentes: a LUMA trabalha inteligência de aprendizagem e evidências de progresso com um Learning Twin; o I-DO reúne operações, finanças e processos em um Business OS multilocatário.',
-    'Também oferecemos a demonstração Evidência Jurídica, com consultas normativas baseadas em fontes verificáveis. Você pode explorar os produtos neste site.',
-  ], followUp: 'Seu interesse é aprendizagem, operações empresariais ou consulta documental?' },
+    'A LCH apresenta I-DO para operações empresariais, LUMA para inteligência de aprendizagem, Meridian para recrutamento, Coded Automation/BPCA para engenharia Blue Prism e OS Electoral/CampaignOS para operações de campanha governadas.',
+    'A Evidência Jurídica é um laboratório RAG separado. LUMA e Evidência têm experiências públicas; BPCA está em developer preview; OS Electoral tem uma demonstração estática não produtiva; as demos ao vivo de I-DO e Meridian estão em revisão.',
+  ], followUp: 'Qual produto você gostaria de explorar?' },
   luma: { facts: [
     'A LUMA é uma experiência de aprendizagem inteligente que usa um Learning Twin para conectar objetivos, progresso e evidências de capacidades.',
     'Você pode experimentar a demonstração de onboarding. A aplicação em programas educacionais exige analisar o modelo de ensino e a operação da instituição.',
   ], followUp: 'Você quer explorar a LUMA como instituição educacional, coach ou empresa?' },
   ido: { facts: [
     'O I-DO é uma plataforma empresarial multilocatária e governada para operações, finanças e processos.',
-    'A LCH disponibiliza uma prévia pública. As integrações e o escopo são definidos com cada organização.',
+    'A LCH apresenta uma prévia conceitual enquanto a demonstração pública está em manutenção. As integrações e o escopo são definidos com cada organização.',
   ], followUp: 'Qual parte da sua operação você gostaria de unificar?' },
+  meridian: { facts: [
+    'Meridian é um CRM de recrutamento multi-organização com candidatos, vagas, candidaturas, análises e fluxos de revisão humana.',
+    'A IA apoia a revisão de evidências e a preparação de perguntas; decisões de contratação permanecem humanas. A demo pública está temporariamente indisponível e o perfil da LCH mostra uma prévia conceitual.',
+  ], followUp: 'Que processo de recrutamento ou aquisição de talentos você deseja melhorar?' },
+  bpca: { facts: [
+    'Coded Automation (BPCA) é um SDK e CLI em developer preview para gerar e verificar Processes e Business Objects de Blue Prism a partir de especificações, controles de qualidade e evidências de entrega.',
+    'Não é um runtime Blue Prism certificado. Importação e execução nativa no Studio continuam sendo validações separadas.',
+  ], followUp: 'Você procura engenharia de automação ou entrega governada?' },
+  electoral: { facts: [
+    'OS Electoral / CampaignOS é um projeto em desenvolvimento para coordenação interna de campanhas com autoridade humana e evidências operacionais auditáveis.',
+    'Team Command Center, Daily War Room e Evidence Control Room públicos são uma demonstração estática somente leitura, não um SaaS produtivo nem sistema de decisão eleitoral autônoma.',
+  ], followUp: 'Deseja revisar a arquitetura operacional, o controle de acesso ou a rastreabilidade das decisões?' },
   contact: { facts: [
     'Você pode enviar uma solicitação pelo formulário de contato da LCH, informando sua organização, área de interesse e o resultado desejado.',
     'O envio não confirma automaticamente uma reunião nem garante prazo de resposta.',
@@ -137,6 +161,10 @@ const labels: Record<string, readonly [string, string]> = {
   'Explorar servicios cloud': ['Explore cloud services', 'Explorar serviços em nuvem'],
   'Probar LUMA': ['Try LUMA', 'Experimentar LUMA'],
   'Explorar I-DO': ['Explore I-DO', 'Explorar I-DO'],
+  'Explorar Coded Automation': ['Explore Coded Automation', 'Explorar Coded Automation'],
+  'Ver OS Electoral': ['View OS Electoral', 'Ver OS Electoral'],
+  'Ver Meridian': ['View Meridian', 'Ver Meridian'],
+  'Ver todos los productos': ['View all products', 'Ver todos os produtos'],
   'Ver todos los proyectos': ['View all projects', 'Ver todos os projetos'],
   'Explorar LUMA': ['Explore LUMA', 'Explorar LUMA'],
   'Conocer I-DO': ['Discover I-DO', 'Conhecer I-DO'],

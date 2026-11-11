@@ -16,6 +16,23 @@ El sitio organiza la propuesta de valor de LCH Technologies en un recorrido úni
 - **Diferenciadores de LCH** centrados en operación, integración y control.
 - **Solicitud de demostración** con validación y estados de envío.
 
+## Portafolio de productos LCH
+
+La sección `/#productos-reales` reúne seis perfiles públicos con material visual editorial y fichas SEO independientes:
+
+| Perfil | URL | Representación verificada |
+| --- | --- | --- |
+| Meridian | `/productos/meridian` | Recruiting CRM; vista conceptual, demo pública temporalmente fuera de servicio |
+| LUMA | `/productos/luma` | Learning Intelligence y Learning Twin; showcase interactivo en `luma.lch-app.cloud/experience` |
+| Coded Automation (BPCA) | `/productos/bpca` | Blue Prism como código; SDK/CLI en developer preview, documentación y repositorio |
+| OS Electoral / CampaignOS | `/productos/electoral` | Coordinación interna con autoridad humana; demo estática de solo lectura y no productiva |
+| I-DO | `/productos/ido` | Business OS; vista conceptual, demo pública en mantenimiento |
+| Evidencia Jurídica | `/productos/legal` | Knowledge Lab de RAG jurídico; demo pública accesible |
+
+Los gráficos del catálogo son ilustraciones editoriales, no capturas de datos productivos. Las visualizaciones de ejemplo indican explícitamente que contienen cifras ficticias. Las fichas usan ES/EN/PT, enlaces internos estables, metadatos Open Graph, `canonical`, `hreflang`, controles de accesibilidad y enlaces al producto solamente cuando su recurso público corresponde al estado comunicado.
+
+La prueba `tests/productPortfolio.test.ts` verifica el contrato de seis fichas, las traducciones, los metadatos sociales y el conocimiento de Donna. El navegador se verifica mediante `scripts/portfolio-smoke.cjs` en móvil y escritorio, incluido en CI. No registrar una prueba local como publicación de producción; la integración debe pasar las políticas de release y despliegue existentes.
+
 ## Stack
 
 - **React 19** — interfaz y composición de componentes.

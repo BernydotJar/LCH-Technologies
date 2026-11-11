@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { translate, type Locale, normalizeLocale, selectInitialLocale, pageMetadata } from './messages';
 import { track } from '../analytics/client';
+import { getProductPageMeta } from '../products/productMeta';
 
 type LocaleContextValue = {
   locale: Locale;
@@ -33,22 +34,26 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
     else url.searchParams.set('lang', locale);
     if (url.href !== window.location.href) window.history.replaceState(window.history.state, '', url.pathname + url.search + url.hash);
     const meta = pageMetadata[locale];
-    document.title = meta.title;
-    updateMeta('meta[name="description"]', meta.description);
-    updateMeta('meta[property="og:title"]', meta.title);
-    updateMeta('meta[property="og:description"]', meta.description);
+    const productMeta = getProductPageMeta(window.location.pathname, locale);
+    const title = productMeta?.title ?? meta.title;
+    const description = productMeta?.description ?? meta.description;
+    const canonical = productMeta?.url ?? 'https://lch-app.cloud/' + (locale === 'es' ? '' : '?lang=' + locale);
+    document.title = title;
+    updateMeta('meta[name="description"]', description);
+    updateMeta('meta[property="og:title"]', title);
+    updateMeta('meta[property="og:description"]', description);
     updateMeta('meta[property="og:locale"]', meta.ogLocale);
-    updateMeta('meta[name="twitter:title"]', meta.title);
-    updateMeta('meta[name="twitter:description"]', meta.description);
-    updateMeta('meta[property="og:url"]', 'https://lch-app.cloud/' + (locale === 'es' ? '' : '?lang=' + locale));
+    updateMeta('meta[name="twitter:title"]', title);
+    updateMeta('meta[name="twitter:description"]', description);
+    updateMeta('meta[property="og:url"]', canonical);
     document.querySelector<HTMLLinkElement>('link[rel="canonical"]')?.setAttribute(
-      'href', 'https://lch-app.cloud/' + (locale === 'es' ? '' : '?lang=' + locale),
+      'href', canonical,
     );
     for (const lang of ['es', 'en', 'pt'] as const) {
       const link = document.querySelector<HTMLLinkElement>('link[hreflang="' + lang + '"]');
-      link?.setAttribute('href', 'https://lch-app.cloud/' + (lang === 'es' ? '' : '?lang=' + lang));
+      link?.setAttribute('href', productMeta ? 'https://lch-app.cloud/productos/' + productMeta.slug + (lang === 'es' ? '' : '?lang=' + lang) : 'https://lch-app.cloud/' + (lang === 'es' ? '' : '?lang=' + lang));
     }
-    track('page_view', { language: locale, page_path: '/' });
+    track('page_view', { language: locale, page_path: productMeta ? ('/productos/' + productMeta.slug) as '/productos/ido' | '/productos/luma' | '/productos/meridian' | '/productos/bpca' | '/productos/electoral' | '/productos/legal' : '/' });
   }, [locale]);
 
   useEffect(() => {

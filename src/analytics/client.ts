@@ -9,9 +9,9 @@ export type AnalyticsEvent =
 export type SafeDimensions = {
   language?: 'es' | 'en' | 'pt';
   theme?: 'dark' | 'light';
-  product?: 'ido' | 'luma' | 'legal' | 'meridian';
+  product?: 'ido' | 'luma' | 'legal' | 'meridian' | 'bpca' | 'electoral';
   section?: 'hero' | 'capabilities' | 'product' | 'contact' | 'cases';
-  page_path?: '/';
+  page_path?: '/' | '/productos/ido' | '/productos/luma' | '/productos/meridian' | '/productos/bpca' | '/productos/electoral' | '/productos/legal';
   challenge?: 'automation' | 'ai' | 'platform' | 'cloud';
 };
 export type Consent = 'granted' | 'denied' | null;
