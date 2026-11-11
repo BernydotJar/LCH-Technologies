@@ -76,7 +76,7 @@ async function testViewport(browser, width, height, locale) {
     await page.waitForFunction(() => document.activeElement?.getAttribute('aria-controls') === 'donna-chat-panel');
     assert.equal(await trigger.getAttribute('aria-expanded'), 'false');
 
-    await page.reload({ waitUntil: 'domcontentloaded' });
+    await page.reload({ waitUntil: 'domcontentloaded', timeout: 30000 });
     await page.getByTestId('theme-toggle').waitFor();
     assert.equal(await page.locator('html').getAttribute('data-theme'), 'dark', 'theme remains dark after reload');
     assert.deepEqual(errors, [], 'no browser errors');
