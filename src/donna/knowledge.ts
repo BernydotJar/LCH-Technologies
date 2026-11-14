@@ -26,7 +26,7 @@ export const CONTACT_LINK: ApprovedLink = {
 export const DONNA_QUICK_PROMPTS = [
   { label: 'Automatizar procesos', message: '¿Cómo puede LCH ayudarme a automatizar tareas manuales?' },
   { label: 'Aplicar IA al negocio', message: '¿Qué soluciones de inteligencia artificial ofrece LCH?' },
-  { label: 'Conocer los productos', message: '¿Qué productos ofrece LCH, incluyendo Meridian, LUMA, Coded Automation y OS Electoral?' },
+  { label: 'Conocer los productos', message: '¿Qué productos tienen?' },
   { label: 'Hablar con el equipo', message: 'Quiero conversar con el equipo de LCH.' },
 ] as const;
 
