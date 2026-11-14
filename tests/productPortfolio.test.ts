@@ -6,6 +6,9 @@ import { renderProductHead } from '../server/productHead.ts';
 import { renderLocalizedHead } from '../server/localizedHead.ts';
 import { translationExists, translate } from '../src/i18n/messages.ts';
 import { respondToDonnaLocalized } from '../src/donna/localized.ts';
+import { DONNA_QUICK_PROMPTS, LCH_KNOWLEDGE } from '../src/donna/knowledge.ts';
+import { isApprovedPublicLink } from '../src/donna/publicLinks.ts';
+import { routeMessage } from '../src/donna/engine.ts';
 
 const slugs = ['ido', 'luma', 'meridian', 'bpca', 'electoral', 'legal'] as const;
 
@@ -54,7 +57,8 @@ test('product profiles and portfolio navigation remain integrated into the LCH s
   assert.match(productSource, /Catálogo de productos LCH/);
   assert.match(productSource, /ProductArt/);
   assert.match(appSource, /ProductDetailPage/);
-  assert.match(productSource, /Developer preview · repositorio y documentación/);
+  assert.match(productSource, /Developer preview · demostración bajo solicitud/);
+  assert.doesNotMatch(productSource, /github\.com\/BernydotJar\/bp-coded-agents/, 'never advertise private BPCA repo in public portfolio');
   assert.match(productSource, /Demostración estática · no productiva/);
   assert.match(productSource, /Vista conceptual · demo temporalmente fuera de servicio/);
 });
@@ -83,4 +87,28 @@ test('new portfolio copy is translated and Donna can explain developer previews 
     assert.equal(campaign.kind, 'grounded');
     assert.match(campaign.reply, /demo|demonstração|demostración|read.only|somente leitura|solo lectura/i);
   }
+});
+
+
+test('Donna product quick action routes to portfolio and every authored link is allowed by the UI', () => {
+  const quick = DONNA_QUICK_PROMPTS.find((prompt) => prompt.label === 'Conocer los productos');
+  assert.ok(quick, 'product quick prompt must exist');
+  const route = routeMessage(quick.message);
+  assert.equal(route.kind, 'matched', 'portfolio prompt must not require clarification');
+  if (route.kind === 'matched') assert.equal(route.entry.id, 'products');
+  for (const lang of ['es', 'en', 'pt'] as const) {
+    const answer = respondToDonnaLocalized([{ role: 'user', content: quick.message }], lang);
+    assert.equal(answer.kind, 'grounded', 'catalog quick prompt must work in ' + lang);
+    assert.match(answer.reply, /BPCA|Coded Automation/i);
+  }
+  for (const entry of LCH_KNOWLEDGE) {
+    for (const link of entry.links) {
+      assert.ok(isApprovedPublicLink(link.url), entry.id + ' must have a UI-visible, explicitly reviewed link: ' + link.url);
+    }
+  }
+  for (const slug of ['ido', 'luma', 'meridian', 'bpca', 'electoral', 'legal']) {
+    assert.equal(isApprovedPublicLink('https://lch-app.cloud/productos/' + slug), true, slug);
+  }
+  assert.equal(isApprovedPublicLink('https://evil.example/'), false);
+  assert.equal(isApprovedPublicLink('https://lch-app.cloud/productos/bpca?redirect=https://evil.example'), false);
 });
