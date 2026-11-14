@@ -24,7 +24,7 @@ La sección `/#productos-reales` reúne seis perfiles públicos con material vis
 | --- | --- | --- |
 | Meridian | `/productos/meridian` | Recruiting CRM; vista conceptual, demo pública temporalmente fuera de servicio |
 | LUMA | `/productos/luma` | Learning Intelligence y Learning Twin; showcase interactivo en `luma.lch-app.cloud/experience` |
-| Coded Automation (BPCA) | `/productos/bpca` | Blue Prism como código; SDK/CLI en developer preview, documentación y repositorio |
+| Coded Automation (BPCA) | `/productos/bpca` | Blue Prism como código; SDK/CLI en developer preview, demo técnica bajo solicitud (repositorio privado) |
 | OS Electoral / CampaignOS | `/productos/electoral` | Coordinación interna con autoridad humana; demo estática de solo lectura y no productiva |
 | I-DO | `/productos/ido` | Business OS; vista conceptual, demo pública en mantenimiento |
 | Evidencia Jurídica | `/productos/legal` | Knowledge Lab de RAG jurídico; demo pública accesible |
