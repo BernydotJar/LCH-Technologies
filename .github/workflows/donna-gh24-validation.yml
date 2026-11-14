@@ -10,7 +10,7 @@ on:
       - '.github/workflows/donna-gh24-validation.yml'
 jobs:
   unit-and-build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
