@@ -66,7 +66,7 @@ test('product profiles and portfolio navigation remain integrated into the LCH s
 test('new portfolio copy is translated and Donna can explain developer previews accurately', () => {
   for (const source of [
     'Catálogo de productos LCH', 'Conocer el producto', 'Explora cada experiencia',
-    'Diseñado para problemas reales.', 'Developer preview · repositorio y documentación',
+    'Diseñado para problemas reales.', 'Developer preview · demostración bajo solicitud',
     'Demostración estática · no productiva', 'Coded Automation',
     'Construir automatizaciones en Blue Prism con la disciplina de ingeniería de software.',
     'Coordinación de campañas con decisiones humanas y evidencia verificable.',
