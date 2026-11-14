@@ -2,11 +2,12 @@ import { marketing } from './marketing.ts';
 import { casesCopy } from './cases.ts';
 import { productCopy } from './products.ts';
 import { portfolioCopy } from './portfolio.ts';
+import { bpcaLabCopy } from './bpcaLab.ts';
 import { contactCopy } from './contact.ts';
 import { donnaCopy } from './donna.ts';
 export type Locale = 'es' | 'en' | 'pt';
 const dictionaries: Record<string, readonly [string, string]> = {
-  ...marketing, ...casesCopy, ...productCopy, ...portfolioCopy, ...contactCopy, ...donnaCopy,
+  ...marketing, ...casesCopy, ...productCopy, ...portfolioCopy, ...bpcaLabCopy, ...contactCopy, ...donnaCopy,
 };
 
 export function normalizeLocale(input: string | null | undefined): Locale | null {

@@ -33,7 +33,7 @@ async function verify(browser, viewport) {
     assert.equal(await page.locator('link[rel="canonical"]').getAttribute('href'), 'https://lch-app.cloud/productos/bpca');
     assert.equal(await page.locator('meta[property="og:url"]').getAttribute('content'), 'https://lch-app.cloud/productos/bpca');
     assert.equal(await page.locator('main a[href="https://github.com/BernydotJar/bp-coded-agents"]').count(), 0, 'private BPCA source is not advertised as a public link');
-    assert.match(await page.locator('main').innerText(), /demostración bajo solicitud/i);
+    assert.match(await page.locator('main').innerText(), /laboratorio técnico disponible/i);
     assert.equal(await page.locator('main a[href="/#contacto"]').count() > 0, true, 'BPCA directs interested visitors to request a demo');
 
     await page.getByTestId('language-switcher').selectOption('en');

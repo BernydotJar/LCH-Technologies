@@ -33,6 +33,17 @@ Los gráficos del catálogo son ilustraciones editoriales, no capturas de datos 
 
 La prueba `tests/productPortfolio.test.ts` verifica el contrato de seis fichas, las traducciones, los metadatos sociales y el conocimiento de Donna. El navegador se verifica mediante `scripts/portfolio-smoke.cjs` en móvil y escritorio, incluido en CI. No registrar una prueba local como publicación de producción; la integración debe pasar las políticas de release y despliegue existentes.
 
+### Laboratorio BPCA / Coded Automation
+
+La ficha `/productos/bpca#laboratorio-bpca` incorpora un **laboratorio técnico interactivo de solo lectura**, integrado en ES/EN/PT. Incluye:
+
+- Contrato sintético `Normalize Text`, con Process → Action → Object para **Blue Prism 6.5.1.14401**.
+- Comandos **reales** `bpca build-pair`, `verify-action-abi` y `resolve-native-deps`, copiables para quien tenga acceso autorizado al SDK privado.
+- Evidencia estática capturada el 14-11-2026 y JSON descargable con huellas, estados y límites.
+- Un bloqueo explícito `MANAGED_ASSEMBLY_TARGET_REGISTRY_V2_MISSING` (no se presume que la DLL esté ausente del destino), con Studio import/Check Code/runtime marcados `NOT_RUN`.
+
+**No existe un compilador BPCA en el navegador ni se publican source XML, VBO, credenciales o releases de Blue Prism.** El laboratorio sirve para explorar el contrato y reproducirlo mediante el CLI en un equipo autorizado, no para fingir un robot conectado al runtime. Prueba: `tests/bpcaLabContract.test.ts` + `scripts/bpca-lab-smoke.cjs` (móvil y escritorio en CI). Más información: [Evidencia y límites de la demo técnica](docs/bpca-public-lab.md).
+
 ## Stack
 
 - **React 19** — interfaz y composición de componentes.
