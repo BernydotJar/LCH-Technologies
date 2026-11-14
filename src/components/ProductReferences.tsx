@@ -118,16 +118,15 @@ export const products: ProductReference[] = [
     whatIsIt:
       'Una plataforma de ingeniería que transforma especificaciones verificables en artefactos de Blue Prism y conserva dependencias, pruebas y controles de calidad. Es developer preview: la validación nativa y la certificación en cada versión de Studio son pasos separados.',
     idealFor: ['Equipos RPA', 'Centros de Excelencia', 'Ingeniería de automatización', 'Equipos de plataforma'],
-    url: 'https://github.com/BernydotJar/bp-coded-agents',
-    displayUrl: 'github.com / bp-coded-agents',
+    url: '/#contacto',
+    displayUrl: 'LCH / Coded Automation',
     tags: ['Automation as Code', 'CLI / SDK', 'Quality gates', 'Blue Prism'],
     embed: false,
     live: false,
-    publicAvailable: true,
-    availabilityLabel: 'Developer preview · repositorio y documentación',
+    publicAvailable: false,
+    availabilityLabel: 'Developer preview · demostración bajo solicitud',
     stat: 'DEVELOPER PREVIEW',
     statLabel: 'automation engineering',
-    actionLabel: 'Ver código y documentación',
     icon: Code2,
   },
   {
@@ -595,8 +594,8 @@ export const ProductReferences = () => {
               ) : (
                 <span
                   className="w-8 h-8 shrink-0 rounded-lg inline-flex items-center justify-center text-amber-200/65 bg-amber-300/[0.06]"
-                  aria-label={active.name + ': ' + t('Demo pública temporalmente indisponible')}
-                  title={t('Demo pública temporalmente indisponible')}
+                  aria-label={active.name + ': ' + t(active.id === 'bpca' ? 'Vista técnica bajo solicitud' : 'Demo pública temporalmente indisponible')}
+                  title={t(active.id === 'bpca' ? 'Vista técnica bajo solicitud' : 'Demo pública temporalmente indisponible')}
                 >
                   <ArrowUpRight size={16} />
                 </span>
@@ -671,6 +670,10 @@ export const ProductReferences = () => {
               >
                 {t(active.actionLabel ?? 'Explorar')} {active.actionLabel ? '' : active.name}
                 <ArrowUpRight size={16} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+              </a>
+            ) : active.id === 'bpca' ? (
+              <a href="/#contacto" className="inline-flex items-center justify-center gap-3 rounded-xl bg-white px-5 py-3.5 text-sm font-bold text-primary transition-colors hover:bg-sky-100">
+                {t('Solicitar demo técnica')} <ArrowRight size={16} />
               </a>
             ) : (
               <div className="inline-flex items-center justify-center gap-3 border border-amber-200/15 bg-amber-300/[0.06] text-amber-100 px-5 py-3.5 rounded-xl font-semibold text-sm cursor-not-allowed">
