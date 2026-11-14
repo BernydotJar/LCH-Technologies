@@ -2,6 +2,7 @@ import { ArrowLeft, ArrowRight, CheckCheck, CircleCheck, Compass, ExternalLink, 
 import { useLocale } from '../i18n/LocaleProvider';
 import { track } from '../analytics/client';
 import { ProductArt } from './ProductArt';
+import { BpcaTechnicalLab } from './BpcaTechnicalLab';
 import { products, type ProductReference } from './ProductReferences';
 
 export function ProductDetailPage({ product }: { product: ProductReference | null }) {
@@ -56,6 +57,10 @@ export function ProductDetailPage({ product }: { product: ProductReference | nul
                   >
                     {linkLabel} <ExternalLink size={16} />
                   </a>
+                ) : product.id === 'bpca' ? (
+                  <a data-testid="bpca-lab-cta" href="#laboratorio-bpca" className="inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3.5 text-sm font-bold text-primary transition-colors hover:bg-sky-100 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal-300">
+                    {t('Explorar laboratorio técnico')} <ArrowRight size={16} />
+                  </a>
                 ) : (
                   <a href="/#contacto" className="inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3.5 text-sm font-bold text-primary transition-colors hover:bg-sky-100">
                     {t('Solicitar una demostración')} <ArrowRight size={16} />
@@ -107,6 +112,8 @@ export function ProductDetailPage({ product }: { product: ProductReference | nul
           </div>
         </div>
       </section>
+
+      {product.id === 'bpca' && <BpcaTechnicalLab />}
 
       <section className="site-product-lab bg-[#0a1028] px-4 py-20 text-white sm:px-6 sm:py-24 lg:px-8">
         <div className="mx-auto max-w-7xl">

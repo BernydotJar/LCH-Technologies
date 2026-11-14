@@ -124,7 +124,7 @@ export const products: ProductReference[] = [
     embed: false,
     live: false,
     publicAvailable: false,
-    availabilityLabel: 'Developer preview · demostración bajo solicitud',
+    availabilityLabel: 'Developer preview · laboratorio técnico disponible',
     stat: 'DEVELOPER PREVIEW',
     statLabel: 'automation engineering',
     icon: Code2,
@@ -672,8 +672,8 @@ export const ProductReferences = () => {
                 <ArrowUpRight size={16} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
               </a>
             ) : active.id === 'bpca' ? (
-              <a href="/#contacto" className="inline-flex items-center justify-center gap-3 rounded-xl bg-white px-5 py-3.5 text-sm font-bold text-primary transition-colors hover:bg-sky-100">
-                {t('Solicitar demo técnica')} <ArrowRight size={16} />
+              <a href="/productos/bpca#laboratorio-bpca" className="inline-flex items-center justify-center gap-3 rounded-xl bg-white px-5 py-3.5 text-sm font-bold text-primary transition-colors hover:bg-sky-100">
+                {t('Explorar demo técnica')} <ArrowRight size={16} />
               </a>
             ) : (
               <div className="inline-flex items-center justify-center gap-3 border border-amber-200/15 bg-amber-300/[0.06] text-amber-100 px-5 py-3.5 rounded-xl font-semibold text-sm cursor-not-allowed">

@@ -62,6 +62,10 @@ jobs:
         env:
           LCH_SMOKE_URL: http://127.0.0.1:4254/
         run: node scripts/portfolio-smoke.cjs
+      - name: BPCA technical laboratory contract, download and responsive E2E
+        env:
+          LCH_SMOKE_URL: http://127.0.0.1:4254/
+        run: node scripts/bpca-lab-smoke.cjs
       - name: Verify global night theme and unobtrusive Donna dock across viewports
         env:
           LCH_SMOKE_URL: http://127.0.0.1:4254/

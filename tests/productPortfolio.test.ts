@@ -57,7 +57,7 @@ test('product profiles and portfolio navigation remain integrated into the LCH s
   assert.match(productSource, /Catálogo de productos LCH/);
   assert.match(productSource, /ProductArt/);
   assert.match(appSource, /ProductDetailPage/);
-  assert.match(productSource, /Developer preview · demostración bajo solicitud/);
+  assert.match(productSource, /Developer preview · laboratorio técnico disponible/);
   assert.doesNotMatch(productSource, /github\.com\/BernydotJar\/bp-coded-agents/, 'never advertise private BPCA repo in public portfolio');
   assert.match(productSource, /Demostración estática · no productiva/);
   assert.match(productSource, /Vista conceptual · demo temporalmente fuera de servicio/);
@@ -66,7 +66,7 @@ test('product profiles and portfolio navigation remain integrated into the LCH s
 test('new portfolio copy is translated and Donna can explain developer previews accurately', () => {
   for (const source of [
     'Catálogo de productos LCH', 'Conocer el producto', 'Explora cada experiencia',
-    'Diseñado para problemas reales.', 'Developer preview · demostración bajo solicitud',
+    'Diseñado para problemas reales.', 'Developer preview · laboratorio técnico disponible',
     'Demostración estática · no productiva', 'Coded Automation',
     'Construir automatizaciones en Blue Prism con la disciplina de ingeniería de software.',
     'Coordinación de campañas con decisiones humanas y evidencia verificable.',
