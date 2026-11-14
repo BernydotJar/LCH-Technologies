@@ -26,7 +26,7 @@ export const CONTACT_LINK: ApprovedLink = {
 export const DONNA_QUICK_PROMPTS = [
   { label: 'Automatizar procesos', message: '¿Cómo puede LCH ayudarme a automatizar tareas manuales?' },
   { label: 'Aplicar IA al negocio', message: '¿Qué soluciones de inteligencia artificial ofrece LCH?' },
-  { label: 'Conocer los productos', message: '¿Qué hacen LUMA e I-DO?' },
+  { label: 'Conocer los productos', message: '¿Qué productos tienen?' },
   { label: 'Hablar con el equipo', message: 'Quiero conversar con el equipo de LCH.' },
 ] as const;
 
@@ -125,22 +125,22 @@ export const LCH_KNOWLEDGE: readonly DonnaEntry[] = [
   },
   {
     id: 'products',
-    label: 'productos I-DO, LUMA y Meridian',
+    label: 'portafolio de productos LCH',
     keywords: ['luma e i do', 'luma y i do', 'luma e ido', 'luma y ido', 'i do luma y meridian', 'ido luma y meridian',
-      'que hacen i do luma y meridian', 'que hacen ido luma y meridian', 'meridian', 'talent intelligence',
-      'productos de lch', 'productos lch', 'que productos ofrecen', 'que productos tienen'],
+      'que hacen i do luma y meridian', 'que hacen ido luma y meridian',
+      'productos de lch', 'productos lch', 'que productos ofrecen', 'que productos tienen', 'portafolio lch'],
     facts: [
-      'LCH presenta tres productos principales con enfoques distintos: I-DO concentra operaciones, finanzas y procesos empresariales en un Business OS multi-tenant; LUMA trabaja inteligencia de aprendizaje mediante un Learning Twin; Meridian organiza recruiting y Talent Intelligence con evidencia y revisión humana.',
-      'Evidencia Jurídica se presenta aparte como una referencia de Academia / Knowledge Lab para consulta normativa con fuentes y citas, no como producto principal.',
+      'El portafolio LCH incluye I-DO (operaciones y finanzas), LUMA (Learning Twin), Meridian (recruiting con revisión humana), Coded Automation/BPCA (ingeniería Blue Prism as code) y OS Electoral/CampaignOS (gobernanza de operaciones de campaña).',
+      'También presenta Evidencia Jurídica como laboratorio RAG. Las disponibilidades son diferentes: LUMA y Evidencia tienen experiencias públicas; BPCA está en developer preview; OS Electoral tiene una demo estática no productiva; I-DO y Meridian ofrecen vistas conceptuales mientras se revisan sus demos.',
     ],
     interest: 'Software Empresarial',
     links: [
       { label: 'Probar LUMA', url: 'https://luma.lch-app.cloud/onboarding' },
-      { label: 'Explorar I-DO', url: 'https://ido.lch-app.cloud/w/colombia/inicio' },
-      { label: 'Ver Meridian', url: 'https://meridian.lch-app.cloud/' },
+      { label: 'Explorar I-DO', url: 'https://lch-app.cloud/productos/ido' },
+      { label: 'Ver Meridian', url: 'https://lch-app.cloud/productos/meridian' },
       { label: 'Ver todos los productos', url: '#productos-reales' },
     ],
-    followUp: '¿Te interesa aprendizaje, operaciones empresariales o talento y recruiting?',
+    followUp: '¿Qué producto te interesa conocer con más detalle?',
   },
   {
     id: 'luma',
@@ -164,10 +164,10 @@ export const LCH_KNOWLEDGE: readonly DonnaEntry[] = [
       'multi tenant', 'plataforma de operaciones', 'gestion operativa empresarial'],
     facts: [
       'I-DO es una plataforma empresarial orientada a operaciones, finanzas y procesos en un sistema gobernado, con arquitectura multi-tenant.',
-      'La presentación de LCH incluye una referencia pública de la experiencia. Las integraciones y alcances se acuerdan para cada organización.',
+      'La ficha pública incluye una vista conceptual. Su demo está en mantenimiento; las integraciones y el alcance se acuerdan con cada organización.',
     ],
     interest: 'Software Empresarial',
-    links: [{ label: 'Conocer I-DO', url: 'https://ido.lch-app.cloud/w/colombia/inicio' }, CONTACT_LINK],
+    links: [{ label: 'Conocer I-DO', url: 'https://lch-app.cloud/productos/ido' }, CONTACT_LINK],
     followUp: '¿Qué parte de la operación quisieras unificar?',
   },
 
@@ -181,8 +181,34 @@ export const LCH_KNOWLEDGE: readonly DonnaEntry[] = [
       'La IA se usa para extraer evidencia relacionada con criterios del rol y preparar preguntas; las decisiones de contratación permanecen bajo revisión humana.',
     ],
     interest: 'Software Empresarial',
-    links: [{ label: 'Ver Meridian', url: 'https://meridian.lch-app.cloud/' }, CONTACT_LINK],
+    links: [{ label: 'Ver Meridian', url: 'https://lch-app.cloud/productos/meridian' }, CONTACT_LINK],
     followUp: '¿Qué parte de recruiting o Talent Acquisition quieres hacer más consistente?',
+  },
+  {
+    id: 'bpca',
+    label: 'Coded Automation BPCA',
+    keywords: ['coded automation', 'bpca', 'blue prism as code', 'automation as code',
+      'blue prism coded agents', 'blue prism cli', 'blue prism sdk'],
+    facts: [
+      'Coded Automation (BPCA) es un SDK y CLI para crear y verificar artefactos Process y Business Object de Blue Prism desde contratos y especificaciones, con pruebas y evidencia de entrega.',
+      'Está en developer preview. No equivale a un runtime Blue Prism certificado ni sustituye las pruebas de importación, compilación y ejecución en Studio.',
+    ],
+    interest: 'Automatización',
+    links: [{ label: 'Explorar Coded Automation', url: 'https://lch-app.cloud/productos/bpca' }, CONTACT_LINK],
+    followUp: '¿Buscas desarrollar automatizaciones con código o gobernar su ciclo de entrega?',
+  },
+  {
+    id: 'electoral',
+    label: 'OS Electoral CampaignOS',
+    keywords: ['os electoral', 'campaignos', 'campaign os', 'plataforma electoral',
+      'operaciones de campaña', 'campaign operations'],
+    facts: [
+      'OS Electoral / CampaignOS es un proyecto de coordinación interna de campañas con autoridad humana, trazabilidad y control de evidencia.',
+      'La demostración pública es una vista estática de solo lectura del Team Command Center, Daily War Room y Evidence Control Room. No constituye un SaaS de producción ni autoriza decisiones electorales autónomas.',
+    ],
+    interest: 'Software Empresarial',
+    links: [{ label: 'Ver OS Electoral', url: 'https://lch-app.cloud/productos/electoral' }, CONTACT_LINK],
+    followUp: '¿Te interesa la arquitectura operativa, el control de acceso o la trazabilidad de decisiones?',
   },
   {
     id: 'contact',

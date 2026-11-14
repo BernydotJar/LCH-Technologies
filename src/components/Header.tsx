@@ -17,6 +17,7 @@ export const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { locale, setLocale, t } = useLocale();
   const { effectiveTheme, toggle } = useTheme();
+  const homeHref = (hash: string) => typeof window !== 'undefined' && window.location.pathname !== '/' ? '/' + hash : hash;
 
   const controls = (
     <div className="flex shrink-0 items-center gap-2" role="group" aria-label={t('Idioma')}>
@@ -49,14 +50,14 @@ export const Header = () => {
   return (
     <header className="site-brand-surface sticky top-0 z-50 w-full bg-primary text-white shadow-md">
       <div className="mx-auto flex h-20 w-full max-w-7xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
-        <a href="#inicio" onClick={() => track('cta_click', { section: 'hero' })} aria-label={t('LCH Technologies — Inicio')} className="inline-flex shrink-0 items-center rounded-md bg-white px-2 py-1.5">
+        <a href={homeHref("#inicio")} onClick={() => track('cta_click', { section: 'hero' })} aria-label={t('LCH Technologies — Inicio')} className="inline-flex shrink-0 items-center rounded-md bg-white px-2 py-1.5">
           <img src="/assets/brand/lch-technologies-logo.svg" alt="LCH Technologies" className="h-10 w-auto sm:h-11" />
         </a>
         <nav className="ml-auto hidden items-center gap-3 xl:flex 2xl:gap-6" aria-label={t('Soluciones')}>
           {navLinks.map((link) => (
-            <a key={link.href} href={link.href} className="text-sm font-medium text-white transition-colors hover:text-teal-200">{t(link.label)}</a>
+            <a key={link.href} href={homeHref(link.href)} className="text-sm font-medium text-white transition-colors hover:text-teal-200">{t(link.label)}</a>
           ))}
-          <a href="#contacto" onClick={() => track('cta_click', { section: 'contact' })} className="whitespace-nowrap rounded bg-accent px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-teal-700 xl:px-6">{t('Conversemos')}</a>
+          <a href={homeHref("#contacto")} onClick={() => track('cta_click', { section: 'contact' })} className="whitespace-nowrap rounded bg-accent px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-teal-700 xl:px-6">{t('Conversemos')}</a>
         </nav>
         {controls}
         <button type="button" className="flex h-10 w-10 shrink-0 items-center justify-center rounded border border-white/15 bg-white/5 text-white transition-colors hover:bg-white/10 xl:hidden" onClick={() => setIsOpen((value) => !value)} aria-label={t(isOpen ? 'Cerrar menú' : 'Abrir menú')} aria-expanded={isOpen} aria-controls="lch-mobile-nav">
@@ -66,9 +67,9 @@ export const Header = () => {
       {isOpen && (
         <nav id="lch-mobile-nav" className="space-y-3 border-t border-white/10 bg-primary px-4 pb-6 pt-2 shadow-lg xl:hidden">
           {navLinks.map((link) => (
-            <a key={link.href} href={link.href} className="block rounded px-1 py-2 text-base font-medium text-white hover:text-teal-200" onClick={() => setIsOpen(false)}>{t(link.label)}</a>
+            <a key={link.href} href={homeHref(link.href)} className="block rounded px-1 py-2 text-base font-medium text-white hover:text-teal-200" onClick={() => setIsOpen(false)}>{t(link.label)}</a>
           ))}
-          <a href="#contacto" className="block w-full rounded bg-accent px-6 py-3 text-center font-semibold text-white" onClick={() => { setIsOpen(false); track('cta_click', { section: 'contact' }); }}>{t('Conversemos')}</a>
+          <a href={homeHref("#contacto")} className="block w-full rounded bg-accent px-6 py-3 text-center font-semibold text-white" onClick={() => { setIsOpen(false); track('cta_click', { section: 'contact' }); }}>{t('Conversemos')}</a>
         </nav>
       )}
     </header>

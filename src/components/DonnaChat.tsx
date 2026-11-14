@@ -5,6 +5,7 @@ import {
   ShieldCheck, Sparkles, X,
 } from 'lucide-react';
 import { DONNA_QUICK_PROMPTS } from '../donna/knowledge';
+import { isApprovedPublicLink } from '../donna/publicLinks';
 import { DONNA_IDEA_ROTATION_MS, DONNA_IDEAS, contextualPrompts } from '../donna/experience';
 import './donna-experience.css';
 import { useLocale } from '../i18n/LocaleProvider';
@@ -21,16 +22,7 @@ type DonnaUiMessage = HistoryTurn & { id: number; links?: DonnaReply['links']; k
 export type DonnaHandoff = { interest: InterestArea; message: string; draft: ContactDraft };
 type Props = { onHandoff: (data: DonnaHandoff) => void; onDraft: (draft: ContactDraft) => void; startContactRequest: DonnaPreparedDraft | null; openExplorationRequest?: number };
 
-const PUBLIC_LINKS = new Set([
-  '#contacto',
-  '#soluciones',
-  '#productos-reales',
-  '#productos',
-  '#privacidad-contacto',
-  'https://evidencia.lch-app.cloud/',
-  'https://luma.lch-app.cloud/onboarding',
-  'https://ido.lch-app.cloud/w/colombia/inicio',
-]);
+
 
 const MAX_VISIBLE = 20;
 const REQUEST_TIMEOUT_MS = 18_000;
@@ -186,7 +178,7 @@ export function DonnaChat({ onHandoff, onDraft, startContactRequest, openExplora
         id: nextId.current++,
         role: 'assistant',
         content: value.reply,
-        links: value.links.filter((link) => PUBLIC_LINKS.has(link.url)),
+        links: value.links.filter((link) => isApprovedPublicLink(link.url)),
         kind: value.kind,
         interest: value.suggestedInterest,
       };

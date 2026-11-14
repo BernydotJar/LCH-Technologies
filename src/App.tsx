@@ -11,7 +11,8 @@ import { Header } from './components/Header';
 import { Hero } from './components/Hero';
 import { Capabilities } from './components/Capabilities';
 import { EvidenceAI } from './components/EvidenceAI';
-import { ProductReferences } from './components/ProductReferences';
+import { ProductReferences, products } from './components/ProductReferences';
+import { ProductDetailPage } from './components/ProductDetailPage';
 import { CaseStudies } from './components/CaseStudies';
 import { Governance } from './components/Governance';
 import { Process } from './components/Process';
@@ -24,6 +25,9 @@ export type DonnaPreparedDraft = { draft: ContactDraft; nonce: number };
 
 export default function App() {
   const [handoff, setHandoff] = useState<ContactHandoff | null>(null);
+  const productSlug = typeof window !== 'undefined' ? window.location.pathname.match(/^\/productos\/([^/]+)\/?$/)?.[1] : undefined;
+  const isProductPath = typeof window !== 'undefined' && window.location.pathname.startsWith('/productos/');
+  const product = products.find((item) => item.id === productSlug) ?? null;
   const [preparedDraft, setPreparedDraft] = useState<DonnaPreparedDraft | null>(null);
   const [openDonnaForContact, setOpenDonnaForContact] = useState<DonnaPreparedDraft | null>(null);
   const [openDonnaForExploration, setOpenDonnaForExploration] = useState(0);
@@ -47,6 +51,14 @@ export default function App() {
     window.location.hash = 'contacto';
     window.requestAnimationFrame(() => document.getElementById('contacto')?.scrollIntoView({ behavior: 'smooth' }));
   };
+
+  if (isProductPath) return (
+    <div className="app-shell min-h-screen bg-white">
+      <Header />
+      <ProductDetailPage product={product} />
+      <Footer />
+    </div>
+  );
 
   return (
     <div className="app-shell min-h-screen bg-white">

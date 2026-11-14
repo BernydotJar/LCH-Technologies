@@ -10,6 +10,8 @@ import { isIP } from 'node:net';
 import { DONNA_LIMITS, parseDonnaRequest } from '../src/donna/engine.ts';
 import { respondToDonnaLocalized } from '../src/donna/localized.ts';
 import { renderLocalizedHead } from './localizedHead.ts';
+import { renderProductHead } from './productHead.ts';
+import { productSlugFromPath } from '../src/products/productMeta.ts';
 
 const CONTENT_TYPES: Readonly<Record<string, string>> = {
   '.html': 'text/html; charset=utf-8',
@@ -173,6 +175,10 @@ export function createSiteHandler(options: SiteHandlerOptions) {
         return;
       }
       const rawPath = decodeURIComponent(url.pathname);
+      if (rawPath.startsWith('/productos/') && !productSlugFromPath(rawPath)) {
+        sendJson(res, 404, { error: 'product_not_found' });
+        return;
+      }
       if (rawPath.includes('\0')) {
         sendJson(res, 400, { error: 'invalid_path' });
         return;
@@ -202,7 +208,9 @@ export function createSiteHandler(options: SiteHandlerOptions) {
         return;
       }
       const rawBody = await readFile(finalFile);
-      const body = ext === '.html' ? Buffer.from(renderLocalizedHead(rawBody.toString('utf8'), url.searchParams.get('lang'))) : rawBody;
+      const body = ext === '.html'
+        ? Buffer.from(renderProductHead(renderLocalizedHead(rawBody.toString('utf8'), url.searchParams.get('lang')), rawPath, url.searchParams.get('lang')))
+        : rawBody;
       res.writeHead(200, {
         'content-type': type,
         'x-content-type-options': 'nosniff',

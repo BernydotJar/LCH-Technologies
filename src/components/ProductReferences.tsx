@@ -16,12 +16,15 @@ import {
   FileText,
   Search,
   BarChart3,
+  Code2,
+  LayoutDashboard,
 } from 'lucide-react';
 import { useLocale } from '../i18n/LocaleProvider';
 import { track } from '../analytics/client';
+import { ProductArt } from './ProductArt';
 
-type ProductReference = {
-  id: 'ido' | 'luma' | 'meridian' | 'legal';
+export type ProductReference = {
+  id: 'ido' | 'luma' | 'meridian' | 'bpca' | 'electoral' | 'legal';
   name: string;
   kicker: string;
   label: string;
@@ -37,10 +40,11 @@ type ProductReference = {
   availabilityLabel: string;
   stat: string;
   statLabel: string;
+  actionLabel?: string;
   icon: typeof Building2;
 };
 
-const products: ProductReference[] = [
+export const products: ProductReference[] = [
   {
     id: 'ido',
     name: 'I-DO',
@@ -51,13 +55,13 @@ const products: ProductReference[] = [
     whatIsIt:
       'Un SaaS empresarial multi-tenant que reúne finanzas, compras, ventas, inventario, personas y automatizaciones en una misma capa operativa, con IA aplicada donde aporta contexto y decisión.',
     idealFor: ['Operaciones', 'Finanzas', 'Back office', 'Procesos multi-sistema'],
-    url: 'https://ido.textilesdemedellin.com/w/colombia/inicio',
-    displayUrl: 'ido.textilesdemedellin.com / colombia',
+    url: 'https://ido.lch-app.cloud/w/colombia/inicio',
+    displayUrl: 'ido.lch-app.cloud / business OS',
     tags: ['ERP', 'Multi-tenant', 'AI-native'],
     embed: false,
     live: false,
     publicAvailable: false,
-    availabilityLabel: 'Preview interactiva disponible · demo pública en recuperación',
+    availabilityLabel: 'Vista conceptual · demo pública en mantenimiento',
     stat: 'BUSINESS OS',
     statLabel: 'enterprise SaaS',
     icon: Building2,
@@ -72,13 +76,13 @@ const products: ProductReference[] = [
     whatIsIt:
       'Una plataforma de learning intelligence que construye un Learning Twin de cada participante para adaptar práctica, contenido y acompañamiento según evidencia real de progreso.',
     idealFor: ['Academias', 'Educación premium', 'L&D', 'Programas high-ticket'],
-    url: 'https://luma.lch-app.cloud/onboarding?theme=light',
-    displayUrl: 'luma.lch-app.cloud / onboarding',
+    url: 'https://luma.lch-app.cloud/experience',
+    displayUrl: 'luma.lch-app.cloud / experience',
     tags: ['Learning Twin', 'Evidence', 'Adaptive learning'],
     embed: true,
     live: true,
     publicAvailable: true,
-    availabilityLabel: 'Demo interactiva disponible',
+    availabilityLabel: 'Showcase interactivo disponible',
     stat: 'LIVE',
     statLabel: 'demo interactiva',
     icon: BookOpenCheck,
@@ -97,12 +101,55 @@ const products: ProductReference[] = [
     displayUrl: 'meridian.lch-app.cloud / recruiting',
     tags: ['Recruiting CRM', 'Human-in-the-loop', 'Evidence', 'Multi-org'],
     embed: false,
-    live: true,
-    publicAvailable: true,
-    availabilityLabel: 'Demo pública disponible',
+    live: false,
+    publicAvailable: false,
+    availabilityLabel: 'Vista conceptual · demo temporalmente fuera de servicio',
     stat: 'TALENT',
     statLabel: 'human-led intelligence',
     icon: Users,
+  },
+  {
+    id: 'bpca',
+    name: 'Coded Automation',
+    kicker: 'Blue Prism · Automation as Code',
+    label: 'Construir automatizaciones en Blue Prism con la disciplina de ingeniería de software.',
+    description:
+      'BPCA es un SDK y CLI para diseñar, generar y verificar Process y Business Objects con contratos tipados, pruebas y evidencia de cada entrega.',
+    whatIsIt:
+      'Una plataforma de ingeniería que transforma especificaciones verificables en artefactos de Blue Prism y conserva dependencias, pruebas y controles de calidad. Es developer preview: la validación nativa y la certificación en cada versión de Studio son pasos separados.',
+    idealFor: ['Equipos RPA', 'Centros de Excelencia', 'Ingeniería de automatización', 'Equipos de plataforma'],
+    url: '/#contacto',
+    displayUrl: 'LCH / Coded Automation',
+    tags: ['Automation as Code', 'CLI / SDK', 'Quality gates', 'Blue Prism'],
+    embed: false,
+    live: false,
+    publicAvailable: false,
+    availabilityLabel: 'Developer preview · demostración bajo solicitud',
+    stat: 'DEVELOPER PREVIEW',
+    statLabel: 'automation engineering',
+    icon: Code2,
+  },
+  {
+    id: 'electoral',
+    name: 'OS Electoral',
+    kicker: 'CampaignOS · Governed Operations',
+    label: 'Coordinación de campañas con decisiones humanas y evidencia verificable.',
+    description:
+      'CampaignOS organiza equipos, señales de operación, decisiones y fuentes en una experiencia de comando con trazabilidad y límites claros de autoridad.',
+    whatIsIt:
+      'Un sistema en desarrollo para la operación interna de campañas. La demo pública presenta Team Command Center, Daily War Room y Evidence Control Room en modo de solo lectura. Es una representación estática, no un SaaS productivo ni una herramienta de decisiones electorales autónomas.',
+    idealFor: ['Coordinación de campañas', 'Gobernanza interna', 'Gestión de equipos', 'Trazabilidad operativa'],
+    url: 'https://bernydotjar.github.io/OS-Electoral/',
+    displayUrl: 'bernydotjar.github.io / OS-Electoral',
+    tags: ['Campaign Operations', 'Human approval', 'Auditability', 'Read-only demo'],
+    embed: false,
+    live: false,
+    publicAvailable: true,
+    availabilityLabel: 'Demostración estática · no productiva',
+    stat: 'CONCEPT DEMO',
+    statLabel: 'governed campaign operations',
+    actionLabel: 'Abrir demo conceptual',
+    icon: LayoutDashboard,
   },
   {
     id: 'legal',
@@ -226,6 +273,7 @@ const MeridianPreview = () => {
   const { t } = useLocale();
   return (
     <div className="relative h-full overflow-hidden bg-[#f7f8fb] text-slate-900">
+      <span className="pointer-events-none absolute bottom-3 right-3 z-20 rounded-full bg-slate-900/85 px-3 py-1.5 text-[10px] font-semibold text-white shadow-lg">{t('Vista ilustrativa · datos de ejemplo')}</span>
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_12%,rgba(99,102,241,0.16),transparent_30%)]" />
       <div className="relative h-full grid grid-cols-[72px_1fr] sm:grid-cols-[86px_1fr]">
         <aside className="border-r border-slate-200 bg-white/90 p-3 sm:p-4 flex flex-col items-center gap-5">
@@ -326,7 +374,7 @@ const MeridianPreview = () => {
 export const ProductReferences = () => {
   const { t } = useLocale();
   const [activeId, setActiveId] = useState<ProductReference['id']>('ido');
-  const [autoPlay, setAutoPlay] = useState(true);
+  const [autoPlay, setAutoPlay] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const reduceMotion = useReducedMotion();
   const active = useMemo(
@@ -362,7 +410,7 @@ export const ProductReferences = () => {
             className="inline-flex items-center gap-2 text-[11px] sm:text-xs font-mono tracking-[0.22em] uppercase text-sky-200 border border-white/10 bg-white/[0.04] px-4 py-2 rounded-full mb-7"
           >
             <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_18px_rgba(52,211,153,0.8)]" />
-            {t('Real products · real environments')}
+            {t('Productos LCH · experiencias y previews')}
           </motion.div>
 
           <motion.h2
@@ -372,8 +420,8 @@ export const ProductReferences = () => {
             transition={{ delay: 0.05 }}
             className="text-5xl sm:text-6xl lg:text-8xl font-bold tracking-[-0.04em] leading-[0.92]"
           >
-            {t('¿Quieres ver demos?')}
-            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-white via-sky-200 to-cyan-400">{t('Mira.')}</span>
+            {t('Tecnología que')}
+            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-white via-sky-200 to-cyan-400">{t('toma forma.')}</span>
           </motion.h2>
 
           <motion.p
@@ -383,12 +431,51 @@ export const ProductReferences = () => {
             transition={{ delay: 0.1 }}
             className="mt-7 max-w-2xl mx-auto text-base sm:text-lg text-white/55 leading-relaxed"
           >
-            {t('Las ideas son fáciles. Los productos funcionando, no tanto. Explora sistemas que LCH ya convirtió en software real.')}
+            {t('Explora nuestras plataformas, herramientas de ingeniería y laboratorios. Cada ficha distingue experiencias públicas, previews y conceptos en desarrollo.')}
           </motion.p>
         </div>
 
+        <div className="mx-auto mb-16 grid max-w-[1240px] gap-4 md:grid-cols-2 xl:grid-cols-3" aria-label={t('Catálogo de productos LCH')}>
+          {products.map((product) => {
+            const Icon = product.icon;
+            return (
+              <a
+                href={`/productos/${product.id}`}
+                key={product.id}
+                className="group flex min-w-0 flex-col overflow-hidden rounded-[24px] border border-white/12 bg-white/[0.055] text-left shadow-[0_18px_60px_rgba(0,0,0,0.14)] transition-all duration-300 hover:-translate-y-1 hover:border-sky-200/35 hover:bg-white/[0.085] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-300"
+                onClick={() => track('product_demo_select', { product: product.id })}
+              >
+                <div className="relative h-[195px] overflow-hidden">
+                  <ProductArt id={product.id} compact />
+                  <div className="absolute left-4 top-4 inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/25 bg-[#08122b]/60 backdrop-blur-md">
+                    <Icon size={18} />
+                  </div>
+                </div>
+                <div className="flex flex-1 flex-col p-5 sm:p-6">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-sky-200">{t(product.kicker)}</p>
+                  <h3 className="mt-2 text-2xl font-bold tracking-[-0.025em] text-white">{product.name}</h3>
+                  <p className="mt-2 min-h-12 text-sm leading-relaxed text-white/65">{t(product.label)}</p>
+                  <div className="mt-5 flex items-center gap-2 text-[11px] text-white/60">
+                    <span aria-hidden="true" className={`h-1.5 w-1.5 shrink-0 rounded-full ${product.live ? 'bg-emerald-300' : product.publicAvailable ? 'bg-sky-300' : 'bg-amber-300'}`} />
+                    <span>{t(product.availabilityLabel)}</span>
+                  </div>
+                  <div className="mt-5 flex items-center justify-between border-t border-white/10 pt-4 font-semibold text-sky-100">
+                    <span className="text-sm">{t('Conocer el producto')}</span>
+                    <ArrowUpRight size={18} className="transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                  </div>
+                </div>
+              </a>
+            );
+          })}
+        </div>
+
+        <div className="mx-auto mb-6 max-w-5xl text-center">
+          <h3 className="text-2xl font-bold tracking-tight sm:text-3xl">{t('Explora cada experiencia')}</h3>
+          <p className="mt-2 text-sm text-white/55">{t('Selecciona un producto para conocer su propuesta y explorar la demostración disponible.')}</p>
+        </div>
+
         <div className="max-w-5xl mx-auto mb-7" role="tablist" aria-label={t('Demos de productos LCH')}>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 p-2 rounded-2xl bg-white/[0.045] border border-white/10 backdrop-blur-xl">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-2 p-2 rounded-2xl bg-white/[0.045] border border-white/10 backdrop-blur-xl">
             {products.map((product) => {
               const Icon = product.icon;
               const selected = product.id === active.id;
@@ -417,7 +504,7 @@ export const ProductReferences = () => {
                   <div className="relative min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       <span className="font-bold text-sm sm:text-base truncate">{product.name}</span>
-                      <span className={`w-1.5 h-1.5 rounded-full ${product.publicAvailable ? 'bg-emerald-400' : 'bg-amber-300'}`} aria-hidden="true" />
+                      <span className={`w-1.5 h-1.5 rounded-full ${product.live ? 'bg-emerald-400' : product.publicAvailable ? 'bg-sky-300' : 'bg-amber-300'}`} aria-hidden="true" />
                     </div>
                     <div className="text-[10px] sm:text-xs mt-0.5 text-white/40 truncate">{product.kicker}</div>
                   </div>
@@ -465,8 +552,8 @@ export const ProductReferences = () => {
                   <span key={item} className="rounded-full border border-white/10 bg-white/[0.045] px-3 py-1.5 text-[11px] text-white/60">{t(item)}</span>
                 ))}
               </div>
-              <div className={`mt-4 inline-flex items-center gap-2 text-[11px] font-medium ${active.publicAvailable ? 'text-emerald-300' : 'text-amber-200'}`}>
-                <span className={`h-1.5 w-1.5 rounded-full ${active.publicAvailable ? 'bg-emerald-400' : 'bg-amber-300'}`} />
+              <div className={`mt-4 inline-flex items-center gap-2 text-[11px] font-medium ${active.live ? 'text-emerald-300' : active.publicAvailable ? 'text-sky-200' : 'text-amber-200'}`}>
+                <span className={`h-1.5 w-1.5 rounded-full ${active.live ? 'bg-emerald-400' : active.publicAvailable ? 'bg-sky-300' : 'bg-amber-300'}`} />
                 {t(active.availabilityLabel)}
               </div>
             </div>
@@ -507,8 +594,8 @@ export const ProductReferences = () => {
               ) : (
                 <span
                   className="w-8 h-8 shrink-0 rounded-lg inline-flex items-center justify-center text-amber-200/65 bg-amber-300/[0.06]"
-                  aria-label={active.name + ': ' + t('Demo pública temporalmente indisponible')}
-                  title={t('Demo pública temporalmente indisponible')}
+                  aria-label={active.name + ': ' + t(active.id === 'bpca' ? 'Vista técnica bajo solicitud' : 'Demo pública temporalmente indisponible')}
+                  title={t(active.id === 'bpca' ? 'Vista técnica bajo solicitud' : 'Demo pública temporalmente indisponible')}
                 >
                   <ArrowUpRight size={16} />
                 </span>
@@ -522,7 +609,7 @@ export const ProductReferences = () => {
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={reduceMotion ? undefined : { opacity: 0, scale: 0.994, y: -5 }}
                 transition={{ duration: 0.24, ease: 'easeOut' }}
-                className="relative h-[600px] sm:h-[680px] lg:h-[720px] bg-white"
+                className={`relative ${active.id === 'bpca' || active.id === 'electoral' ? 'h-[400px] sm:h-[480px]' : 'h-[600px] sm:h-[680px] lg:h-[720px]'} bg-white`}
               >
                 {active.embed ? (
                   <iframe
@@ -535,6 +622,8 @@ export const ProductReferences = () => {
                   />
                 ) : active.id === 'meridian' ? (
                   <MeridianPreview />
+                ) : active.id === 'bpca' || active.id === 'electoral' ? (
+                  <ProductArt id={active.id} />
                 ) : (
                   <IdoPreview />
                 )}
@@ -560,6 +649,9 @@ export const ProductReferences = () => {
               </div>
               <h3 className="text-2xl sm:text-3xl font-bold tracking-tight">{t(active.label)}</h3>
               <p className="mt-3 text-sm sm:text-base text-white/50 leading-relaxed max-w-2xl">{t(active.description)}</p>
+              <a href={`/productos/${active.id}`} className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-sky-200 hover:text-white">
+                {t('Ver ficha del producto')} <ArrowRight size={15} />
+              </a>
               <div className="flex flex-wrap gap-2 mt-5">
                 {active.tags.map((tag) => (
                   <span key={tag} className="text-[11px] text-white/55 border border-white/10 bg-white/[0.035] rounded-full px-3 py-1.5">
@@ -576,8 +668,12 @@ export const ProductReferences = () => {
                 rel="noreferrer"
                 className="group inline-flex items-center justify-center gap-3 bg-white text-primary px-5 py-3.5 rounded-xl font-bold text-sm hover:bg-sky-100 transition-colors"
               >
-                {t('Explorar')} {active.name}
+                {t(active.actionLabel ?? 'Explorar')} {active.actionLabel ? '' : active.name}
                 <ArrowUpRight size={16} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+              </a>
+            ) : active.id === 'bpca' ? (
+              <a href="/#contacto" className="inline-flex items-center justify-center gap-3 rounded-xl bg-white px-5 py-3.5 text-sm font-bold text-primary transition-colors hover:bg-sky-100">
+                {t('Solicitar demo técnica')} <ArrowRight size={16} />
               </a>
             ) : (
               <div className="inline-flex items-center justify-center gap-3 border border-amber-200/15 bg-amber-300/[0.06] text-amber-100 px-5 py-3.5 rounded-xl font-semibold text-sm cursor-not-allowed">
@@ -589,7 +685,7 @@ export const ProductReferences = () => {
 
         <div className="max-w-[1240px] mx-auto mt-12 pt-6 border-t border-white/10 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between text-[10px] sm:text-xs text-white/30 font-mono tracking-wide uppercase">
           <span>{t('Built by LCH Technologies · systems, not slides')}</span>
-          <span>{t('Product Lab / 04 product references')}</span>
+          <span>{t('Product Lab / 06 product references')}</span>
         </div>
       </div>
     </section>
