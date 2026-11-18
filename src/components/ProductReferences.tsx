@@ -21,7 +21,7 @@ import { useLocale } from '../i18n/LocaleProvider';
 import { track } from '../analytics/client';
 
 type ProductReference = {
-  id: 'ido' | 'luma' | 'meridian';
+  id: 'ido' | 'luma' | 'meridian' | 'asii';
   name: string;
   kicker: string;
   label: string;
@@ -82,6 +82,27 @@ const products: ProductReference[] = [
     stat: 'LIVE',
     statLabel: 'demo interactiva',
     icon: BookOpenCheck,
+  },
+  {
+    id: 'asii',
+    name: 'ASII',
+    kicker: 'Private Knowledge Intelligence',
+    label: 'Investigación municipal respaldada por fuentes, pasajes y trazabilidad.',
+    description:
+      'Plataforma privada de consulta del Second Brain: búsqueda FTS5, citas al minuto de origen, contexto documental y herramientas MCP de solo lectura. El acceso está restringido a usuarios autorizados.',
+    whatIsIt:
+      'ASII permite recuperar evidencia histórica y documental de La Antigua Guatemala mediante consultas de texto, temas municipales y enlaces a fuentes originales. Los subtítulos automáticos no se presentan como hechos verificados.',
+    idealFor: ['Investigación documental', 'Knowledge operations', 'Auditoría de fuentes', 'Agentes IA'],
+    url: 'https://asii.lch-app.cloud/',
+    displayUrl: 'asii.lch-app.cloud / acceso privado',
+    tags: ['SQLite FTS5', 'RAG', 'MCP', 'Acceso privado'],
+    embed: false,
+    live: false,
+    publicAvailable: false,
+    availabilityLabel: 'Acceso privado · despliegue en preparación',
+    stat: 'PRIVATE',
+    statLabel: 'evidence workspace',
+    icon: ShieldCheck,
   },
   {
     id: 'meridian',
@@ -300,6 +321,55 @@ const MeridianPreview = () => {
   );
 };
 
+/** Public illustration only. Never embeds or fetches the private ASII origin. */
+const AsiiPreview = () => {
+  const { t } = useLocale();
+  return (
+    <div className="relative flex h-full flex-col overflow-hidden bg-[#f7f8f4] text-[#18382e]">
+      <div className="flex items-center justify-between border-b border-[#e2e8dc] bg-[#15372b] px-6 py-5 text-white sm:px-10">
+        <div className="flex items-center gap-3">
+          <span className="font-serif text-3xl font-bold tracking-tighter text-[#e5efcf]">a<span className="text-[#d9a86a]">!</span></span>
+          <div>
+            <div className="text-sm font-bold tracking-[0.12em]">ASII</div>
+            <div className="text-[10px] text-white/55">Private Knowledge Intelligence</div>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-3 py-2 text-[10px] font-semibold text-white/75">
+          <ShieldCheck size={14} />{t('Acceso privado')}
+        </div>
+      </div>
+      <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col justify-center px-6 py-10 sm:px-12 lg:py-14">
+        <div className="mb-5 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#52795e]">
+          <Sparkles size={14} />{t('Fuentes antes que conclusiones')}
+        </div>
+        <h4 className="max-w-2xl text-4xl font-semibold leading-tight tracking-[-0.04em] sm:text-5xl">
+          {t('Una pregunta.')} <span className="font-serif font-normal italic text-[#6e8c71]">{t('La evidencia.')}</span>
+        </h4>
+        <div className="mt-8 flex items-center gap-3 rounded-xl border border-[#cadace] bg-white p-4 shadow-sm sm:p-5">
+          <Search className="shrink-0 text-[#66836c]" size={20} />
+          <span className="flex-1 text-xs text-[#819488] sm:text-sm">{t('¿Qué se ha dicho sobre el agua potable?')}</span>
+          <span className="flex shrink-0 items-center justify-center rounded-lg bg-[#234e38] px-3 py-2 text-xs font-semibold text-white">↗</span>
+        </div>
+        <div className="mt-6 grid gap-3 sm:grid-cols-2">
+          <div className="rounded-xl border border-[#e1e9df] bg-white p-5 shadow-sm">
+            <div className="mb-3 flex items-center gap-2 text-[10px] font-semibold text-[#64836e]"><FileText size={15}/>{t('PASAJES Y FUENTES')}</div>
+            <div className="h-2 w-4/5 rounded bg-[#dce7dc]" />
+            <div className="mt-3 h-2 w-full rounded bg-[#edf1e9]" />
+            <div className="mt-2 h-2 w-3/5 rounded bg-[#edf1e9]" />
+          </div>
+          <div className="rounded-xl border border-[#e1e9df] bg-white p-5 shadow-sm">
+            <div className="mb-3 flex items-center gap-2 text-[10px] font-semibold text-[#64836e]"><Database size={15}/>{t('CONTEXTO VERIFICABLE')}</div>
+            <div className="h-2 w-3/4 rounded bg-[#dce7dc]" />
+            <div className="mt-3 h-2 w-full rounded bg-[#edf1e9]" />
+            <div className="mt-2 h-2 w-1/2 rounded bg-[#edf1e9]" />
+          </div>
+        </div>
+        <p className="mt-6 flex items-center gap-2 text-[11px] text-[#829689]"><ShieldCheck size={14}/>{t('Vista ilustrativa · datos privados no expuestos')}</p>
+      </div>
+    </div>
+  );
+};
+
 export const ProductReferences = () => {
   const { t } = useLocale();
   const [activeId, setActiveId] = useState<ProductReference['id']>('ido');
@@ -352,7 +422,7 @@ export const ProductReferences = () => {
         </div>
 
         <div className="max-w-5xl mx-auto mb-7" role="tablist" aria-label={t('Demos de productos LCH')}>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 p-2 rounded-2xl bg-white/[0.045] border border-white/10 backdrop-blur-xl">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 p-2 rounded-2xl bg-white/[0.045] border border-white/10 backdrop-blur-xl">
             {products.map((product) => {
               const Icon = product.icon;
               const selected = product.id === active.id;
@@ -482,6 +552,8 @@ export const ProductReferences = () => {
                   />
                 ) : active.id === 'meridian' ? (
                   <MeridianPreview />
+                ) : active.id === 'asii' ? (
+                  <AsiiPreview />
                 ) : (
                   <IdoPreview />
                 )}
@@ -528,7 +600,7 @@ export const ProductReferences = () => {
               </a>
             ) : (
               <div className="inline-flex items-center justify-center gap-3 border border-amber-200/15 bg-amber-300/[0.06] text-amber-100 px-5 py-3.5 rounded-xl font-semibold text-sm cursor-not-allowed">
-                {t('Demo pública en mantenimiento')}
+                {active.id === 'asii' ? t('Acceso restringido · solicitar autorización') : t('Demo pública en mantenimiento')}
               </div>
             )}
           </motion.div>
@@ -563,7 +635,7 @@ export const ProductReferences = () => {
 
         <div className="max-w-[1240px] mx-auto mt-12 pt-6 border-t border-white/10 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between text-[10px] sm:text-xs text-white/30 font-mono tracking-wide uppercase">
           <span>{t('Built by LCH Technologies · systems, not slides')}</span>
-          <span>{t('Product Lab / 03 product references')}</span>
+          <span>{t('Product Lab / 04 product references')}</span>
         </div>
       </div>
     </section>
